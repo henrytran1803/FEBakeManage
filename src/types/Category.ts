@@ -39,5 +39,25 @@ export interface CategoryListProps {
     categories: Category[];
     onCategoryAdded: () => void;
     onCategoryDeleted: (category: Category) => void;
-    onCategoryUpdated: () => void;
+    onCategoryUpdated: (category: Category) => void;
+}
+export interface CategorySheetProps {
+    isOpen: boolean;
+    onClose: () => void;
+    category?: Category;
+    onSuccess: (isSuccess: boolean) => void;
+}
+export interface SearchPromotionFilterProps {
+    searchTerm: string;
+    setSearchTerm: (value: string) => void;
+    activeFilter: 'all' | 'active' | 'inactive';
+    setActiveFilter: (value: 'all' | 'active' | 'inactive') => void;
+    sortConfig: {
+        sortBy: string;
+        sortDir: 'asc' | 'desc';
+    };
+    setSortConfig: (value: { sortBy: string; sortDir: 'asc' | 'desc' }) => void;
+    setPage: (page: number) => void;
+    dateFilter: 'all' | 'upcoming' | 'ongoing' | 'ended';
+    setDateFilter: (value: 'all' | 'upcoming' | 'ongoing' | 'ended') => void;
 }

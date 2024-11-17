@@ -42,7 +42,7 @@ export const categoryService = {
                 throw new Error('Failed to create category');
             }
     },
-    updateCategory: async (id :number, name: string, active: boolean, isChange: Boolean, file: File, fileName: string)=>{
+    updateCategory: async (id :number, name: string, active: boolean, isChange: boolean, file: File, fileName: string)=>{
         try{
             if(isChange){
                 await uploadService.deleteImageSingle(fileName)
@@ -75,6 +75,14 @@ export const categoryService = {
             return response;
         } catch (error) {
             throw new Error('Failed to delete category');
+        }
+    },
+    getAllCategories: async () => {
+        try {
+            const response = await categoryApi.getAll();
+            return response;
+        } catch (error) {
+            throw new Error('Failed to get all category');
         }
     }
 };

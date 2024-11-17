@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import {Edit, Trash2, Plus, Check} from "lucide-react";
 import { CategoryListProps} from "@/types/Category";
+import {getImageUrl} from "@/utils/imageUtils.ts";
 
 
 export default function CategoryList({
@@ -17,6 +18,8 @@ export default function CategoryList({
                                          onCategoryDeleted,
                                          onCategoryUpdated
                                      }: CategoryListProps) {
+
+
     return (
         <div>
             <div className="mb-4 flex justify-end">
@@ -47,7 +50,7 @@ export default function CategoryList({
                                 </TableCell>
                                 <TableCell>
                                     <img
-                                        src={category.imageUrl}
+                                        src={getImageUrl(category.imageUrl)}
                                         alt={category.name}
                                         className="w-16 h-16 object-cover rounded-md"
                                     />
@@ -71,7 +74,7 @@ export default function CategoryList({
                                         <Button
                                             variant="outline"
                                             size="icon"
-                                            onClick={() => onCategoryUpdated()}
+                                            onClick={() => onCategoryUpdated(category)}
                                         >
                                             <Edit className="h-4 w-4" />
                                         </Button>

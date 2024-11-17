@@ -1,10 +1,11 @@
 import { Routes, Route } from "react-router-dom";
 import LoginPage from "@/pages/LoginPage";
 import NotFound from "@/pages/NotFound";
-import { ProductPage } from "@/pages/ProductPage";
 import { CategoryPage } from "@/pages/CategoryPage";
 import { HomePage } from "@/pages/HomePage";
 import {AdminLayout} from "@/layouts/AdminLayout.tsx";
+import ProductPage from "@/pages/ProductPage.tsx";
+import {PromotionPage} from "@/pages/PromotionPage.tsx";
 
 const AppRoutes: React.FC = () => {
     return (
@@ -15,7 +16,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="home" element={<HomePage />} />
                 <Route path="product" element={<ProductPage />} />
                 <Route path="category" element={<CategoryPage />} />
-                <Route path="discount" element={<CategoryPage />} />
+                <Route path="discount" element={<PromotionPage />} />
                 <Route path="recipe" element={<CategoryPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />

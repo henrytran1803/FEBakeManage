@@ -1,11 +1,10 @@
-// pages/CategoryPage/index.tsx
 import { useEffect, useState } from "react";
 import LoadingScreen from "@/pages/LoadingScreen";
-import { SearchFilter } from "@/components/SearchCategoryFilter";
-import CategoryList from "@/components/CategoryList";
+import { PromotionSearchFilter } from "@/components/PromotionSearchFilter";
+import PromotionList from "@/components/PromotionList";
 import { TablePagination } from "@/components/TablePagination";
-import { Category } from "@/types/Category";
-import { categoryService } from "@/services/categoryService";
+import { Promotion } from "@/types/promotion";
+import { promotionService } from "@/services/promotionService";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -16,18 +15,22 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {useToast} from "@/hooks/use-toast.ts";
-import CategorySheet from "@/components/CategorySheet.tsx";
-import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
-import {CheckCircle, ExpandIcon} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CheckCircle, ExpandIcon } from "lucide-react";
+import PromotionSheet from "@/components/PromotionSheet.tsx";
 
-export function CategoryPage() {
+export function PromotionPage() {
     // States
-    const [categories, setCategories] = useState<Category[]>([]);
+    const [promotions, setPromotions] = useState<Promotion[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
-    const [sortConfig, setSortConfig] = useState<'asc' | 'desc'>('asc');
+    const [dateFilter, setDateFilter] = useState<'all' | 'upcoming' | 'ongoing' | 'ended'>('all');
+    const [sortConfig, setSortConfig] = useState({
+        sortBy: 'name',
+        sortDir: 'asc' as 'asc' | 'desc'
+    });
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
@@ -35,7 +38,7 @@ export function CategoryPage() {
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isDeleteOpenActive, setIsDeleteOpenActive] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
+    const [selectedPromotion, setSelectedPromotion] = useState<Promotion | undefined>(undefined);
     const [alert, setAlert] = useState<{
         show: boolean;
         type: 'error' | 'success';
@@ -47,31 +50,35 @@ export function CategoryPage() {
         title: '',
         message: ''
     });
-    const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
+    const [promotionToDelete, setPromotionToDelete] = useState<number | null>(null);
     const { toast } = useToast();
-    const fetchCategories = async () => {
+
+    const fetchPromotions = async () => {
         try {
             setLoading(true);
-            const response = await categoryService.searchCategories({
+            const response = await promotionService.searchPromotions({
                 page,
                 size,
-                search: searchTerm,
-                activeFilter,
-                sortConfig,
+                sortBy: sortConfig.sortBy,
+                sortDir: sortConfig.sortDir,
+                name: searchTerm,
+                isActive: activeFilter === 'all' ? undefined : activeFilter === 'active'
             });
 
             if (response.success) {
                 const { content, totalPages: total, totalElements: elements } = response.data;
-                setCategories(content);
+                setPromotions(content);
                 setTotalPages(total);
                 setTotalElements(elements);
+                console.log(response)
+                console.log(promotions)
 
             }
         } catch (error) {
             toast({
                 variant: "destructive",
                 title: "Lỗi",
-                description: "Không thể tải danh sách danh mục",
+                description: "Không thể tải danh sách khuyến mãi",
             });
         } finally {
             setLoading(false);
@@ -79,13 +86,8 @@ export function CategoryPage() {
     };
 
     useEffect(() => {
-        fetchCategories();
-    }, [page, size, searchTerm, activeFilter, sortConfig]);
-    const handleCategoryAdded = () => {
-        setSelectedCategory(undefined);
-        setIsSheetOpen(true);
-        fetchCategories();
-    };
+        fetchPromotions();
+    }, [page, size, searchTerm, activeFilter, sortConfig, dateFilter]);
 
     const showAlert = (type: 'error' | 'success', title: string, message: string) => {
         setAlert({
@@ -94,69 +96,63 @@ export function CategoryPage() {
             title,
             message
         });
-        // Auto hide after 3 seconds
         setTimeout(() => {
             setAlert(prev => ({ ...prev, show: false }));
         }, 3000);
     };
-    const onSuccess = (isSuccess: boolean) => {
-        if (isSuccess) {
-            showAlert('success', 'Thành công', 'Cập nhật danh mục thành công');
-            fetchCategories()
-        }else {
-            showAlert('error', 'Lỗi', 'Kích thước file không được vượt quá 5MB');
-
-        }
-    }
-    const handleCategoryUpdated = (category: Category) => {
-        setSelectedCategory(category);
+    console.log(showAlert)
+    const handlePromotionAdded = () => {
+        setSelectedPromotion(undefined);
         setIsSheetOpen(true);
-        fetchCategories();
     };
-    const handleDeleteClick = (category: Category) => {
-        setCategoryToDelete(category.id);
-        if (category.isActive){
+
+    const handlePromotionUpdated = (promotion: Promotion) => {
+        setSelectedPromotion(promotion);
+        setIsSheetOpen(true);
+    };
+
+    const handleDeleteClick = (promotion: Promotion) => {
+        setPromotionToDelete(promotion.id);
+        if (promotion.isActive) {
             setIsDeleteOpen(true);
-        }else {
+        } else {
             setIsDeleteOpenActive(true);
         }
-
-
     };
 
     const handleDeleteConfirm = async () => {
-        if (!categoryToDelete) return;
+        if (!promotionToDelete) return;
 
         try {
-            const response = await categoryService.deleteCategory(categoryToDelete);
+            const response = await promotionService.deletePromotion(promotionToDelete);
             if (response.success) {
                 toast({
                     title: "Thành công",
-                    description: "Đã xóa danh mục",
+                    description: "Đã cập nhật trạng thái khuyến mãi",
                 });
-                fetchCategories();
+                fetchPromotions();
             }
         } catch (error) {
             toast({
                 variant: "destructive",
                 title: "Lỗi",
-                description: "Không thể xóa danh mục",
+                description: "Không thể cập nhật trạng thái khuyến mãi",
             });
         } finally {
             setIsDeleteOpen(false);
             setIsDeleteOpenActive(false);
-            setCategoryToDelete(null);
+            setPromotionToDelete(null);
         }
     };
 
     return (
         <div className="p-4 min-w-[85vw]">
             {loading ? (
-            <LoadingScreen />
+                <LoadingScreen />
             ) : (
                 <>
-                    <h1 className="text-2xl font-bold mb-6">Quản lý danh mục</h1>
-                    <SearchFilter
+                    <h1 className="text-2xl font-bold mb-6">Quản lý khuyến mãi</h1>
+                    <PromotionSearchFilter
                         searchTerm={searchTerm}
                         setSearchTerm={setSearchTerm}
                         activeFilter={activeFilter}
@@ -164,13 +160,15 @@ export function CategoryPage() {
                         sortConfig={sortConfig}
                         setSortConfig={setSortConfig}
                         setPage={setPage}
+                        dateFilter={dateFilter}
+                        setDateFilter={setDateFilter}
                     />
 
-                    <CategoryList
-                        categories={categories}
-                        onCategoryAdded={handleCategoryAdded}
-                        onCategoryDeleted={handleDeleteClick}
-                        onCategoryUpdated={handleCategoryUpdated}
+                    <PromotionList
+                        promotions={promotions}
+                        onPromotionAdded={handlePromotionAdded}
+                        onPromotionDeleted={handleDeleteClick}
+                        onPromotionUpdated={handlePromotionUpdated}
                     />
 
                     <TablePagination
@@ -180,7 +178,7 @@ export function CategoryPage() {
                         setSize={setSize}
                         totalPages={totalPages}
                         totalElements={totalElements}
-                        currentPageElements={categories.length}
+                        currentPageElements={promotions.length}
                     />
 
                     <AlertDialog
@@ -189,10 +187,10 @@ export function CategoryPage() {
                     >
                         <AlertDialogContent>
                             <AlertDialogHeader>
-                                <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
+                                <AlertDialogTitle>Xác nhận vô hiệu hóa</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    Bạn có chắc chắn muốn xóa danh mục này?
-                                    Hành động này không thể hoàn tác.
+                                    Bạn có chắc chắn muốn vô hiệu hóa khuyến mãi này?
+                                    Các sản phẩm trong khuyến mãi sẽ không còn được áp dụng giảm giá.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
@@ -201,20 +199,22 @@ export function CategoryPage() {
                                     onClick={handleDeleteConfirm}
                                     className="bg-red-600 hover:bg-red-700"
                                 >
-                                    Xóa
+                                    Vô hiệu hóa
                                 </AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
+
                     <AlertDialog
                         open={isDeleteOpenActive}
                         onOpenChange={setIsDeleteOpenActive}
                     >
                         <AlertDialogContent>
                             <AlertDialogHeader>
-                                <AlertDialogTitle>Xác nhận kích hoạt lại</AlertDialogTitle>
+                                <AlertDialogTitle>Xác nhận kích hoạt</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    Bạn có chắc chắn muốn kích hoạt danh mục này?
+                                    Bạn có chắc chắn muốn kích hoạt lại khuyến mãi này?
+                                    Tất cả sản phẩm trong khuyến mãi sẽ được áp dụng giảm giá.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
@@ -228,6 +228,7 @@ export function CategoryPage() {
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
+
                     {alert.show && (
                         <Alert variant={alert.type === 'error' ? "destructive" : "default"} className="mt-4">
                             {alert.type === 'error' ? (
@@ -241,11 +242,23 @@ export function CategoryPage() {
                             </AlertDescription>
                         </Alert>
                     )}
-                    <CategorySheet
+
+
+                    <PromotionSheet
                         isOpen={isSheetOpen}
                         onClose={() => setIsSheetOpen(false)}
-                        category={selectedCategory}
-                        onSuccess={onSuccess}
+                        promotion={selectedPromotion}
+                        onSuccess={(success) => {
+                            if (success) {
+                                showAlert('success', 'Thành công', selectedPromotion
+                                    ? 'Cập nhật khuyến mãi thành công'
+                                    : 'Thêm khuyến mãi thành công'
+                                );
+                                fetchPromotions();
+                            } else {
+                                showAlert('error', 'Lỗi', 'Có lỗi xảy ra');
+                            }
+                        }}
                     />
                 </>
             )}

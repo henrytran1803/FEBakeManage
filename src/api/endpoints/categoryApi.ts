@@ -40,5 +40,9 @@ export const categoryApi = {
     delete: async (id: number): Promise<ApiResponse<void>> => {
         const response = await api.delete(`/api/categories/${id}`);
         return response.data;
+    },
+    getAll: async (): Promise<ApiResponse<Category[]>> => {
+        const response = await api.get(`/api/categories`);
+        return response.data;
     }
 };
