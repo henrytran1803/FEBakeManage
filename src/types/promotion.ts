@@ -88,3 +88,11 @@ export interface PromotionSheetProps {
     promotion?: Promotion;
     onSuccess: (isSuccess: boolean) => void;
 }
+
+export interface PromotionDaily {
+    discount: number;
+    productBatchIds: number[];
+    endDate: string;
+    skipDefaultDiscount: boolean;
+    getLastestDate:boolean;
+}

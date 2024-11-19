@@ -16,6 +16,7 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import {ProductFormSheet} from "@/components/ProductFormSheet.tsx";
+import {useNavigate} from "react-router-dom";
 
 const ProductPage: React.FC = () => {
     // State declarations
@@ -97,6 +98,11 @@ const ProductPage: React.FC = () => {
 
         }
     };
+    const navigate = useNavigate();
+
+    const handleOpenManageExpiry = () => {
+        navigate("/admin/manageexpiry")
+    }
     const handleDeleteConfirm = async () => {
         try {
             const response = await productService.updateStatus(idDelete);
@@ -153,6 +159,7 @@ const ProductPage: React.FC = () => {
                 <Button
                     variant="outline"
                     className="inline-flex items-center"
+                    onClick={handleOpenManageExpiry}
                 >
                     <Clock className="w-5 h-5 mr-2"/>
                     Quản lý hạn sử dụng
@@ -220,7 +227,6 @@ const ProductPage: React.FC = () => {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            // Trong ProductPage
             <ProductFormSheet
                 isOpen={isFormOpen}
                 onClose={() => setIsFormOpen(false)}

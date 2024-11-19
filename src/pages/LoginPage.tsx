@@ -4,7 +4,7 @@ import {useState} from "react";
 import {ApiResponse} from "@/types/ApiResponse.ts";
 import {LoginData} from "@/types/Auth.ts";
 import {login} from "@/services/AuthService.ts";
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 const LoginPage: React.FC = () => {
@@ -12,7 +12,7 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error , setError] = useState<string | null>(null);
-// const navigate = useNavigate();
+  const navigate = useNavigate();
   const handleLogin = async ( email: string, password: string) => {
     setIsLoading(true);
     setError(null);
@@ -20,7 +20,7 @@ const LoginPage: React.FC = () => {
       const result: ApiResponse<LoginData> = await login(email, password);
       if (result.success) {
         const roles = result.data.user.roles;
-        // navigate(roles.includes("manage") ? "/admin/home" : "/dashboard");
+        navigate(roles.includes("manage") ? "/admin/home" : "/dashboard");
         console.log(roles);
       } else {
         setError(result.message || "Login failed. Please check your credentials.");

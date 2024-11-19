@@ -1,6 +1,6 @@
 import {
     PaginatedPromotionResponse, Promotion,
-    PromotionCreate, PromotionDetail, PromotionDetailCreate, PromotionForDetail,
+    PromotionCreate, PromotionDaily, PromotionDetail, PromotionDetailCreate, PromotionForDetail,
     PromotionSearchParams,
     PromotionUpdate
 } from "@/types/promotion.ts";
@@ -46,6 +46,10 @@ export const promotionApi = {
     },
     updateStatus: async (promotionId: number): Promise<ApiResponse<void>> => {
         const response = await api.delete(`/api/promotions/${promotionId}`);
+        return response.data;
+    },
+    createDailyPromotion: async (data: PromotionDaily): Promise<ApiResponse<void>> => {
+        const response = await api.post(`/api/promotions/quick`, data);
         return response.data;
     },
 };

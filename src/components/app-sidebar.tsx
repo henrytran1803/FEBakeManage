@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/sidebar"
 import {useEffect, useState} from "react";
 import {User} from "@/types/Auth.ts";
+import {logout} from "@/services/AuthService.ts";
+import {useNavigate} from "react-router-dom";
 
 const items = [
     {
@@ -52,7 +54,12 @@ const items = [
 
 export function AppSidebar() {
     const [user, setUser] = useState<User | null>(null);
+    const navigate = useNavigate();
 
+    const handleLogout = () => {
+        logout(); // Xóa các thông tin authentication
+        navigate('/login'); // Chuyển hướng về trang login
+    };
     useEffect(() => {
         const userData = localStorage.getItem('user');
         if (userData) {
@@ -86,7 +93,7 @@ export function AppSidebar() {
                 </SidebarGroup>
             </SidebarContent>
 
-            <SidebarFooter className="border-t p-4"> {/* Add padding & border */}
+            <SidebarFooter className="border-t p-4">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <DropdownMenu>
@@ -102,7 +109,8 @@ export function AppSidebar() {
                                 align="start"
                                 className="w-56"
                             >
-                                <DropdownMenuItem className="text-red-600">
+                                <DropdownMenuItem className="text-red-600"
+                                    onClick={handleLogout}>
                                     Logout
                                 </DropdownMenuItem>
                             </DropdownMenuContent>

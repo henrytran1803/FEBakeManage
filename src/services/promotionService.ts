@@ -1,7 +1,7 @@
 
 import {promotionApi} from "@/api/endpoints/promotionApi.ts";
 import {
-    PromotionCreate,
+    PromotionCreate, PromotionDaily,
     PromotionDetailCreate,
     PromotionSearchParams,
     PromotionUpdate
@@ -37,6 +37,14 @@ export const promotionService = {
     createPromotion: async (data: PromotionCreate) => {
         try {
             const response = await promotionApi.create(data);
+            return response;
+        } catch (error) {
+            throw new Error('Failed to create promotion');
+        }
+    },
+    createPromotionDaily: async (data: PromotionDaily) => {
+        try {
+            const response = await promotionApi.createDailyPromotion(data);
             return response;
         } catch (error) {
             throw new Error('Failed to create promotion');
