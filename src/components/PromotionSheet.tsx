@@ -375,10 +375,10 @@ export default function PromotionSheet({
                     </span>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                {batch.currentDiscount > 0 && (
+                                                {batch.dailyDiscount > 0 && (
                                                     <span
-                                                        className={`text-xs px-2 py-1 rounded ${getDiscountColor(batch.currentDiscount)}`}>
-                                                -{batch.currentDiscount}%
+                                                        className={`text-xs px-2 py-1 rounded ${getDiscountColor(batch.dailyDiscount)}`}>
+                                                -{batch.dailyDiscount}%
                                               </span>
                                                 )}
                                                 {batch.countDown > 0 && (

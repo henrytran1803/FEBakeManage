@@ -118,7 +118,6 @@ export function ManageExpiryPage() {
                   </span>
                                 </TableCell>
                                 <TableCell>{product.dateExpiry}</TableCell>
-                                <TableCell>{product.currentDiscount}%</TableCell>
                                 <TableCell>{product.dailyDiscount}%</TableCell>
                                 <TableCell>{product.countDown} days</TableCell>
                                 <TableCell>{product.quantity}</TableCell>

@@ -1,3 +1,6 @@
+import {Price} from "@/types/price.ts";
+import {CartItem} from "@/types/productBatch.ts";
+
 export interface SearchProductParams {
     page?: number;
     size?: number;
@@ -24,6 +27,9 @@ export interface SearchProductFilterProps {
     setPriceRange: (value: { min: number | null; max: number | null } | ((prev: { min: number | null; max: number | null }) => { min: number | null; max: number | null })) => void;
     setPage: (value: number) => void;
 }
+
+
+
 
 export interface UpdateStatusParams {
     status: boolean;
@@ -105,6 +111,34 @@ export interface PaginatedProductResponse {
     size: number;
     number: number;
 }
+
+export interface PaginatedProductActiveResponse {
+    content: SearchProductActiveResponse[];
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
+}
+
+export  interface SearchProductActiveResponse {
+    id: number;
+    name: string;
+    imageUrl: string;
+    categoryId: number;
+    categoryName: string;
+    maxDailyDiscount: number;
+    totalQuantity: number;
+    price: number;
+}
+export interface SearchProductActiveParams {
+    productName?: string;
+    categoryIds?: number[];
+    page?: number;
+    size?: number;
+    sortBy?: string;
+    sortDirection?: 'asc' | 'desc';
+}
+
 export interface ProductTableProps {
     products: Product[];
     onEdit: (product: Product) => void;
@@ -116,3 +150,46 @@ export interface ProductFormSheetProps {
     onSuccess: () => void;
     productId?: number | null;
 }
+export interface ProductDetailActive {
+    id : number;
+    name: string;
+    description: string;
+    currentPrice: number;
+    category: CategoryActive;
+    productBatches: ProductBatchActive[];
+    imageUrls: string[]
+}
+export interface ProductBatchActive {
+    id : number;
+    expirationDate: string;
+    status: boolean;
+    dailyDiscount: number;
+}
+export interface CategoryActive{
+    id: number;
+    name: string;
+}
+export interface DetailProductActiveResponse {
+    active: ProductDetailActive;
+    prices: Price[];
+}
+export interface ProductCart {
+    productBatchId:number;
+    quantity:number;
+    quantityRemain: number;
+    name: string;
+    dailyDiscount: number;
+    discountBonus: number;
+    categoryName: string;
+    price: number;
+    imageUrl: string;
+}
+export interface ProductCartRequest {
+    discountCode:string;
+    productBatchCarts: CartItem[];
+}
+// productBatchCarts": [
+// {
+//     "productBatchId": 1,
+//     "quantity": 2
+// },

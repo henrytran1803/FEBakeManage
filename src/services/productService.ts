@@ -1,6 +1,14 @@
 import {productApi} from "@/api/endpoints/productApi.ts";
-import {ProductCreate, ProductImage, ProductUpdate} from "@/types/product.ts";
+import {
+    DetailProductActiveResponse, ProductCart, ProductCartRequest,
+    ProductCreate,
+    ProductImage,
+    ProductUpdate,
+    SearchProductActiveParams
+} from "@/types/product.ts";
 import {uploadService} from "@/services/uploadService.ts";
+import {priceApi} from "@/api/endpoints/priceApi.ts";
+import {ApiResponse} from "@/types/ApiResponse.ts";
 
 export const productService = {
     searchProducts: async (params: {
@@ -32,6 +40,24 @@ export const productService = {
 
         } catch (error) {
             throw new Error('Failed to fetch products');
+        }
+    },
+    searchActive: async (params: SearchProductActiveParams) => {
+        try {
+            const apiParams = {
+                page: params.page,
+                size: params.size,
+                sortBy: params.sortBy || 'name',
+                sortDirection: params.sortDirection || 'asc',
+                productName: params.productName || undefined,
+                categoryIds: params.categoryIds || undefined
+            };
+
+            const response = await productApi.searchActive(apiParams);
+            return response;
+
+        } catch (error) {
+            throw new Error('Failed to fetch active products');
         }
     },
     create: async (data: {
@@ -106,5 +132,35 @@ export const productService = {
         } catch (error) {
             throw new Error('Failed to get product details');
         }
+    },
+
+    getDetailProduct: async (id: number): Promise<DetailProductActiveResponse> => {
+        try {
+            const [activeResponse, pricesResponse] = await Promise.all([
+                productApi.getProductActive(id),
+                priceApi.getById(id)
+            ]);
+
+            const response: DetailProductActiveResponse = {
+                active: activeResponse.data,
+                prices: pricesResponse.data
+            };
+
+            return response;
+        } catch (error) {
+            throw new Error('Failed to get product details');
+        }
+    },
+    getProductCart: async (data: ProductCartRequest): Promise<ApiResponse<ProductCart[]>> => {
+        try {
+            const response = productApi.getProductCart(data);
+
+            return response;
+        } catch (error) {
+            throw new Error('Failed to get product details');
+        }
     }
+
+
+
 }
