@@ -1,6 +1,6 @@
 'use client'
 
-import { Ticket, ChevronUp, Home, Boxes, Settings, User2 , Box} from 'lucide-react'
+import { Ticket, ChevronUp, Home, Boxes, Settings, User2 , Box,FileText} from 'lucide-react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -50,6 +50,11 @@ const items = [
         url: "/admin/recipe",
         icon: Settings,
     },
+    {
+        title: "Bill",  // Mới thêm mục Bill vào menu
+        url: "/admin/bills", // Địa chỉ URL của trang Bill
+        icon: FileText, // Sử dụng icon hóa đơn
+      },
 ]
 
 export function AppSidebar() {
