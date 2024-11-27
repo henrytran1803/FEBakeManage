@@ -13,6 +13,7 @@ const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error , setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
   const handleLogin = async ( email: string, password: string) => {
     setIsLoading(true);
     setError(null);
@@ -31,6 +32,7 @@ const LoginPage: React.FC = () => {
       setIsLoading(false);
     }
   };
+ 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

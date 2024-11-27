@@ -13,6 +13,7 @@ import HomePage from "@/pages/HomePage.tsx";
 import {UserLayout} from "@/layouts/UserLayout.tsx";
 import ProductDetailPage from "@/pages/ProductDetailPage.tsx";
 import CartPage from "@/pages/CartPage.tsx";
+import BillList from "./pages/BillList";
 import IngredientPage  from "./pages/IngredientPage";   
 import ImportHistoryPage from './pages/ImportHistoryPage';
 import ExportHistoryPage from './pages/ExportHistoryPage';
@@ -44,14 +45,14 @@ const AppRoutes: React.FC = () => {
                 <Route path="manageexpiry" element={<ManageExpiryPage />} />
                 <Route path="nearexpiry" element={<NearExpiryPage />} />
                 <Route path="expired" element={<ExpiredPage />} />
+                <Route path="bills" element={<BillList />} />  {/* Thêm route để hiển thị BillList */}
                 <Route path="ingredient" element={<IngredientPage />} />
                 <Route path="import-history" element={<ImportHistoryPage />} />
                 <Route path="export-history" element={<ExportHistoryPage />} />
                 <Route path="import-ingredient" element={<ImportIngredientPage />} />
                 <Route path="export-ingredient" element={<ExportIngredientPage />} />
                 <Route path="supplier" element={<SupplierPage />} />
-                
-            </Route>
+               </Route>
 
             <Route path="*" element={<NotFound />} />
         </Routes>
