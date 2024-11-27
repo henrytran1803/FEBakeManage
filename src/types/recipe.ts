@@ -15,3 +15,18 @@ export interface Recipe {
     recipeDetails: RecipeDetail[];
 }
 
+export interface RecipeResponseDetail {
+    recipeId: number;
+    ingredientId: number;
+    quantity: number;
+    
+}
+
+
+export interface RecipeResponse {
+    id: number;
+    name: string;
+    recipeDetails: RecipeResponseDetail[];
+
+}
+

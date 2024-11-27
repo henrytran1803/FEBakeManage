@@ -1,6 +1,6 @@
 'use client'
 
-import { Ticket, ChevronUp, Home, Boxes, Settings, User2 , Box} from 'lucide-react'
+import { Ticket, ChevronUp, Home, Boxes, Settings, User2 , Box, Truck, Milk  } from 'lucide-react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -49,6 +49,16 @@ const items = [
         title: "Recipe",
         url: "/admin/recipe",
         icon: Settings,
+    },
+    {
+        title: "Ingredient",
+        url: "/admin/ingredient",
+        icon: Milk ,
+    },
+    {
+        title: "Supplier",
+        url: "/admin/supplier",
+        icon: Truck,
     },
 ]
 
