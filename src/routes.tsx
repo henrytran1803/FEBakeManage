@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import {Routes,  Route } from "react-router-dom";
 import LoginPage from "@/pages/LoginPage";
 import NotFound from "@/pages/NotFound";
 import { CategoryPage } from "@/pages/CategoryPage";
@@ -13,12 +13,14 @@ import HomePage from "@/pages/HomePage.tsx";
 import {UserLayout} from "@/layouts/UserLayout.tsx";
 import ProductDetailPage from "@/pages/ProductDetailPage.tsx";
 import CartPage from "@/pages/CartPage.tsx";
+import RecipePage from "@/pages/RecipePage.tsx";
+import BakeryDashboard from "@/pages/DashBoardPage.tsx";
 
 const AppRoutes: React.FC = () => {
     return (
         <Routes>
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/" element={<UserLayout />} >
+            <Route path="/:id" element={<UserLayout />} >
                 <Route index element={<HomePage />} />
                 <Route path="product/:id" element={<ProductDetailPage />} />
                 <Route path="cart" element={<CartPage />} />
@@ -27,12 +29,12 @@ const AppRoutes: React.FC = () => {
             <Route path="/admin"element={
                 <ProtectedRoute role="MANAGE" element={<AdminLayout />} />
             }>
-                <Route index element={<HomePage />} />
-                <Route path="home" element={<HomePage />} />
+                <Route index element={<BakeryDashboard />} />
+                <Route path="home" element={<BakeryDashboard />} />
                 <Route path="product" element={<ProductPage />} />
                 <Route path="category" element={<CategoryPage />} />
                 <Route path="discount" element={<PromotionPage />} />
-                <Route path="recipe" element={<CategoryPage />} />
+                <Route path="recipe" element={<RecipePage />} />
                 <Route path="manageexpiry" element={<ManageExpiryPage />} />
                 <Route path="nearexpiry" element={<NearExpiryPage />} />
                 <Route path="expired" element={<ExpiredPage />} />

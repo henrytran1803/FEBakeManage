@@ -7,8 +7,11 @@ import { Category } from "@/types/Category.ts";
 import { categoryService } from "@/services/categoryService.ts";
 import { productService } from "@/services/productService.ts";
 import { CategoryListForCheckBox } from "@/components/CategoryListForCheckBox.tsx";
+import {useParams} from "react-router-dom";
+import {useCartStore} from "@/store/useCartStore.ts";
 
 export default function HomePage() {
+    const { id } = useParams();
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
     const [products, setProducts] = useState<SearchProductActiveResponse[]>([]);
@@ -19,8 +22,15 @@ export default function HomePage() {
     const [totalElements, setTotalElements] = useState(0);
     const [sortBy, setSortBy] = useState("name");
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const { setTable } = useCartStore();
 
     useEffect(() => {
+        if (id) {
+            setTable(id)
+        }else{
+            setTable('1')
+        }
+        console.log(id)
         const fetchCategories = async () => {
             const data = await categoryService.getAllCategories();
             setCategories(data.data);
