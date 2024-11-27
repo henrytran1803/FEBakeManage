@@ -55,6 +55,11 @@ const items = [
         url: "/admin/bills", // Địa chỉ URL của trang Bill
         icon: FileText, // Sử dụng icon hóa đơn
       },
+      {
+        title: "Manage user",  // Mới thêm mục Bill vào menu
+        url: "/admin/manage-user", // Địa chỉ URL của trang Bill
+        icon: User2, // Sử dụng icon hóa đơn
+      },
 ]
 
 export function AppSidebar() {

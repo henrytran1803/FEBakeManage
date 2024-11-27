@@ -14,6 +14,7 @@ import {UserLayout} from "@/layouts/UserLayout.tsx";
 import ProductDetailPage from "@/pages/ProductDetailPage.tsx";
 import CartPage from "@/pages/CartPage.tsx";
 import BillList from "./pages/BillList";
+import UserManagementPage from "./pages/UserManagementPage";
 
 const AppRoutes: React.FC = () => {
     return (
@@ -38,6 +39,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="nearexpiry" element={<NearExpiryPage />} />
                 <Route path="expired" element={<ExpiredPage />} />
                 <Route path="bills" element={<BillList />} />  {/* Thêm route để hiển thị BillList */}
+                <Route path="manage-user" element={<UserManagementPage />} />  {/* Thêm route để hiển thị BillList */}
             </Route>
 
             <Route path="*" element={<NotFound />} />
