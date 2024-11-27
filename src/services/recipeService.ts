@@ -20,6 +20,8 @@ export const recipeService = {
             return response;
         } catch (error) {
             throw new Error("Failed to get recipes");
+        }
+    },
     getRecipeByid : async (id :number) => {
         try {
             const response  = await recipeApi.getRecipeById(id);

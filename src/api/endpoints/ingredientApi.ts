@@ -3,7 +3,6 @@ import { ApiResponse } from "@/types/ApiResponse";
 import { ExportIngredientsRequest } from "@/types/ExportIngredientsRequest";
 import { ImportIngredientsRequest } from "@/types/ImportIngredientsRequest";
 import { Ingredient } from "@/types/Ingredient";
-import {Ingredient} from "@/types/ingredient.ts";
 export const ingredientApi = {
     getAllIngredients: async (): Promise<ApiResponse<Ingredient[]>> => {
         const response = await api.get("/api/ingredients");
