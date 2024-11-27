@@ -13,6 +13,12 @@ import HomePage from "@/pages/HomePage.tsx";
 import {UserLayout} from "@/layouts/UserLayout.tsx";
 import ProductDetailPage from "@/pages/ProductDetailPage.tsx";
 import CartPage from "@/pages/CartPage.tsx";
+import IngredientPage  from "./pages/IngredientPage";   
+import ImportHistoryPage from './pages/ImportHistoryPage';
+import ExportHistoryPage from './pages/ExportHistoryPage';
+import ImportIngredientPage from './pages/ImportIngredientPage';
+import ExportIngredientPage from './pages/ExportIngredientPage';
+import SupplierPage from "./pages/SupplierPage";
 import RecipePage from "@/pages/RecipePage.tsx";
 import BakeryDashboard from "@/pages/DashBoardPage.tsx";
 
@@ -38,7 +44,13 @@ const AppRoutes: React.FC = () => {
                 <Route path="manageexpiry" element={<ManageExpiryPage />} />
                 <Route path="nearexpiry" element={<NearExpiryPage />} />
                 <Route path="expired" element={<ExpiredPage />} />
-
+                <Route path="ingredient" element={<IngredientPage />} />
+                <Route path="import-history" element={<ImportHistoryPage />} />
+                <Route path="export-history" element={<ExportHistoryPage />} />
+                <Route path="import-ingredient" element={<ImportIngredientPage />} />
+                <Route path="export-ingredient" element={<ExportIngredientPage />} />
+                <Route path="supplier" element={<SupplierPage />} />
+                
             </Route>
 
             <Route path="*" element={<NotFound />} />
