@@ -8,13 +8,15 @@ interface CartStore {
     updateItem: (item: CartItem) => void;
     removeItem: (productBatchId: number) => void;
     clearCart: () => void;
+    setTable: (tableNumber: string) => void; // Thêm action mới
+
 }
 
 export const useCartStore = create<CartStore>()(
     persist(
         (set) => ({
             currentCart: {
-                table: 1,
+                table: '1',
                 carts: []
             },
 
@@ -64,10 +66,17 @@ export const useCartStore = create<CartStore>()(
                         )
                     }
                 })),
+            setTable: (tableNumber) =>
+                set((state) => ({
+                    currentCart: {
+                        ...state.currentCart,
+                        table: tableNumber
+                    }
+                })),
 
             clearCart: () => set({
                 currentCart: {
-                    table: 1,
+                    table: '1',
                     carts: []
                 }
             }),

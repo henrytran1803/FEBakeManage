@@ -1,12 +1,10 @@
-// src/api/endpoints/ingredientApi.ts
-import { api } from "@/api/axios";  // Giả sử bạn có một file axios.ts cho API base
+import { api } from "@/api/axios";  
 import { ApiResponse } from "@/types/ApiResponse";
 import { ExportIngredientsRequest } from "@/types/ExportIngredientsRequest";
 import { ImportIngredientsRequest } from "@/types/ImportIngredientsRequest";
 import { Ingredient } from "@/types/Ingredient";
-
+import {Ingredient} from "@/types/ingredient.ts";
 export const ingredientApi = {
-    //Danh sách nguyên liệu
     getAllIngredients: async (): Promise<ApiResponse<Ingredient[]>> => {
         const response = await api.get("/api/ingredients");
         return response.data;
@@ -50,6 +48,10 @@ export const ingredientApi = {
         const response = await api.get("/api/ingredients/export");
         return response.data;
     },
+      getAll: async (): Promise<ApiResponse<Ingredient[]>> => {
+        const response = await api.get(`/api/ingredients/active`);
+        return response.data;
+    },
 
     //Tìm kiếm nguyên liệu 
     searchIngredients: async (keyword: string): Promise<ApiResponse<any>> => {
@@ -59,3 +61,7 @@ export const ingredientApi = {
 
 
 };
+
+
+    
+

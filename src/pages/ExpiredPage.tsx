@@ -116,7 +116,6 @@ export function ExpiredPage() {
                             <TableHead>Name</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Expiry Date</TableHead>
-                            <TableHead>Current Discount</TableHead>
                             <TableHead>Daily Discount</TableHead>
                             <TableHead>Countdown</TableHead>
                             <TableHead>Quantity</TableHead>

@@ -80,6 +80,7 @@ export const categoryService = {
     getAllCategories: async () => {
         try {
             const response = await categoryApi.getAll();
+            console.log(response);
             return response;
         } catch (error) {
             throw new Error('Failed to get all category');

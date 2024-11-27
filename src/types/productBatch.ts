@@ -34,7 +34,7 @@ export interface ProductBatchStatus {
     status: ["ACTIVE", "NEAR_EXPIRY", "EXPIRED"]
 }
 export interface Cart {
-    table: number;
+    table: string;
     carts: CartItem[];
 }
 
