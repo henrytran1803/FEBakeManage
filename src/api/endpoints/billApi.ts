@@ -1,7 +1,6 @@
-// src/api/endpoints/billApi.ts
-import { api } from '../axios'; 
+import { api } from '../axios';
 import { ApiResponse } from '@/types/ApiResponse';
-import { BillResponseData } from '@/types/Bill'; // Chỉ import BillResponseData
+import { BillResponseData } from '@/types/Bill';
 
 interface BillSearchParams {
   status?: string;
@@ -15,7 +14,7 @@ export const billApi = {
     if (params.status) searchParams.append('status', params.status);
     if (params.page !== undefined) searchParams.append('page', params.page.toString());
     if (params.size) searchParams.append('size', params.size.toString());
-
+    console.log(`/api/admin/bills/status?${searchParams.toString()}`)
     const response = await api.get(`/api/admin/bills/status?${searchParams.toString()}`);
     return response.data;
   },

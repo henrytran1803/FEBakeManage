@@ -35,8 +35,11 @@ export const promotionService = {
     },
 
     createPromotion: async (data: PromotionCreate) => {
+        console.log(data)
+
         try {
             const response = await promotionApi.create(data);
+
             return response;
         } catch (error) {
             throw new Error('Failed to create promotion');

@@ -1,5 +1,4 @@
 import { billApi } from '@/api/endpoints/billApi'; 
-import { BillResponseData } from '@/types/Bill';
 
 export const billService = {
     searchBills: async (params: {

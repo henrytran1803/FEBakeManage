@@ -45,7 +45,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="manageexpiry" element={<ManageExpiryPage />} />
                 <Route path="nearexpiry" element={<NearExpiryPage />} />
                 <Route path="expired" element={<ExpiredPage />} />
-                <Route path="bills" element={<BillList />} />  {/* Thêm route để hiển thị BillList */}
+                <Route path="bills" element={<BillList />} />
                 <Route path="ingredient" element={<IngredientPage />} />
                 <Route path="import-history" element={<ImportHistoryPage />} />
                 <Route path="export-history" element={<ExportHistoryPage />} />
