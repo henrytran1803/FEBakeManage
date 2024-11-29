@@ -10,7 +10,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {Form, FormControl, FormField, FormItem, FormLabel} from "@/components/ui/form.tsx";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel} from "@/components/ui/form.tsx";
 import {Switch} from "@/components/ui/switch.tsx";
 import {useToast} from "@/hooks/use-toast.ts";
 
@@ -83,9 +83,7 @@ export function NearExpiryPage() {
                     <Button variant="outline" onClick={() => navigate('/admin/manageexpiry')}>
                         Back
                     </Button>
-                    <Button onClick={() => setShowDialog(true)} disabled={selectedIds.length === 0}>
-                        Create Promotion
-                    </Button>
+
                 </div>
 
                 <div className="grid grid-cols-3 gap-6">
@@ -111,7 +109,6 @@ export function NearExpiryPage() {
                                     <TableHead>Name</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead>Expiry Date</TableHead>
-                                    <TableHead>Current Discount</TableHead>
                                     <TableHead>Daily Discount</TableHead>
                                     <TableHead>Countdown</TableHead>
                                 </TableRow>
@@ -177,6 +174,9 @@ export function NearExpiryPage() {
                                                     onCheckedChange={field.onChange}
                                                 />
                                             </FormControl>
+                                            <FormDescription className="text-sm text-gray-500">
+                                                Bỏ qua % giảm giá nhập và tự động lấy giảm giá tương ứng của sản phẩm được quy định từ trước
+                                            </FormDescription>
                                         </FormItem>
                                     )}
                                 />
@@ -193,6 +193,9 @@ export function NearExpiryPage() {
                                                     onCheckedChange={field.onChange}
                                                 />
                                             </FormControl>
+                                            <FormDescription className="text-sm text-gray-500">
+                                               Lấy ngày xa nhất của lô sản phẩm được chọn
+                                            </FormDescription>
                                         </FormItem>
                                     )}
                                 />
@@ -211,10 +214,10 @@ export function NearExpiryPage() {
                                         )}
                                     />
                                 )}
-
-                                <Button type="submit" className="w-full">
-                                    Save Settings
+                                <Button type="submit" onClick={() => setShowDialog(true)} disabled={selectedIds.length === 0}>
+                                    Create Promotion
                                 </Button>
+
                             </form>
                         </Form>
                     </div>

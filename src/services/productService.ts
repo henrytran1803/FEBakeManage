@@ -151,6 +151,15 @@ export const productService = {
             throw new Error('Failed to get product details');
         }
     },
+    getPricehistory: async (id: number) => {
+        try {
+            const response = await priceApi.getById(id);
+            return response;
+        }
+        catch (error) {
+            throw new Error('Failed to get pricehistory');
+        }
+    },
     getProductCart: async (data: ProductCartRequest): Promise<ApiResponse<ProductCart[]>> => {
         try {
             const response = productApi.getProductCart(data);

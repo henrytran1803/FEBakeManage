@@ -1,6 +1,8 @@
 'use client'
 
-import { Ticket, ChevronUp, Home, Boxes, Settings, User2 , Box,FileText, Grid2X2Icon} from 'lucide-react'
+
+import { Ticket, ChevronUp, Home, Boxes, Settings, User2 , Box,FileText, Grid2X2Icon, Truck, Milk} from 'lucide-react'
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -55,6 +57,7 @@ const items = [
         url: "/admin/bills", // Địa chỉ URL của trang Bill
         icon: FileText, // Sử dụng icon hóa đơn
       },
+
       {
         title: "Manage user",  // Mới thêm mục Bill vào menu
         url: "/admin/manage-user", // Địa chỉ URL của trang Bill
@@ -65,6 +68,18 @@ const items = [
         url: "/admin/area-table", // Địa chỉ URL của trang Bill
         icon: Grid2X2Icon, // Sử dụng icon hóa đơn
       },
+      {
+
+        title: "Ingredient",
+        url: "/admin/ingredient",
+        icon: Milk ,
+    },
+    {
+        title: "Supplier",
+        url: "/admin/supplier",
+        icon: Truck,
+    },
+
 ]
 
 export function AppSidebar() {
