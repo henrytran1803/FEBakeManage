@@ -1,6 +1,6 @@
 'use client'
 
-import { Ticket, ChevronUp, Home, Boxes, Settings, User2 , Box,FileText, Grid2X2Icon} from 'lucide-react'
+import { Ticket, ChevronUp, Home, Boxes, Settings, User2 , Box,FileText} from 'lucide-react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -25,46 +25,13 @@ import {logout} from "@/services/AuthService.ts";
 import {useNavigate} from "react-router-dom";
 
 const items = [
-    {
-        title: "Home",
-        url: "/admin/home",
-        icon: Home,
-    },
-    {
-        title: "Category",
-        url: "/admin/category",
-        icon: Box,
-    },
-    {
-        title: "Product",
-        url: "/admin/product",
-        icon: Boxes,
-    },
-    {
-        title: "Discount",
-        url: "/admin/discount",
-        icon: Ticket,
-    },
-    {
-        title: "Recipe",
-        url: "/admin/recipe",
-        icon: Settings,
-    },
+  
     {
         title: "Bill",  // Mới thêm mục Bill vào menu
-        url: "/admin/bills", // Địa chỉ URL của trang Bill
+        url: "/employee/bill", // Địa chỉ URL của trang Bill
         icon: FileText, // Sử dụng icon hóa đơn
       },
-      {
-        title: "Manage user",  // Mới thêm mục Bill vào menu
-        url: "/admin/manage-user", // Địa chỉ URL của trang Bill
-        icon: User2, // Sử dụng icon hóa đơn
-      },
-      {
-        title: "Manager area-table",  // Mới thêm mục Bill vào menu
-        url: "/admin/area-table", // Địa chỉ URL của trang Bill
-        icon: Grid2X2Icon, // Sử dụng icon hóa đơn
-      },
+    
 ]
 
 export function AppSidebar() {

@@ -1,6 +1,6 @@
 import { api } from '../axios';
 import { ApiResponse } from '@/types/ApiResponse';
-import { User } from '@/types/Auth';
+
 import { UserResponseRegisterDTO, UserRequest, Page, ListUserActive } from '@/types/User';
 
 interface UserSearchParams {
