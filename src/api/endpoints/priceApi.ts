@@ -5,7 +5,7 @@ import {Price} from "@/types/price.ts";
 
 export const priceApi = {
     getById: async (id: number): Promise<ApiResponse<Price[]>> => {
-        const response = await api.get(`/api/products/${id}/price/history`);
+        const response = await api.get(`/api/price/${id}/history`);
         return response.data;
     },
 }

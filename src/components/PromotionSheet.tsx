@@ -35,7 +35,6 @@ export default function PromotionSheet({
                                            promotion,
                                            onSuccess
                                        }: PromotionSheetProps) {
-    // Form states
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [discount, setDiscount] = useState("");
