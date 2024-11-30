@@ -18,12 +18,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { CategorySheetProps} from "@/types/Category";
-import { useToast } from "@/hooks/use-toast";
 import { categoryService } from "@/services/categoryService";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 import {Switch} from "@/components/ui/switch.tsx";
 import {getImageUrl} from "@/utils/imageUtils.ts";
+import {CategoryErrorCode} from "@/utils/error/categoryError.ts";
+import {useCustomToast} from "@/hooks/CustomAlert.tsx";
 
 
 
@@ -33,10 +34,10 @@ export default function CategorySheet({
                                           category,
                                           onSuccess
                                       }: CategorySheetProps) {
-    const { toast } = useToast();
     const [loading, setLoading] = useState(false);
     const [previewImage, setPreviewImage] = useState<string>("");
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const { showErrorToast, showSuccessToast } = useCustomToast();
 
     const form = useForm({
         defaultValues: {
@@ -65,24 +66,17 @@ export default function CategorySheet({
         }
     }, [category, form]);
 
+
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             if (file.size > 5 * 1024 * 1024) {
-                toast({
-                    variant: "destructive",
-                    title: "Lỗi",
-                    description: "Kích thước file không được vượt quá 5MB"
-                });
+                showErrorToast(CategoryErrorCode.CATEGORY_IMAGE_SIZE);
                 return;
             }
 
             if (!file.type.startsWith('image/')) {
-                toast({
-                    variant: "destructive",
-                    title: "Lỗi",
-                    description: "Vui lòng chọn file ảnh"
-                });
+                showErrorToast(CategoryErrorCode.CATEGORY_IMAGE_TYPE);
                 return;
             }
             setSelectedFile(file);
@@ -96,8 +90,22 @@ export default function CategorySheet({
     const onSubmit = async (data: any) => {
         try {
             setLoading(true);
+
+            // Validate name
+            if (!data.name.trim()) {
+                showErrorToast(CategoryErrorCode.CATEGORY_NAME_REQUIRED);
+                return;
+            }
+
+            if (data.name.length > 250) {
+                showErrorToast(CategoryErrorCode.CATEGORY_NAME_LENGTH);
+                return;
+            }
+
+            // Handle update
             if (category) {
                 if (!selectedFile && !data.name) {
+                    showErrorToast(CategoryErrorCode.CONNECT_ERROR);
                     onSuccess(false);
                     return;
                 }
@@ -110,14 +118,17 @@ export default function CategorySheet({
                     selectedFile || new File([], ""),
                     category.imageUrl
                 );
-                if (response.success) {
 
+                if (response.success) {
+                    showSuccessToast(CategoryErrorCode.UPDATE_SUCCESS);
                     onSuccess(true);
                     onClose();
                 }
-            } else {
+            }
+            // Handle create
+            else {
                 if (!selectedFile) {
-                    onSuccess(false);
+                    showErrorToast(CategoryErrorCode.CATEGORY_IMAGE_REQUIRED);
                     return;
                 }
 
@@ -127,22 +138,13 @@ export default function CategorySheet({
                 );
 
                 if (response.success) {
-                    toast({
-                        title: "Thành công",
-                        description: "Tạo danh mục thành công"
-                    });
+                    showSuccessToast(CategoryErrorCode.POST_SUCCESS);
                     onSuccess(true);
                     onClose();
                 }
             }
         } catch (error) {
-            toast({
-                variant: "destructive",
-                title: "Lỗi",
-                description: category
-                    ? "Không thể cập nhật danh mục"
-                    : "Không thể tạo danh mục"
-            });
+            showErrorToast(CategoryErrorCode.CONNECT_ERROR);
         } finally {
             setLoading(false);
         }

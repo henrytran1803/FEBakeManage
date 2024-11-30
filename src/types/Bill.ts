@@ -25,7 +25,7 @@ export interface Bill {
   
   export interface BillResponseData {
     content: Bill[];
-    pageable: any; // Có thể thêm kiểu dữ liệu chi tiết cho pageable
+    pageable: any;
     last: boolean;
     totalElements: number;
     totalPages: number;

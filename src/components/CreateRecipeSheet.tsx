@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { recipeService } from "@/services/recipeService"
-import { Ingredient } from "@/types/ingredient"
 import { CreateRecipe, CreateRecipeDetail } from "@/types/recipe"
+import {Ingredient} from "@/types/Ingredient.ts";
+import {RecipeErrorCode} from "@/utils/error/recipeError.ts";
+import {useCustomToast} from "@/hooks/CustomAlert.tsx";
 
 interface CreateRecipeSheetProps {
     ingredients: Ingredient[];
@@ -20,31 +22,89 @@ interface Quantities {
 
 const CreateRecipeSheet = ({ ingredients, onSuccess, onError }: CreateRecipeSheetProps) => {
     const [recipeName, setRecipeName] = useState<string>('');
+    const { showErrorToast, showSuccessToast } = useCustomToast();
     const [selectedIngredients, setSelectedIngredients] = useState<number[]>([]);
     const [quantities, setQuantities] = useState<Quantities>({});
+    const [loading, setLoading] = useState(false);
+    const validateForm = (): boolean => {
+        if (!recipeName.trim()) {
+            showErrorToast(RecipeErrorCode.RECIPE_NAME_REQUIRED);
+            return false;
+        }
 
+        if (recipeName.length > 250) {
+            showErrorToast(RecipeErrorCode.RECIPE_NAME_LENGTH);
+            return false;
+        }
+
+        // Kiểm tra nguyên liệu
+        if (selectedIngredients.length === 0) {
+            showErrorToast(RecipeErrorCode.RECIPE_INGREDIENTS_REQUIRED);
+            return false;
+        }
+
+        // Kiểm tra số lượng nguyên liệu
+        for (const ingredientId of selectedIngredients) {
+            const quantity = quantities[ingredientId];
+
+            if (!quantity) {
+                showErrorToast(RecipeErrorCode.RECIPE_INGREDIENT_QUANTITY_REQUIRED);
+                return false;
+            }
+
+            const quantityNum = parseFloat(quantity);
+
+            if (isNaN(quantityNum)) {
+                showErrorToast(RecipeErrorCode.RECIPE_INGREDIENT_QUANTITY_INVALID);
+                return false;
+            }
+
+            if (quantityNum <= 0) {
+                showErrorToast(RecipeErrorCode.RECIPE_INGREDIENT_QUANTITY_MIN);
+                return false;
+            }
+
+            if (quantityNum > 1000) {
+                showErrorToast(RecipeErrorCode.RECIPE_INGREDIENT_QUANTITY_MAX);
+                return false;
+            }
+        }
+
+        return true;
+    };
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const recipeDetails: CreateRecipeDetail[] = selectedIngredients.map(ingredientId => ({
-            ingredientId,
-            quantity: parseFloat(quantities[ingredientId]) || 0
-        }));
-
-        const newRecipe: CreateRecipe = {
-            name: recipeName,
-            recipeDetails
-        };
+        if (!validateForm()) {
+            return;
+        }
 
         try {
+            setLoading(true);
+
+            const recipeDetails: CreateRecipeDetail[] = selectedIngredients.map(ingredientId => ({
+                ingredientId,
+                quantity: parseFloat(quantities[ingredientId])
+            }));
+
+            const newRecipe: CreateRecipe = {
+                name: recipeName,
+                recipeDetails
+            };
+
             await recipeService.createRecipe(newRecipe);
+            showSuccessToast(RecipeErrorCode.POST_SUCCESS);
             onSuccess();
+
             // Reset form
             setRecipeName('');
             setSelectedIngredients([]);
             setQuantities({});
         } catch (error) {
+            showErrorToast(RecipeErrorCode.CONNECT_ERROR);
             onError();
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -114,9 +174,9 @@ const CreateRecipeSheet = ({ ingredients, onSuccess, onError }: CreateRecipeShee
             <div className="mt-4 flex justify-end">
                 <Button
                     type="submit"
-                    disabled={!recipeName || selectedIngredients.length === 0}
+                    disabled={loading || !recipeName || selectedIngredients.length === 0}
                 >
-                    Create Recipe
+                    {loading ? "Đang xử lý..." : "Thêm công thức"}
                 </Button>
             </div>
         </form>

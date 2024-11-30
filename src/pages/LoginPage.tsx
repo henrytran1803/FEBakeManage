@@ -22,6 +22,7 @@ const LoginPage: React.FC = () => {
       if (result.success) {
         const roles = result.data.user.roles;
         navigate(roles.includes("ROLE_MANAGE") ? "/admin/home" : "/employee");
+
         console.log(roles);
       } else {
         setError(result.message || "Login failed. Please check your credentials.");
@@ -36,11 +37,9 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("1")
     console.log(isLoading)
 
     if (!isLoading){
-      console.log("here")
       handleLogin(username, password);
     }
   };

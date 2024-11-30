@@ -3,6 +3,7 @@
 
 import { Ticket, ChevronUp, Home, Boxes, Settings, User2 , Box,FileText, Grid2X2Icon, Truck, Milk} from 'lucide-react'
 
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -53,9 +54,9 @@ const items = [
         icon: Settings,
     },
     {
-        title: "Bill",  // Mới thêm mục Bill vào menu
-        url: "/admin/bills", // Địa chỉ URL của trang Bill
-        icon: FileText, // Sử dụng icon hóa đơn
+        title: "Bill",
+        url: "/admin/bills",
+        icon: FileText,
       },
 
       {
@@ -69,7 +70,7 @@ const items = [
         icon: Grid2X2Icon, // Sử dụng icon hóa đơn
       },
       {
-
+    
         title: "Ingredient",
         url: "/admin/ingredient",
         icon: Milk ,

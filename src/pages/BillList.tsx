@@ -25,6 +25,7 @@ const BillList: React.FC = () => {
   };
    // Search-related state and functions
    const [isSearching, setIsSearching] = useState(false);
+
   const [bills, setBills] = useState<Bill[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedBill, setSelectedBill] = useState<BillResponse_View_Cake>(defaultBill);
@@ -44,6 +45,7 @@ const BillList: React.FC = () => {
         setTotalPages(response.data.totalPages);
       } catch (error) {
         setError('Không thể tải danh sách hóa đơn');
+
       } finally {
         setIsLoading(false);
       }
@@ -311,6 +313,7 @@ const BillList: React.FC = () => {
         </Alert>
       )}
     </div>
+
   );
 };
 

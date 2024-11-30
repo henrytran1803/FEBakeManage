@@ -1,4 +1,3 @@
-// components/product/ProductFormSheet.tsx
 import React, { useEffect, useState } from 'react';
 import {
     Sheet,
@@ -24,6 +23,8 @@ import { recipeService } from "@/services/recipeService";
 import { productService } from "@/services/productService";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {ImageUpload} from "@/components/ImageUpload.tsx";
+import {useCustomToast} from "@/hooks/CustomAlert.tsx";
+import {ProductErrorCode} from "@/utils/error/createProductError.tsx";
 
 
 
@@ -38,11 +39,9 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
     const [loading, setLoading] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
     const [productImages, setProductImages] = useState<ProductImage[] >([]);
-
-    // const [productDetail, setProductDetail] = useState<ProductDetail | null>(null);
-    // const [fileNames, setFileNames] = useState<string[]>([]);
     const [isImageChanged, setIsImageChanged] = useState(false);
     const [deletedImages, setDeletedImages] = useState<ProductImage[]>([]);
+    const { showErrorToast, showSuccessToast } = useCustomToast();
 
     const handleImageDeleted = (deletedImage: ProductImage) => {
         setDeletedImages(prev => [...prev, deletedImage]);
@@ -64,7 +63,6 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
             shelfLifeDaysWarning: 0,
         });
         setFiles([]);
-        // setFileNames([]);
         setIsImageChanged(false);
         setDeletedImages([]);
         setProductImages([])
@@ -140,68 +138,116 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
         try {
             setLoading(true);
+
+            // Category validation
             if (formData.categoryId === 0) {
-                alert('Vui lòng chọn danh mục');
+                showErrorToast(ProductErrorCode.CATEGORY_REQUIRED_ERROR);
                 return;
             }
+
+            // Recipe validation
             if (formData.recipeId === 0) {
-                alert('Vui lòng chọn công thức');
+                showErrorToast(ProductErrorCode.RECIPE_REQUIRED_ERROR);
                 return;
             }
-            if (!formData.name.trim()) {
-                alert('Vui lòng nhập tên sản phẩm');
+
+            // Name validation
+            if (!formData.name) {
+                showErrorToast(ProductErrorCode.PRODUCT_NAME_INPUT_ERROR);
                 return;
             }
             if (formData.name.length > 250) {
-                alert('Tên sản phẩm không được vượt quá 250 ký tự');
+                showErrorToast(ProductErrorCode.PRODUCT_NAME_LENGTH_ERROR);
                 return;
             }
-            if (!formData.description.trim()) {
-                alert('Vui lòng nhập mô tả');
+
+            // Description validation
+            if (!formData.description) {
+                showErrorToast(ProductErrorCode.PRODUCT_DESC_INPUT_ERROR);
                 return;
             }
             if (formData.description.length > 250) {
-                alert('Mô tả không được vượt quá 250 ký tự');
+                showErrorToast(ProductErrorCode.PRODUCT_DESC_LENGTH_ERROR);
                 return;
             }
-            if (formData.price < 0) {
-                alert('Giá phải lớn hơn hoặc bằng 0');
+
+            // Price validation
+            if (!formData.price) {
+                showErrorToast(ProductErrorCode.PRODUCT_PRICE_INPUT_ERROR);
                 return;
             }
-            if (formData.weight <= 0) {
-                alert('Khối lượng phải lớn hơn 0');
+            if (formData.price < 1000) {
+                showErrorToast(ProductErrorCode.PRODUCT_PRICE_INPUT_ERROR2);
                 return;
             }
-            if (formData.length <= 0) {
-                alert('Chiều dài phải lớn hơn 0');
+
+            // Weight validation
+            if (!formData.weight) {
+                showErrorToast(ProductErrorCode.PRODUCT_WEIGHT_INPUT_ERROR1);
                 return;
             }
-            if (formData.width <= 0) {
-                alert('Chiều rộng phải lớn hơn 0');
+            if (formData.weight < 1 || formData.weight > 20000) {
+                showErrorToast(ProductErrorCode.PRODUCT_WEIGHT_INPUT_ERROR2);
                 return;
             }
-            if (formData.height <= 0) {
-                alert('Chiều cao phải lớn hơn 0');
+
+            // Length validation
+            if (!formData.length) {
+                showErrorToast(ProductErrorCode.PRODUCT_LENGTH_INPUT_ERROR1);
+                return;
+            }
+            if (formData.length < 1 || formData.length > 200) {
+                showErrorToast(ProductErrorCode.PRODUCT_LENGTH_INPUT_ERROR2);
+                return;
+            }
+
+            // Width validation
+            if (!formData.width) {
+                showErrorToast(ProductErrorCode.PRODUCT_WIDTH_INPUT_ERROR1);
+                return;
+            }
+            if (formData.width < 1 || formData.width > 200) {
+                showErrorToast(ProductErrorCode.PRODUCT_WIDTH_INPUT_ERROR2);
+                return;
+            }
+
+            // Height validation
+            if (!formData.height) {
+                showErrorToast(ProductErrorCode.PRODUCT_HEIGHT_INPUT_ERROR1);
+                return;
+            }
+            if (formData.height < 1 || formData.height > 200) {
+                showErrorToast(ProductErrorCode.PRODUCT_HEIGHT_INPUT_ERROR2);
+                return;
+            }
+
+            if (!formData.shelfLifeDays) {
+                showErrorToast(ProductErrorCode.PRODUCT_EXPIRY_INPUT_ERROR1);
                 return;
             }
             if (formData.shelfLifeDays <= 0) {
-                alert('Hạn sử dụng phải lớn hơn 0');
+                showErrorToast(ProductErrorCode.PRODUCT_EXPIRY_INPUT_ERROR2);
                 return;
             }
+
             if (formData.shelfLifeDaysWarning <= 0) {
-                alert('Cảnh báo hạn sử dụng phải lớn hơn 0');
+                showErrorToast(ProductErrorCode.PRODUCT_EXPIRY_WARNING_ERROR);
                 return;
             }
+
             if (formData.discountLimit < 0 || formData.discountLimit > 100) {
-                alert('Giới hạn giảm giá phải từ 0 đến 100');
+                showErrorToast(ProductErrorCode.PRODUCT_DISCOUNT_LIMIT_ERROR);
                 return;
             }
+
             if (!productId && files.length === 0) {
-                alert('Vui lòng chọn ít nhất một ảnh');
+                showErrorToast(ProductErrorCode.PRODUCT_IMAGE_REQUIRED_ERROR);
                 return;
             }
+
             if (productId) {
                 const updateData: ProductUpdate = {
                     id: productId,
@@ -214,17 +260,19 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                     deletedImages
                 );
                 if (response.success) {
+                    showSuccessToast(ProductErrorCode.POST_SUCCESS);
                     onSuccess();
                 }
             } else {
                 const response = await productService.create(formData, files);
                 if (response.success) {
+                    showSuccessToast(ProductErrorCode.POST_SUCCESS);
                     onSuccess();
                 }
             }
         } catch (error) {
             console.error('Error submitting form:', error);
-            alert('Có lỗi xảy ra khi lưu sản phẩm');
+            showErrorToast(ProductErrorCode.CONNECT_ERROR);
         } finally {
             setLoading(false);
         }
@@ -444,8 +492,7 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                             <div>Loading...</div>
                         </div>
                     ) : (
-                        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                            {/* ... rest of your form ... */}
+                        // <form onSubmit={handleSubmit} className="space-y-4 mt-4">
                             <div className="space-y-2">
                                 <Label>Hình ảnh</Label>
                                 <ImageUpload
@@ -455,8 +502,6 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                                     onDeleteImage={handleImageDeleted}
                                 />
                             </div>
-                            {/* ... rest of your form ... */}
-                        </form>
                     )}
 
                     <div className="flex justify-end gap-4 pt-4">

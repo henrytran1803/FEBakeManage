@@ -49,7 +49,7 @@ export const promotionApi = {
         return response.data;
     },
     createDailyPromotion: async (data: PromotionDaily): Promise<ApiResponse<void>> => {
-        const response = await api.post(`/api/promotions/quick`, data);
+        const response = await api.post(`/api/discounts`, data);
         return response.data;
     },
 };

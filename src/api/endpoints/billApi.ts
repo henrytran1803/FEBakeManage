@@ -1,8 +1,8 @@
-// src/api/endpoints/billApi.ts
 import { api } from '../axios';
 import { ApiResponse } from "@/types/ApiResponse";
 import { BillResponseData, BillResponse_View_Cake, BillStatusHistoryDTO, BillRequest, BillStatusDTO, BillStatus } from "@/types/Bill";
 import { Search } from 'lucide-react';
+
 
 // Interface cho các tham số tìm kiếm hóa đơn
 interface BillSearchParams {
@@ -80,5 +80,6 @@ export const billApi = {
             throw new Error("Không thể tìm kiếm hóa đơn");
         }
     }
+
 
 };
