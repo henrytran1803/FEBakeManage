@@ -1,6 +1,9 @@
-import {callApi} from "@/services/ApiService.ts";
-import {LoginData, User} from "@/types/Auth.ts";
-import {ApiResponse} from "@/types/ApiResponse.ts";
+// AuthService.ts
+import {callApi} from "@/services/ApiService";
+import {LoginData, User} from "@/types/Auth";
+import {ApiResponse} from "@/types/ApiResponse";
+import {toast} from "@/hooks/use-toast.ts";
+let websocket: WebSocket | null = null;
 
 export const login = async (email: string, password: string): Promise<ApiResponse<LoginData>> => {
     try {
@@ -11,6 +14,8 @@ export const login = async (email: string, password: string): Promise<ApiRespons
 
         if (result.success) {
             setAuthData(result.data);
+            connectWebSocket(result.data.token);
+
         }
         console.log(result);
         return result;
@@ -29,6 +34,7 @@ const setAuthData = (authData: LoginData) => {
     localStorage.setItem('user', JSON.stringify(authData.user));
     localStorage.setItem('auth', authData.user.roles.includes('manage') ? 'MANAGE' : 'USER');
 };
+
 export const getAuthState = (): { isAuthenticated: boolean; user: User | null; token: string | null } => {
     const token = localStorage.getItem('token');
     const userStr = localStorage.getItem('user');
@@ -48,23 +54,63 @@ export const getAuthState = (): { isAuthenticated: boolean; user: User | null; t
 };
 
 export const logout = () => {
+    disconnectWebSocket();
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('auth');
 };
 
-export const isTokenValid = (): boolean => {
-    const { token } = getAuthState();
-    if (!token) return false;
+const connectWebSocket = (token: string) => {
+    const API_BASE_URL = import.meta.env.VITE_WS_URL;
 
-    try {
-        const [, payload] = token.split('.');
-        const decodedPayload = JSON.parse(atob(payload));
-        const expirationTime = decodedPayload.exp * 1000;
+    const wsUrl = `ws://${API_BASE_URL}/websocket?token=${token}`;
+    console.log(wsUrl)
+    websocket = new WebSocket(wsUrl);
 
-        return Date.now() < expirationTime;
-    } catch (error) {
-        console.error('Error validating token:', error);
-        return false;
+    websocket.onopen = () => {
+        console.log('WebSocket connected');
+    };
+
+    websocket.onmessage = (event) => {
+        console.log("WebSocket message received:", event.data);
+
+        try {
+            // Parse JSON message
+            const message = JSON.parse(event.data);
+            const { type, message: content, severity, duration } = message;
+
+            // Map severity to toast variants
+            const severityMap: Record<string, "default" | "destructive" | null | undefined> = {
+                SUCCESS: "default",
+                INFO: "default",
+                WARNING: "default",
+                ERROR: "destructive",
+            };
+
+            // Display toast notification
+            toast({
+                title: type,
+                description: content,
+                variant: severityMap[severity] || "default", // Default to "default" if severity is unknown
+                duration: duration || 3000, // Default duration
+            });
+        } catch (error) {
+            console.error("Error processing WebSocket message:", error);
+        }
+    };
+
+    websocket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
+
+    websocket.onclose = () => {
+        console.log('WebSocket disconnected');
+    };
+};
+
+const disconnectWebSocket = () => {
+    if (websocket) {
+        websocket.close();
+        websocket = null;
     }
 };
