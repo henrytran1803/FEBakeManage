@@ -35,7 +35,6 @@ const AppRoutes: React.FC = () => {
                 <Route index element={<HomePage />} />
                 <Route path="product/:id" element={<ProductDetailPage />} />
                 <Route path="cart" element={<CartPage />} />
-
             </Route>
             <Route path="/admin" element={<ProtectedRoute role="MANAGE" element={<AdminLayout />} />}>
                 <Route index element={<BakeryDashboard />} />
