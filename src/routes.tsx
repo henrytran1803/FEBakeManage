@@ -33,6 +33,9 @@ const AppRoutes: React.FC = () => {
         <Routes>
             <Route path="/login" element={<LoginPage />} />
             {/*user*/}
+            <Route path="/" element={<UserLayout />}>
+                <Route index element={<HomePage />} />
+            </Route>
             <Route path="/:id" element={<UserLayout />}>
                 <Route index element={<HomePage />} />
             </Route>
