@@ -55,7 +55,13 @@ const AppRoutes: React.FC = () => {
                 <Route path="nearexpiry" element={<NearExpiryPage />} />
                 <Route path="expired" element={<ExpiredPage />} />
                 <Route path="area-table" element={<AreaPage />} />
-                <Route path="manage-user" element={<UserManagementPage />} />  
+                <Route path="manage-user" element={<UserManagementPage />} />
+                <Route path="ingredient" element={<IngredientPage />} />
+                <Route path="import-history" element={<ImportHistoryPage />} />
+                <Route path="export-history" element={<ExportHistoryPage />} />
+                <Route path="import-ingredient" element={<ImportIngredientPage />} />
+                <Route path="export-ingredient" element={<ExportIngredientPage />} />
+                <Route path="supplier" element={<SupplierPage />} />
             </Route>
             {/*employee*/}
             <Route path="/employee" element={<ProtectedRoute role="USER" element={<EmployeeLayout />} />}>
