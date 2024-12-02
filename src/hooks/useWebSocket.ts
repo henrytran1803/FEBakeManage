@@ -18,7 +18,7 @@ export function useWebSocket(url: string, enabled: boolean) {
                 toast({
                     title: type,
                     description: content,
-                    variant: severityMap[severity] || "default", // Sử dụng giá trị mặc định nếu không khớp
+                    variant: severityMap[severity] || "default", 
                     duration: duration || 3000,
                 });
 
