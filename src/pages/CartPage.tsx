@@ -43,27 +43,27 @@ const Cart: React.FC = () => {
     }, [currentCart.carts, discountCode]);
     
       // Xử lý tạo hóa đơn mới
-      const handleCreateBill = async () => {
-        setIsCreatingBill(true);
-        try {
-            const billRequest = {
-                customerName,
-                customerPhone,
-                paymentMethod,
-                diningOption,
-                productBatchCarts: currentCart.carts // Dữ liệu sản phẩm từ giỏ hàng
-            };
+    //   const handleCreateBill = async () => {
+    //     setIsCreatingBill(true);
+    //     try {
+    //         const billRequest = {
+    //             customerName,
+    //             customerPhone,
+    //             paymentMethod,
+    //             diningOption,
+    //             productBatchCarts: currentCart.carts // Dữ liệu sản phẩm từ giỏ hàng
+    //         };
             
-            // Gửi yêu cầu tạo hóa đơn
-            await billService.createBill(billRequest);
-            alert("Hóa đơn đã được tạo thành công");
-            navigate("/hoadon");  // Chuyển hướng đến trang danh sách hóa đơn
-        } catch (error) {
-            console.error("Không thể tạo hóa đơn:", error);
-        } finally {
-            setIsCreatingBill(false);
-        }
-    };
+    //         // Gửi yêu cầu tạo hóa đơn
+    //         await billService.createBill(billRequest);
+    //         alert("Hóa đơn đã được tạo thành công");
+    //         navigate("/hoadon");  // Chuyển hướng đến trang danh sách hóa đơn
+    //     } catch (error) {
+    //         console.error("Không thể tạo hóa đơn:", error);
+    //     } finally {
+    //         setIsCreatingBill(false);
+    //     }
+    // };
 
     if (isLoading) {
         return <div className="flex justify-center items-center min-h-[400px]">Loading...</div>;

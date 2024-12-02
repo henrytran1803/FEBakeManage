@@ -1,7 +1,9 @@
 import { api } from '../axios';
 import { ApiResponse } from '@/types/ApiResponse';
+import { User } from '@/types/Auth';
 
-import { UserResponseRegisterDTO, UserRequest, Page, ListUserActive } from '@/types/User';
+import {  UserRequest, Page, ListUserActive } from '@/types/User';
+import { register } from 'module';
 
 interface UserSearchParams {
   page?: number;
@@ -12,8 +14,13 @@ interface UserSearchParams {
 }
 
 export const userApi = {
+  //tạo người dùng
+  create: async (register:UserRequest): Promise<ApiResponse<User>> =>{
+    const response=await  api.post('/api/auth/register',register);
+    return response.data;
+  },
   // API sửa thông tin người dùng
-  updateUser: async (id: number, userRequest: UserRequest): Promise<ApiResponse<UserResponseRegisterDTO>> => {
+  updateUser: async (id: number, userRequest: UserRequest): Promise<ApiResponse<User>> => {
     const response = await api.put(`/api/admin/user/${id}`, userRequest);
     return response.data;
   },
@@ -52,7 +59,7 @@ getActiveUsers: async (params: UserSearchParams): Promise<ApiResponse<ListUserAc
   },
 
   // API lấy thông tin người dùng theo ID
-  getUserById: async (id: number): Promise<ApiResponse<UserResponseRegisterDTO>> => {
+  getUserById: async (id: number): Promise<ApiResponse<User>> => {
     const response = await api.get(`/api/admin/user/${id}`);
     return response.data;
   }
