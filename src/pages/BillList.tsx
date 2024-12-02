@@ -33,10 +33,15 @@ const BillList: React.FC = () => {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
+  const [role, setRole] = useState<string | null>(null); // State to store user role
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+      // Giả sử bạn lấy role từ localStorage hoặc từ API
+      const userRole = localStorage.getItem('auth'); // Hoặc lấy từ API
+      setRole(userRole); // Lưu role vào state
+      console.log(userRole)
     const fetchBills = async () => {
       try {
         setIsLoading(true);
@@ -56,18 +61,30 @@ const BillList: React.FC = () => {
 
   const updateBillStatus = async (billId: number, newStatus: BillStatus) => {
     try {
+      // Lấy thông tin người dùng từ localStorage
       const userData = localStorage.getItem('user');
-
+  
       if (userData) {
         const parsedUser = JSON.parse(userData);
         const userId = parsedUser.id;
-
-        if (userId) {
+        const userRole = localStorage.getItem('auth'); // Giả sử role của người dùng lưu trong `parsedUser.role`
+  
+        // Kiểm tra nếu role là MANAGE và trạng thái hiện tại của hóa đơn là NOT_PAID
+        const bill = bills.find(bill => bill.billId === billId); // Tìm hóa đơn cần cập nhật
+        if (!bill) {
+          alert('Hóa đơn không tồn tại');
+          return;
+        }
+  
+        // Chỉ cho phép cập nhật nếu role là "MANAGE" và trạng thái hóa đơn là NOT_PAID
+        if (userRole === "MANAGE" && bill.billStatus === BillStatus.NOT_PAID) {
           await billService.updateBillStatus(billId, newStatus, userId);
           alert('Trạng thái hóa đơn đã được cập nhật');
           setIsDialogOpen(false);
-        } else {
-          alert('Không tìm thấy userId trong dữ liệu người dùng');
+        } else if (userRole !== "MANAGE") {
+          alert('Bạn không có quyền cập nhật trạng thái này');
+        } else if (bill.billStatus !== BillStatus.NOT_PAID) {
+          alert('Hóa đơn không có trạng thái "NOT_PAID" để cập nhật thành "CANCEL"');
         }
       } else {
         alert('Không tìm thấy dữ liệu người dùng trong localStorage');
@@ -77,6 +94,7 @@ const BillList: React.FC = () => {
       alert('Đã có lỗi xảy ra khi cập nhật trạng thái hóa đơn');
     }
   };
+  
 
   const handleViewDetails = async (billId: number) => {
     try {
@@ -133,7 +151,30 @@ const BillList: React.FC = () => {
     setStatus(newStatus);
     setIsSearching(false);
   };
-
+   // Hàm mở Dialog và chọn hóa đơn muốn hủy
+   const handleCancelClick = (bill: BillResponse_View_Cake) => {
+    setSelectedBill(bill); // Chọn hóa đơn cần hủy
+    setIsDialogOpen(true); // Mở dialog xác nhận
+  };
+   // Hàm chuyển đổi Bill sang BillResponse_View_Cake
+   const convertToBillResponseViewCake = (bill: Bill): BillResponse_View_Cake => {
+    return {
+      billId: bill.billId,
+      customerName: bill.customerName,
+      customerPhone: bill.customerPhone,
+      totalAmount: bill.totalAmount,
+      billStatus: bill.billStatus,
+      paymentMethod: bill.paymentMethod,
+      nameArea:  '', // Nếu không có thì gán giá trị mặc định
+      nameTable: '', // Tương tự
+      diningOption: bill.diningOption || '', // Tương tự
+      billDetails:  [] // Tương tự
+    };
+  };
+  const handleOpenDialog = (bill: Bill) => {
+    setSelectedBill(convertToBillResponseViewCake(bill)); // Chuyển đổi Bill thành BillResponse_View_Cake
+    setIsDialogOpen(true);
+  };
   return (
     <div>
       <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginTop: '20px' }}>Danh sách hóa đơn</h1>
@@ -195,6 +236,7 @@ const BillList: React.FC = () => {
       <TableHead>Trạng thái</TableHead>
       <TableHead>Tổng tiền</TableHead>
       <TableHead>Thao tác</TableHead>
+      <TableHead>Hủy</TableHead>
     </TableRow>
   </TableHeader>
 
@@ -238,6 +280,18 @@ const BillList: React.FC = () => {
           <TableCell>
             <Button onClick={() => handleViewDetails(bill.billId)}>Xem chi tiết</Button>
           </TableCell>
+          <TableCell>
+                {/* Hiển thị nút "Hủy hóa đơn" nếu role là MANAGE và trạng thái là NOT_PAID */}
+                {role === "MANAGE" && bill.billStatus === BillStatus.NOT_PAID && (
+                  <Button
+                    variant="destructive"
+                   onClick={() => handleOpenDialog(bill)} // Gọi hàm mở dialog và chuyển đối tượng bill vào
+                  >
+                    Hủy hóa đơn
+                    
+                  </Button>
+                )}
+              </TableCell>
         </TableRow>
       ))
     )}
@@ -253,6 +307,28 @@ const BillList: React.FC = () => {
         currentPageElements={bills.length}
         totalElements={0}
       />
+        {/* Dialog xác nhận Hủy hóa đơn */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogOverlay />
+        <DialogContent>
+          <DialogClose onClick={() => setIsDialogOpen(false)}>
+            <X />
+          </DialogClose>
+          <h2 className="text-lg font-semibold">Xác nhận hủy hóa đơn</h2>
+          <p>Bạn có chắc chắn muốn hủy hóa đơn của {selectedBill.customerName}?</p>
+          <div className="flex justify-end gap-4 mt-4">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Hủy
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => updateBillStatus(selectedBill.billId, BillStatus.CANCEL)}
+            >
+              Xác nhận hủy
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogOverlay className="fixed inset-0 bg-black/50" />

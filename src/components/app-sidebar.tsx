@@ -55,7 +55,7 @@ const items = [
     },
     {
         title: "Bill",
-        url: "/admin/bills",
+        url: "/admin/bill",
         icon: FileText,
       },
 

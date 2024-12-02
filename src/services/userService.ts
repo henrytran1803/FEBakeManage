@@ -4,6 +4,10 @@ import { UserRequest } from "@/types/User";
 
 // Khai báo service cho user
 export const userService = {
+    createUser: async(register: UserRequest)=>{
+        const response=await userApi.create(register);
+        return response.data;
+    },
     // API sửa thông tin người dùng
     updateUser: async (id: number, userRequest: UserRequest) => {
         try {
@@ -54,3 +58,5 @@ export const userService = {
         }
     },
 };
+
+export { userApi };

@@ -25,6 +25,7 @@ import ExportIngredientPage from './pages/ExportIngredientPage';
 import SupplierPage from "./pages/SupplierPage";
 import RecipePage from "@/pages/RecipePage.tsx";
 import BakeryDashboard from "@/pages/DashBoardPage.tsx";
+import AreaPage from "@/pages/AreaPage"
 import {EmployeeLayout} from "@/layouts/EmployeeLayout.tsx";
 
 
@@ -49,19 +50,13 @@ const AppRoutes: React.FC = () => {
                 <Route path="category" element={<CategoryPage />} />
                 <Route path="discount" element={<PromotionPage />} />
                 <Route path="recipe" element={<RecipePage />} />
-                <Route path="bills" element={<BillList />} />
+                <Route path="bill" element={<BillList />} />
                 <Route path="manageexpiry" element={<ManageExpiryPage />} />
                 <Route path="nearexpiry" element={<NearExpiryPage />} />
                 <Route path="expired" element={<ExpiredPage />} />
-                <Route path="manage-user" element={<UserManagementPage />} />
-                <Route path="ingredient" element={<IngredientPage />} />
-                <Route path="import-history" element={<ImportHistoryPage />} />
-                <Route path="export-history" element={<ExportHistoryPage />} />
-                <Route path="import-ingredient" element={<ImportIngredientPage />} />
-                <Route path="export-ingredient" element={<ExportIngredientPage />} />
-                <Route path="supplier" element={<SupplierPage />} />
+                <Route path="area-table" element={<AreaPage />} />
+                <Route path="manage-user" element={<UserManagementPage />} />  
             </Route>
-
             {/*employee*/}
             <Route path="/employee" element={<ProtectedRoute role="USER" element={<EmployeeLayout />} />}>
                 {/*nghiên cứu chỗ page home*/}
