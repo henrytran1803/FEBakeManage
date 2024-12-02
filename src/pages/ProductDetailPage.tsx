@@ -83,7 +83,7 @@ export default function ProductDetailPage() {
             <Button
                 variant="ghost"
                 className="mb-6 flex items-center gap-2"
-                onClick={() => navigate('/')}
+                onClick={() => navigate(-1)}
             >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Products

@@ -25,17 +25,20 @@ import ExportIngredientPage from './pages/ExportIngredientPage';
 import SupplierPage from "./pages/SupplierPage";
 import RecipePage from "@/pages/RecipePage.tsx";
 import BakeryDashboard from "@/pages/DashBoardPage.tsx";
+import {EmployeeLayout} from "@/layouts/EmployeeLayout.tsx";
 
 
 const AppRoutes: React.FC = () => {
     return (
         <Routes>
             <Route path="/login" element={<LoginPage />} />
+            {/*user*/}
             <Route path="/:id" element={<UserLayout />}>
                 <Route index element={<HomePage />} />
-                <Route path="product/:id" element={<ProductDetailPage />} />
-                <Route path="cart" element={<CartPage />} />
             </Route>
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/product/:id" element={<ProductDetailPage />} />
+            {/*admin*/}
             <Route path="/admin" element={<ProtectedRoute role="MANAGE" element={<AdminLayout />} />}>
                 <Route index element={<BakeryDashboard />} />
                 <Route path="home" element={<BakeryDashboard />} />
@@ -43,26 +46,25 @@ const AppRoutes: React.FC = () => {
                 <Route path="category" element={<CategoryPage />} />
                 <Route path="discount" element={<PromotionPage />} />
                 <Route path="recipe" element={<RecipePage />} />
+                <Route path="bills" element={<BillList />} />
                 <Route path="manageexpiry" element={<ManageExpiryPage />} />
                 <Route path="nearexpiry" element={<NearExpiryPage />} />
                 <Route path="expired" element={<ExpiredPage />} />
-
-                <Route path="manage-user" element={<UserManagementPage />} />  
-            </Route>
-            <Route path="/employee" element={<ProtectedRoute role="USER" element={<UserLayout />} />}>
-               
-                <Route path="home" element={<HomePage />} />
-                <Route path="bill" element={<BillList />} />
-
+                <Route path="manage-user" element={<UserManagementPage />} />
                 <Route path="ingredient" element={<IngredientPage />} />
-            <Route path="import-history" element={<ImportHistoryPage />} />
-            <Route path="export-history" element={<ExportHistoryPage />} />
-            <Route path="import-ingredient" element={<ImportIngredientPage />} />
-            <Route path="export-ingredient" element={<ExportIngredientPage />} />
-            <Route path="supplier" element={<SupplierPage />} />
+                <Route path="import-history" element={<ImportHistoryPage />} />
+                <Route path="export-history" element={<ExportHistoryPage />} />
+                <Route path="import-ingredient" element={<ImportIngredientPage />} />
+                <Route path="export-ingredient" element={<ExportIngredientPage />} />
+                <Route path="supplier" element={<SupplierPage />} />
             </Route>
 
-         
+            {/*employee*/}
+            <Route path="/employee" element={<ProtectedRoute role="USER" element={<EmployeeLayout />} />}>
+                {/*nghiên cứu chỗ page home*/}
+                {/*<Route path="home" element={<HomePage />} />*/}
+                <Route path="bill" element={<BillList />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
         </Routes>
        
