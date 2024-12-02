@@ -1,6 +1,6 @@
 'use client'
 
-import { Ticket, ChevronUp, Home, Boxes, Settings, User2 , Box,FileText} from 'lucide-react'
+import {ChevronUp ,User2 ,FileText} from 'lucide-react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -27,9 +27,9 @@ import {useNavigate} from "react-router-dom";
 const items = [
   
     {
-        title: "Bill",  // Mới thêm mục Bill vào menu
-        url: "/employee/bill", // Địa chỉ URL của trang Bill
-        icon: FileText, // Sử dụng icon hóa đơn
+        title: "Bill",
+        url: "/employee/bill",
+        icon: FileText,
       },
     
 ]
@@ -39,8 +39,8 @@ export function AppSidebar() {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        logout(); // Xóa các thông tin authentication
-        navigate('/login'); // Chuyển hướng về trang login
+        logout();
+        navigate('/login');
     };
     useEffect(() => {
         const userData = localStorage.getItem('user');
