@@ -6,7 +6,7 @@ export interface User {
     dateOfBirth: string;
     email: string;
     active: boolean;
-    roles: string[];
+    roles: Set<string>;
   }
   export interface ListUserActive {
     content: User[];
@@ -40,7 +40,7 @@ export interface User {
     email: string;
     password: string;
     active: boolean; // Thay 'isActive' thành 'active' cho phù hợp với JavaScript
-    dateOfBirth: Date; // Dùng kiểu Date nếu backend sử dụng Date
+    dateOfBirth: String; // Dùng kiểu Date nếu backend sử dụng Date
     roles: Set<string>; // Dùng Set<string> cho trường roles nếu cần thiết
   }
   
