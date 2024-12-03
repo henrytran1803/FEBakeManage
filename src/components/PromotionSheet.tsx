@@ -24,6 +24,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {format} from "date-fns";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
 import {Switch} from "@/components/ui/switch.tsx";
+import {useCustomToast} from "@/hooks/CustomAlert.tsx";
+import {PromotionErrorCode, validatePromotionDates, validatePromotionName} from "@/utils/error/promotionError.ts";
 
 
 
@@ -33,13 +35,13 @@ export default function PromotionSheet({
                                            promotion,
                                            onSuccess
                                        }: PromotionSheetProps) {
-    // Form states
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [discount, setDiscount] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [promotionDetail, setPromotionDetail] = useState<PromotionForDetail | null>(null);
+    const { showErrorToast, showSuccessToast } = useCustomToast();
 
     const [products, setProducts] = useState<ProductBatch[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -85,11 +87,92 @@ export default function PromotionSheet({
             }
         }
     }, [isOpen, promotion]);
+
+
     const handleSubmit = async () => {
         try {
+            setLoading(true);
+
+            // For normal promotions
+            if (promotionType === "normal") {
+                // Name validation
+                if (!name.trim()) {
+                    showErrorToast(PromotionErrorCode.PROMOTION_NAME_REQUIRED);
+                    return;
+                }
+                if (!validatePromotionName(name)) {
+                    showErrorToast(PromotionErrorCode.PROMOTION_NAME_NO_SPECIAL_CHARS);
+                    return;
+                }
+                if (name.length > 250) {
+                    showErrorToast(PromotionErrorCode.PROMOTION_NAME_LENGTH);
+                    return;
+                }
+
+                // Description validation
+                if (!description.trim()) {
+                    showErrorToast(PromotionErrorCode.PROMOTION_DESC_REQUIRED);
+                    return;
+                }
+                if (description.length > 250) {
+                    showErrorToast(PromotionErrorCode.PROMOTION_DESC_LENGTH);
+                    return;
+                }
+
+                // Date validation
+                if (!startDate) {
+                    showErrorToast(PromotionErrorCode.PROMOTION_START_DATE_REQUIRED);
+                    return;
+                }
+                if (!endDate) {
+                    showErrorToast(PromotionErrorCode.PROMOTION_END_DATE_REQUIRED);
+                    return;
+                }
+
+                const dateError = validatePromotionDates(startDate, endDate);
+                if (dateError) {
+                    showErrorToast(dateError);
+                    return;
+                }
+            }
+
+            // Common validations for both normal and daily promotions
+            // Discount validation
+            if (!discount) {
+                showErrorToast(PromotionErrorCode.PROMOTION_DISCOUNT_REQUIRED);
+                return;
+            }
+            const discountValue = parseInt(discount);
+            if (discountValue < 0 || discountValue > 100) {
+                showErrorToast(PromotionErrorCode.PROMOTION_DISCOUNT_RANGE);
+                return;
+            }
+
+            // Product selection validation
+            if (selectedProducts.length === 0) {
+                showErrorToast(PromotionErrorCode.PROMOTION_PRODUCTS_REQUIRED);
+                return;
+            }
+
+            // Daily promotion specific validations
+            if (promotionType === "daily") {
+                if (!getLastestDate && !endDate) {
+                    showErrorToast(PromotionErrorCode.PROMOTION_DAILY_END_DATE_REQUIRED);
+                    return;
+                }
+                if (!getLastestDate) {
+                    const dateError = validatePromotionDates(new Date().toISOString().split('T')[0], endDate);
+                    if (dateError) {
+                        showErrorToast(PromotionErrorCode.PROMOTION_DAILY_END_DATE_INVALID);
+                        return;
+                    }
+                }
+            }
+
+            // Proceed with saving data...
             if (promotionType === "daily") {
                 const dailyPromotionData: PromotionDaily = {
-                    discount: parseInt(discount),
+                    discount: discountValue,
                     productBatchIds: selectedProducts,
                     endDate: getLastestDate ? "" : `${endDate}T23:59:59`,
                     skipDefaultDiscount,
@@ -97,7 +180,6 @@ export default function PromotionSheet({
                 };
                 await promotionService.createPromotionDaily(dailyPromotionData);
             } else {
-                // Logic cũ cho promotion thường
                 const formData = {
                     name,
                     description,
@@ -107,7 +189,6 @@ export default function PromotionSheet({
                 };
 
                 if (promotionDetail) {
-                    // Logic update hiện tại
                     const addedProducts = selectedProducts.filter(
                         id => !initialProducts.includes(id)
                     );
@@ -128,7 +209,7 @@ export default function PromotionSheet({
                     } as PromotionCreate);
                 }
             }
-
+            showSuccessToast("Success")
             onSuccess(true);
             onClose();
             resetForm();

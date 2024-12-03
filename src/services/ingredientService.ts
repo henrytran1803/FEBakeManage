@@ -4,6 +4,7 @@ import { Ingredient } from "@/types/Ingredient";
 import { ApiResponse } from "@/types/ApiResponse";
 import { ImportIngredientsRequest } from "@/types/ImportIngredientsRequest";
 import { ExportIngredientsRequest } from "@/types/ExportIngredientsRequest";
+import {ingredientApi} from "@/api/endpoints/ingredientApi.ts";
 
 export const ingredientService = {
     getAllIngredients: async (): Promise<ApiResponse<Ingredient[]>> => {
@@ -14,7 +15,15 @@ export const ingredientService = {
             throw new Error("Failed to fetch ingredients");
         }
     },
-
+   getAll: async () => {
+          try {
+              const response = await ingredientApi.getAll();
+              return response.data;
+          }
+          catch (error) {
+              throw new Error("cannot get all Ingredient API");
+          }
+      },
     createIngredient: async (data: { name: string; unit_id: number; warning_limits: number }): Promise<ApiResponse<Ingredient>> => {
         try {
             const response = await ingredientApi.createIngredient(data);
@@ -92,3 +101,4 @@ export const ingredientService = {
         }
     }
 };
+

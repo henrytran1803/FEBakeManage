@@ -28,5 +28,24 @@ export interface RecipeResponse {
     name: string;
     recipeDetails: RecipeResponseDetail[];
 
+export interface GetRecipe {
+    id: number;
+    name: string;
+    detailDTOS: GetDetailRecipe[];
+}
+export interface GetDetailRecipe {
+    ingredientId:number;
+    ingredientName:string;
+    quantity: number;
+}
+
+
+export interface CreateRecipe {
+    name:string;
+    recipeDetails: CreateRecipeDetail[]
+}
+export interface CreateRecipeDetail {
+    ingredientId:number;
+    quantity:number;
 }
 

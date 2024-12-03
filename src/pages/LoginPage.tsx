@@ -13,6 +13,7 @@ const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error , setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
   const handleLogin = async ( email: string, password: string) => {
     setIsLoading(true);
     setError(null);
@@ -20,7 +21,8 @@ const LoginPage: React.FC = () => {
       const result: ApiResponse<LoginData> = await login(email, password);
       if (result.success) {
         const roles = result.data.user.roles;
-        navigate(roles.includes("manage") ? "/admin/home" : "/dashboard");
+        navigate(roles.includes("manage") ? "/admin/home" : "/employee");
+
         console.log(roles);
       } else {
         setError(result.message || "Login failed. Please check your credentials.");
@@ -31,14 +33,13 @@ const LoginPage: React.FC = () => {
       setIsLoading(false);
     }
   };
+ 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("1")
     console.log(isLoading)
 
     if (!isLoading){
-      console.log("here")
       handleLogin(username, password);
     }
   };

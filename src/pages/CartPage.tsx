@@ -9,6 +9,8 @@ import { useCartStore } from "@/store/useCartStore.ts";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { DiningOption, PaymentMethod } from '@/types/Bill';
+import { billService } from '@/services/billService';
 
 const Cart: React.FC = () => {
     const navigate = useNavigate();
@@ -16,6 +18,11 @@ const Cart: React.FC = () => {
     const [productDetails, setProductDetails] = useState<ProductCart[]>([]);
     const [discountCode, setDiscountCode] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const [isCreatingBill, setIsCreatingBill] = useState(false);  // State để kiểm tra xem đang tạo hóa đơn không
+    const [customerName, setCustomerName] = useState('');
+    const [customerPhone, setCustomerPhone] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.CASH);  // Sử dụng enum
+    const [diningOption, setDiningOption] = useState<DiningOption>(DiningOption.DIN_IN);  // Sử dụng enum
 
     useEffect(() => {
         const loadProductDetails = async () => {
@@ -34,6 +41,29 @@ const Cart: React.FC = () => {
 
         loadProductDetails();
     }, [currentCart.carts, discountCode]);
+    
+      // Xử lý tạo hóa đơn mới
+    //   const handleCreateBill = async () => {
+    //     setIsCreatingBill(true);
+    //     try {
+    //         const billRequest = {
+    //             customerName,
+    //             customerPhone,
+    //             paymentMethod,
+    //             diningOption,
+    //             productBatchCarts: currentCart.carts // Dữ liệu sản phẩm từ giỏ hàng
+    //         };
+            
+    //         // Gửi yêu cầu tạo hóa đơn
+    //         await billService.createBill(billRequest);
+    //         alert("Hóa đơn đã được tạo thành công");
+    //         navigate("/hoadon");  // Chuyển hướng đến trang danh sách hóa đơn
+    //     } catch (error) {
+    //         console.error("Không thể tạo hóa đơn:", error);
+    //     } finally {
+    //         setIsCreatingBill(false);
+    //     }
+    // };
 
     if (isLoading) {
         return <div className="flex justify-center items-center min-h-[400px]">Loading...</div>;
