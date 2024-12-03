@@ -131,7 +131,7 @@ const ImportHistoryPage: React.FC = () => {
                     <table className="w-full mt-4 border-collapse">
                         <thead>
                             <tr>
-                                <th className="border px-4 py-2">Ingredient ID</th>
+                                <th className="border px-4 py-2">Nguyên liệu</th>
                                 <th className="border px-4 py-2">Số lượng</th>
                                 <th className="border px-4 py-2">Giá</th>
                             </tr>
