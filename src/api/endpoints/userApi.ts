@@ -2,8 +2,8 @@ import { api } from '../axios';
 import { ApiResponse } from '@/types/ApiResponse';
 import { User } from '@/types/Auth';
 
-import {  UserRequest, Page, ListUserActive } from '@/types/User';
-import { register } from 'module';
+import {  UserRequest, Page, ListUserActive, RegisterRequest } from '@/types/User';
+
 
 interface UserSearchParams {
   page?: number;
@@ -15,7 +15,7 @@ interface UserSearchParams {
 
 export const userApi = {
   //tạo người dùng
-  create: async (register:UserRequest): Promise<ApiResponse<User>> =>{
+  create: async (register:RegisterRequest): Promise<ApiResponse<User>> =>{
     const response=await  api.post('/api/auth/register',register);
     return response.data;
   },

@@ -1,10 +1,10 @@
 import { userApi } from "@/api/endpoints/userApi";
-import { UserRequest } from "@/types/User";
+import { RegisterRequest, UserRequest } from "@/types/User";
 
 
 // Khai báo service cho user
 export const userService = {
-    createUser: async(register: UserRequest)=>{
+    createUser: async(register: RegisterRequest)=>{
         const response=await userApi.create(register);
         return response.data;
     },

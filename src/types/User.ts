@@ -3,8 +3,8 @@ export interface User {
     id: number;
     firstName: string;
     lastName: string;
-    dateOfBirth: string;
     email: string;
+    dateOfBirth: string;
     active: boolean;
     roles: Set<string>;
   }
@@ -18,14 +18,7 @@ export interface User {
     number: number;
     sort: any;
   }
-  export interface UserCreate {
-    firstName: string;
-    lastName: string;
-    email: string;
-    dateOfBirth: string;
-    password: string;
-    roles: string[];
-  }
+
   
   export interface PaginatedUserResponse {
     content: User[];
@@ -33,14 +26,23 @@ export interface User {
     totalElements: number;
   }
 
-  
+  // dùng để tạo
+  export interface RegisterRequest {
+    firstName: string;
+    lastName: string;
+    email: string;
+    dateOfBirth: string; // Dùng kiểu Date nếu backend sử dụng Date
+    password: string;
+    roles: Set<string>; // Dùng Set<string> cho trường roles nếu cần thiết
+  }
+  // dùng để sửa
   export interface UserRequest {
     firstName: string;
     lastName: string;
     email: string;
     password: string;
-    active: boolean; // Thay 'isActive' thành 'active' cho phù hợp với JavaScript
-    dateOfBirth: String; // Dùng kiểu Date nếu backend sử dụng Date
+    dateOfBirth: string; // Dùng kiểu Date nếu backend sử dụng Date
+    active: boolean;
     roles: Set<string>; // Dùng Set<string> cho trường roles nếu cần thiết
   }
   
