@@ -6,7 +6,7 @@ export interface User {
     email: string;
     dateOfBirth: string;
     active: boolean;
-    roles: Set<string>;
+    roleIds: Set<number>;
   }
   export interface ListUserActive {
     content: User[];
@@ -33,7 +33,7 @@ export interface User {
     email: string;
     dateOfBirth: string; // Dùng kiểu Date nếu backend sử dụng Date
     password: string;
-    roles: Set<string>; // Dùng Set<string> cho trường roles nếu cần thiết
+    roleIds: number[]; // Dùng Set<string> cho trường roles nếu cần thiết
   }
   // dùng để sửa
   export interface UserRequest {
@@ -42,8 +42,17 @@ export interface User {
     email: string;
     password: string;
     dateOfBirth: string; // Dùng kiểu Date nếu backend sử dụng Date
-    active: boolean;
-    roles: Set<string>; // Dùng Set<string> cho trường roles nếu cần thiết
+    isActive:boolean;
+    roleIds: number[]; // Dùng Set<string> cho trường roles nếu cần thiết
+  }
+  export interface UserRequestSua {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    dateOfBirth: string; // Dùng kiểu Date nếu backend sử dụng Date
+    isActive:boolean;
+    roleIds: number[]; // Dùng Set<string> cho trường roles nếu cần thiết
   }
   
  // Cập nhật Page<T> để bao gồm các trường phân trang và thông tin khác từ API
