@@ -26,7 +26,6 @@ export default function PromotionSheet({
                                            promotion,
                                            onSuccess
                                        }: PromotionSheetProps) {
-    // State declarations
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [discount, setDiscount] = useState("");
@@ -165,21 +164,20 @@ export default function PromotionSheet({
                 showErrorToast(PromotionErrorCode.PROMOTION_PRODUCTS_REQUIRED);
                 return;
             }
-
-            // Daily promotion specific validations
-            if (promotionType === "daily" && !isEditing) {
-                if (!getLastestDate && !endDate) {
-                    showErrorToast(PromotionErrorCode.PROMOTION_DAILY_END_DATE_REQUIRED);
-                    return;
-                }
-                if (!getLastestDate) {
-                    const dateError = validatePromotionDates(new Date().toISOString().split('T')[0], endDate);
-                    if (dateError) {
-                        showErrorToast(PromotionErrorCode.PROMOTION_DAILY_END_DATE_INVALID);
-                        return;
-                    }
-                }
-            }
+            //
+            // if (promotionType === "daily" && !isEditing) {
+            //     if (!getLastestDate && !endDate) {
+            //         showErrorToast(PromotionErrorCode.PROMOTION_DAILY_END_DATE_REQUIRED);
+            //         return;
+            //     }
+            //     if (!getLastestDate) {
+            //         const dateError = validatePromotionDates(new Date().toISOString().split('T')[0], endDate);
+            //         if (dateError) {
+            //             showErrorToast(PromotionErrorCode.PROMOTION_DAILY_END_DATE_INVALID);
+            //             return;
+            //         }
+            //     }
+            // }
 
             // Submit logic
             if (promotionType === "daily" && !isEditing) {
@@ -190,6 +188,7 @@ export default function PromotionSheet({
                     skipDefaultDiscount,
                     getLastestDate
                 };
+                console.log(dailyPromotionData)
                 await promotionService.createPromotionDaily(dailyPromotionData);
             } else {
                 const formData = {
@@ -222,12 +221,11 @@ export default function PromotionSheet({
                 }
             }
 
-            showSuccessToast("Thành công");
+            showSuccessToast(PromotionErrorCode.POST_SUCCESS);
             onSuccess(true);
             onClose();
             resetForm();
         } catch (error) {
-            console.error('Failed to save promotion:', error);
             setError("Không thể lưu khuyến mãi. Vui lòng thử lại.");
             onSuccess(false);
         } finally {

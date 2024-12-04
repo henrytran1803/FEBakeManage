@@ -2,9 +2,9 @@ import { api } from '../axios';
 import { ApiResponse } from '@/types/ApiResponse';
 import { User } from '@/types/Auth';
 
-import {  UserRequest, Page, ListUserActive, UserName } from '@/types/User';
-import { register } from 'module';
+import {  UserRequest, ListUserActive, UserName } from '@/types/User';
 
+export interface UserSearchParams {
 
   page?: number;
   size?: number;
