@@ -2,7 +2,7 @@ import { api } from '../axios';
 import { ApiResponse } from '@/types/ApiResponse';
 import { User } from '@/types/Auth';
 
-import {  UserRequest, Page, ListUserActive } from '@/types/User';
+import {  UserRequest, Page, ListUserActive, UserName } from '@/types/User';
 import { register } from 'module';
 
 interface UserSearchParams {
@@ -62,5 +62,12 @@ getActiveUsers: async (params: UserSearchParams): Promise<ApiResponse<ListUserAc
   getUserById: async (id: number): Promise<ApiResponse<User>> => {
     const response = await api.get(`/api/admin/user/${id}`);
     return response.data;
+  },
+
+  // Api lấy tất cả user(tên)
+  getAllUser: async (): Promise<ApiResponse<UserName[]>> => {
+    const response = await api.get('/api/admin/user');
+    return response.data;
   }
+
 };

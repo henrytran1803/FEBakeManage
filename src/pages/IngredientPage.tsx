@@ -9,6 +9,8 @@ import { Unit } from "@/types/Unit";
 import { unitService } from "@/services/unitService";
 import Modal from "@/components/ui/Modal";
 import { useNavigate } from "react-router-dom";
+import { useCustomToast } from "@/hooks/CustomAlert";
+import { IngredientErrorCode } from "@/utils/error/ingredientError";
 
 const IngredientPage: React.FC = () => {
     const [allIngredients, setAllIngredients] = useState<Ingredient[]>([]); // Dữ liệu từ API
@@ -28,7 +30,8 @@ const IngredientPage: React.FC = () => {
     });
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const navigate = useNavigate();
-
+    const { showErrorToast, showSuccessToast } = useCustomToast();
+    
     // Fetch danh sách nguyên liệu
     const fetchIngredients = async () => {
         try {
@@ -36,9 +39,11 @@ const IngredientPage: React.FC = () => {
             const response = await ingredientService.getAllIngredients();
             if (response.success) {
                 setAllIngredients(response.data);
+            } else {
+                showErrorToast(IngredientErrorCode.INGREDIENT_FETCH_FAIL);
             }
         } catch (error) {
-            console.error("Error fetching ingredients:", error);
+            showErrorToast(IngredientErrorCode.INGREDIENT_FETCH_FAIL);
         } finally {
             setLoading(false);
         }
@@ -50,9 +55,11 @@ const IngredientPage: React.FC = () => {
             const response = await unitService.getAllUnits();
             if (response.success) {
                 setUnits(response.data);
+            } else {
+                showErrorToast(IngredientErrorCode.UNIT_FETCH_FAIL);
             }
         } catch (error) {
-            console.error("Error fetching units:", error);
+            showErrorToast(IngredientErrorCode.UNIT_FETCH_FAIL);
         }
     };
 
@@ -80,16 +87,16 @@ const IngredientPage: React.FC = () => {
         try {
             const response = await ingredientService.createIngredient(newIngredient);
             if (response.success) {
-                alert("Thêm nguyên liệu thành công!");
+                showSuccessToast(IngredientErrorCode.INGREDIENT_ADD_SUCCESS);
                 fetchIngredients(); // Refresh danh sách nguyên liệu
                 setShowAddModal(false);
                 setNewIngredient({ name: "", unit_id: 0, warning_limits: 0 });
             } else {
-                alert("Thêm nguyên liệu thất bại.");
+                showErrorToast(IngredientErrorCode.INGREDIENT_ADD_FAIL);
             }
         } catch (error) {
             console.error("Error adding ingredient:", error);
-            alert("Có lỗi xảy ra khi thêm nguyên liệu.");
+            showErrorToast(IngredientErrorCode.INGREDIENT_ADD_FAIL);
         }
     };
 
@@ -99,12 +106,18 @@ const IngredientPage: React.FC = () => {
 
         if (!newIngredient.name.trim()) {
             newErrors.name = "Tên nguyên liệu không được để trống.";
+            showErrorToast(IngredientErrorCode.INGREDIENT_NAME_REQUIRED);
+        }
+        if (newIngredient.name.length > 100) {
+            showErrorToast(IngredientErrorCode.INGREDIENT_NAME_LENGTH);
         }
         if (newIngredient.unit_id === 0) {
             newErrors.unit_id = "Vui lòng chọn đơn vị.";
+            showErrorToast(IngredientErrorCode.INGREDIENT_UNIT_REQUIRED);
         }
         if (newIngredient.warning_limits < 0) {
             newErrors.warning_limits = "Giới hạn cảnh báo không được nhỏ hơn 0.";
+            showErrorToast(IngredientErrorCode.INGREDIENT_WARNING_LIMIT);
         }
 
         setErrors(newErrors);
@@ -114,18 +127,23 @@ const IngredientPage: React.FC = () => {
     const handleAddUnitSubmit = async () => {
         if (!newUnit.name.trim()) {
             setErrors({ name: "Tên đơn vị không được để trống." });
+            showErrorToast(IngredientErrorCode.UNIT_NAME_REQUIRED);
+            return;
+        }
+        if (newUnit.name.length > 50) {
+            showErrorToast(IngredientErrorCode.UNIT_NAME_LENGTH);
             return;
         }
     
         try {
             await unitService.createUnit(newUnit.name.trim());
-            alert("Thêm đơn vị thành công!");
+            showSuccessToast(IngredientErrorCode.UNIT_ADD_SUCCESS);
             setShowAddUnitModal(false); // Đóng modal
             setNewUnit({ name: "" }); // Reset form
             setErrors({}); // Reset lỗi
             fetchUnits();
         } catch (error) {
-            setErrors({ name: "Có lỗi xảy ra khi thêm đơn vị." });
+            showErrorToast(IngredientErrorCode.UNIT_ADD_FAIL);
         }
     };
     
@@ -205,7 +223,7 @@ const IngredientPage: React.FC = () => {
                 </Button>
             </div>
 
-            <IngredientTable ingredients={filteredIngredients} units={units} onRefresh={fetchIngredients} />
+            <IngredientTable ingredients={filteredIngredients} units={units}  isActiveFilter={isActiveFilter} onRefresh={fetchIngredients} />
 
             {showAddModal && (
                 <Modal

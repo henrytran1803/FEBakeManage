@@ -57,6 +57,16 @@ export const userService = {
             throw new Error("Failed to fetch user by ID");
         }
     },
+
+    // API lấy danh sách tất cả user(tên)
+    getAllUser: async () => {
+        try {
+            const response = await userApi.getAllUser();
+            return response;
+        } catch (error) {
+            throw new Error("Fail to get all user");
+        }
+    },
 };
 
 export { userApi };
