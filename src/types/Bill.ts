@@ -1,5 +1,5 @@
 export enum PaymentMethod{
-    CASH="CASK",
+    CASH="CASH",
     QR_CODE="QR_CODE"
 }
 export enum DiningOption{
@@ -54,6 +54,7 @@ export interface BillResponseCreate {
     sort: any;
   }
 export interface BillResponse_View_Cake{
+   
     billId: number;
     customerName: string;
     customerPhone: string;
@@ -92,16 +93,5 @@ export interface BillStatusDTO{
     billId: number;
     oldStatus:string;
     newStatus:string;
-    updatedBy:number;
-    updatedAt:Date;
-}
-export interface BillStatusHistoryDTO{
-    id: number;
-    billId: number;
-    oldStatus:string;
-    newStatus:string;
-    updateById:number;
-    updatedByName:string;
-    updateAt:Date;
-
+  
 }

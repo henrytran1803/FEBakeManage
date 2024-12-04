@@ -165,7 +165,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="CASH">Cash</SelectItem>
-                <SelectItem value="CARD">Card</SelectItem>
+                <SelectItem value="QR_CODE">Card</SelectItem>
               </SelectContent>
             </Select>
           </div>

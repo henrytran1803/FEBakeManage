@@ -1,6 +1,6 @@
 import { api } from '../axios';
 import { ApiResponse } from "@/types/ApiResponse";
-import { BillResponseData, BillResponse_View_Cake, BillStatusHistoryDTO, BillRequest, BillStatusDTO, BillStatus, BillResponseCreate } from "@/types/Bill";
+import { BillResponseData, BillResponse_View_Cake, BillRequest, BillStatusDTO, BillStatus, BillResponseCreate } from "@/types/Bill";
 import { Search } from 'lucide-react';
 
 
@@ -35,11 +35,7 @@ export const billApi = {
         return response.data;
     },
 
-    // Lấy lịch sử trạng thái của hóa đơn
-    getStatusHistory: async (billId: number): Promise<ApiResponse<BillStatusHistoryDTO[]>> => {
-        const response = await api.get(`/api/user/bills/${billId}/history`);
-        return response.data;
-    },
+ 
 
     // Tạo hóa đơn mới
     createBill: async (billRequest: BillRequest): Promise<ApiResponse<BillResponseCreate>> => {
@@ -48,10 +44,10 @@ export const billApi = {
     },
 
     // Cập nhật trạng thái hóa đơn
-    updateBillStatus: async (billId: number, newStatus: BillStatus, userId?: number): Promise<ApiResponse<BillStatusDTO>> => {
+    updateBillStatus: async (billId: number, newStatus: BillStatus): Promise<ApiResponse<BillStatusDTO>> => {
         const params = new URLSearchParams();
         params.append('newStatus', newStatus);
-        if (userId) params.append('userId', userId.toString());
+       
 
         const response = await api.put(`/api/user/bills/${billId}/status?${params.toString()}`);
         return response.data;

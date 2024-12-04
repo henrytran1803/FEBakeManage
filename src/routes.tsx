@@ -27,6 +27,11 @@ import RecipePage from "@/pages/RecipePage.tsx";
 import BakeryDashboard from "@/pages/DashBoardPage.tsx";
 import AreaPage from "@/pages/AreaPage"
 import {EmployeeLayout} from "@/layouts/EmployeeLayout.tsx";
+import CheckoutedBill from "./pages/CheckoutedBill";
+import { Cancel } from "@radix-ui/react-alert-dialog";
+import CancelPage from "./pages/CancelPage";
+import QRSuccessPage from "./pages/QRssPage";
+import CancelQRPage from "./pages/CancelQRPage";
 
 
 const AppRoutes: React.FC = () => {
@@ -40,7 +45,12 @@ const AppRoutes: React.FC = () => {
             <Route path="/:id" element={<UserLayout />}>
                 <Route index element={<HomePage />} />
             </Route>
+            <Route path="/bills/:billId/checkouted" element={<CheckoutedBill />} />
+            <Route path="/bills/:billId/cancelCash" element={<CancelPage />} />
+            <Route path="/bills/:billId/qrsuccess" element={<QRSuccessPage />} />
+            <Route path="/bills/:billId/cancel" element={<CancelQRPage />} />
             <Route path="/cart" element={<CartPage />} />
+            
             <Route path="/product/:id" element={<ProductDetailPage />} />
             {/*admin*/}
             <Route path="/admin" element={<ProtectedRoute role="MANAGE" element={<AdminLayout />} />}>
