@@ -69,6 +69,7 @@ const SupplierPage: React.FC = () => {
         }
         return null; // Dữ liệu hợp lệ
     };
+    
 
     const handleSave = async () => {
         const validationError = validateSupplier(currentSupplier);
@@ -108,6 +109,7 @@ const SupplierPage: React.FC = () => {
             showErrorToast(SupplierErrorCode.SUPPLIER_UPDATE_FAIL);
         }
     };
+    
 
     const handleInputChange = (field: keyof Omit<Supplier, "id">, value: string) => {
         setCurrentSupplier({ ...currentSupplier, [field]: value });
