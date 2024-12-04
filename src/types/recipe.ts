@@ -27,7 +27,7 @@ export interface RecipeResponse {
     id: number;
     name: string;
     recipeDetails: RecipeResponseDetail[];
-
+}
 export interface GetRecipe {
     id: number;
     name: string;

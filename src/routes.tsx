@@ -14,9 +14,6 @@ import {UserLayout} from "@/layouts/UserLayout.tsx";
 import ProductDetailPage from "@/pages/ProductDetailPage.tsx";
 import CartPage from "@/pages/CartPage.tsx";
 import BillList from "./pages/BillList";
-
-import UserManagementPage from "./pages/UserManagementPage";
-
 import IngredientPage  from "./pages/IngredientPage";   
 import ImportHistoryPage from './pages/ImportHistoryPage';
 import ExportHistoryPage from './pages/ExportHistoryPage';
@@ -32,6 +29,7 @@ import { Cancel } from "@radix-ui/react-alert-dialog";
 import CancelPage from "./pages/CancelPage";
 import QRSuccessPage from "./pages/QRssPage";
 import CancelQRPage from "./pages/CancelQRPage";
+
 
 
 const AppRoutes: React.FC = () => {
@@ -65,12 +63,17 @@ const AppRoutes: React.FC = () => {
                 <Route path="nearexpiry" element={<NearExpiryPage />} />
                 <Route path="expired" element={<ExpiredPage />} />
                 <Route path="area-table" element={<AreaPage />} />
-                <Route path="manage-user" element={<UserManagementPage />} />  
+                <Route path="manage-user" element={<UserPage />} />
+                <Route path="ingredient" element={<IngredientPage />} />
+                <Route path="import-history" element={<ImportHistoryPage />} />
+                <Route path="export-history" element={<ExportHistoryPage />} />
+                <Route path="import-ingredient" element={<ImportIngredientPage />} />
+                <Route path="export-ingredient" element={<ExportIngredientPage />} />
+                <Route path="supplier" element={<SupplierPage />} />
             </Route>
             {/*employee*/}
             <Route path="/employee" element={<ProtectedRoute role="USER" element={<EmployeeLayout />} />}>
-                {/*nghiên cứu chỗ page home*/}
-                {/*<Route path="home" element={<HomePage />} />*/}
+
                 <Route path="bill" element={<BillList />} />
             </Route>
             <Route path="*" element={<NotFound />} />

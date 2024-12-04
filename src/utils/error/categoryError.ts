@@ -5,7 +5,7 @@ export enum CategoryErrorCode {
     CATEGORY_IMAGE_SIZE = 'CATEGORY_IMAGE_SIZE',
     CATEGORY_IMAGE_TYPE = 'CATEGORY_IMAGE_TYPE',
     CONNECT_ERROR = 'CONNECT_ERROR',
-    POST_SUCCESS = 'POST_SUCCESS',
+    POST_CATEGORY_SUCCESS = 'POST_SUCCESS',
     UPDATE_SUCCESS = 'UPDATE_SUCCESS'
 }
 
@@ -16,6 +16,6 @@ export const categoryErrorMessages: { [key in CategoryErrorCode]: string } = {
     [CategoryErrorCode.CATEGORY_IMAGE_SIZE]: 'Kích thước hình ảnh không được vượt quá 5MB',
     [CategoryErrorCode.CATEGORY_IMAGE_TYPE]: 'Vui lòng chọn file hình ảnh hợp lệ',
     [CategoryErrorCode.CONNECT_ERROR]: 'Có lỗi xảy ra khi thao tác với danh mục',
-    [CategoryErrorCode.POST_SUCCESS]: 'Tạo danh mục thành công',
+    [CategoryErrorCode.POST_CATEGORY_SUCCESS]: 'Tạo danh mục thành công',
     [CategoryErrorCode.UPDATE_SUCCESS]: 'Cập nhật danh mục thành công'
 };

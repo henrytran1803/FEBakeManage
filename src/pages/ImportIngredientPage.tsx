@@ -8,6 +8,10 @@ import LoadingScreen from "@/pages/LoadingScreen";
 import Modal from "@/components/ui/Modal";
 import { Unit } from "@/types/Unit";
 import { unitService } from "@/services/unitService";
+import { useCustomToast } from "@/hooks/CustomAlert";
+import { IngredientErrorCode } from "@/utils/error/ingredientError";
+import { SupplierErrorCode } from "@/utils/error/supplierError";
+
 
 const ImportIngredientPage: React.FC = () => {
     const [ingredients, setIngredients] = useState<any[]>([]);  // Lưu danh sách Ingredient ban đầu
@@ -19,16 +23,19 @@ const ImportIngredientPage: React.FC = () => {
     const [selectedSupplier, setSelectedSupplier] = useState<number | string>("Không");
     const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
-
+    const { showErrorToast, showSuccessToast } = useCustomToast();
+    
     // Lấy danh sách nhà cung cấp
     const fetchSuppliers = async () => {
         try {
             const response = await supplierService.getSuppliers();
             if (response.success) {
                 setSuppliers(response.data);
+            } else {
+                showErrorToast(SupplierErrorCode.SUPPLIER_FETCH_FAIL);
             }
         } catch (error) {
-            console.error("Error fetching suppliers:", error);
+            showErrorToast(SupplierErrorCode.SUPPLIER_FETCH_FAIL);
         }
     };
 
@@ -38,9 +45,11 @@ const ImportIngredientPage: React.FC = () => {
             const response = await unitService.getAllUnits();
             if (response.success) {
                 setUnits(response.data);
+            } else {
+                showErrorToast(IngredientErrorCode.UNIT_FETCH_FAIL);
             }
         } catch (error) {
-            console.error("Error fetching units:", error);
+            showErrorToast(IngredientErrorCode.UNIT_FETCH_FAIL);
         }
     };
 
@@ -60,9 +69,11 @@ const ImportIngredientPage: React.FC = () => {
                     quantity: 1,  
                     price: 0,  
                 })));
+            } else {
+                showErrorToast(IngredientErrorCode.INGREDIENT_FETCH_FAIL);
             }
         } catch (error) {
-            console.error("Error fetching ingredients:", error);
+            showErrorToast(IngredientErrorCode.INGREDIENT_FETCH_FAIL);
         } finally {
             setLoading(false);
         }
@@ -116,8 +127,28 @@ const ImportIngredientPage: React.FC = () => {
     };
 
     const handleSubmit = async () => {
+        if (selectedIngredients.length === 0) {
+            showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_EMPTY);
+            return;
+        }
+
+        for (const ingredient of selectedIngredients) {
+            if (ingredient.quantity <= 0) {
+                showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_QUANTITY);
+                return;
+            }
+            if (ingredient.price === null ) {
+                showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_PRICE_EMPTY);
+                return;
+            }
+            if (ingredient.price < 0) {
+                showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_PRICE);
+                return;
+            }
+        }
+
         const requestData: ImportIngredientsRequest = {
-            user_id: 1, // Giả sử user_id là 1, thay bằng id của người đang đăng nhập.
+            user_id: 1, 
             id_supplier: selectedSupplier === "Không" ? null : Number(selectedSupplier), // Chuyển đổi thành number
             ingredients: selectedIngredients,
         };
@@ -125,14 +156,14 @@ const ImportIngredientPage: React.FC = () => {
         try {
             const response = await ingredientService.importIngredients(requestData);
             if (response.success) {
-                alert("Nhập nguyên liệu thành công!");
+                showSuccessToast(IngredientErrorCode.IMPORT_INGREDIENT_SUCCESS);
                 setSelectedIngredients([]); // Reset lại danh sách nguyên liệu đã chọn
             } else {
-                alert("Có lỗi xảy ra khi nhập nguyên liệu.");
+                showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_FAIL);
             }
         } catch (error) {
             console.error("Error importing ingredients:", error);
-            alert("Có lỗi khi nhập nguyên liệu.");
+            showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_FAIL);
         }
     };
 
