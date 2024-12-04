@@ -1,5 +1,5 @@
 export enum PaymentMethod{
-    CASH="CASK",
+    CASH="CASH",
     QR_CODE="QR_CODE"
 }
 export enum DiningOption{
@@ -13,6 +13,7 @@ export enum BillStatus{
     COMPLETED="COMPLETED",
     CANCEL="CANCEL"
 }
+// response cho
 export interface Bill {
     billId: number;
     customerName: string;
@@ -22,6 +23,25 @@ export interface Bill {
     billStatus: BillStatus;
     totalAmount: number;
   }
+
+export interface billDetails {
+    id: number;
+    productBatchId: number;
+    quantity: number;
+    price: number;
+}
+
+  // response cho tạo bill
+export interface BillResponseCreate {
+    billId: number;
+    customerName: string;
+    customerPhone: string;
+    paymentMethod:string;
+    diningOption: string;
+    billStatus: string;
+    totalAmount: number;
+    billDetails: billDetails[];
+}
   
   export interface BillResponseData {
     content: Bill[];
@@ -34,6 +54,7 @@ export interface Bill {
     sort: any;
   }
 export interface BillResponse_View_Cake{
+   
     billId: number;
     customerName: string;
     customerPhone: string;
@@ -59,27 +80,18 @@ export interface BillRequest{
     customerPhone:string;
     paymentMethod:string;
     tableId:number;
-    diningOption:DiningOption;
+    diningOption:string;
+   
     billDetails: BillDetailRequest[];
 }
 export interface BillDetailRequest{
     productBatchId: number;
     quantity: number;
+   
 }
 export interface BillStatusDTO{
     billId: number;
     oldStatus:string;
     newStatus:string;
-    updatedBy:number;
-    updatedAt:Date;
-}
-export interface BillStatusHistoryDTO{
-    id: number;
-    billId: number;
-    oldStatus:string;
-    newStatus:string;
-    updateById:number;
-    updatedByName:string;
-    updateAt:Date;
-
+  
 }

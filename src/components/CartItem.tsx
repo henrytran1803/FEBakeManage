@@ -14,13 +14,15 @@ interface CartItemProps {
     productDetails: ProductCart;
     onUpdateQuantity: (item: { productBatchId: number; quantity: number }) => void;
     onRemove: (productBatchId: number) => void;
+    onCheckout: () => void; // Callback để xử lý checkout
 }
 
 const CartItem: React.FC<CartItemProps> = ({
                                                item,
                                                productDetails,
                                                onUpdateQuantity,
-                                               onRemove
+                                               onRemove,
+                                               onCheckout
                                            }) => {
     const getDiscountedPrice = () => {
         const basePrice = productDetails.price * item.quantity;
@@ -28,6 +30,7 @@ const CartItem: React.FC<CartItemProps> = ({
         const bonusDiscountAmount = basePrice * (productDetails.discountBonus / 100);
         return basePrice - dailyDiscountAmount - bonusDiscountAmount;
     };
+    const discountedPrice = getDiscountedPrice(); // Tính giá cuối sau khi giảm giá
     console.log(getDiscountedPrice())
     return (
         <div className="flex items-center gap-4 p-4 border-b">

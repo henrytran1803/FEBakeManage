@@ -33,6 +33,15 @@ export const userService = {
         }
     },
 
+       activateUser: async (id: number) => {
+        try {
+            const response = await userApi.activateUser(id);
+            return response;
+        } catch (error) {
+            throw new Error("Failed to deactivate user");
+        }
+    },
+
     getActiveUsers: async (params: UserSearchParams = {}) => {
         try {
             const response = await userApi.getActiveUsers({

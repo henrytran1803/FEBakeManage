@@ -1,6 +1,6 @@
 
 import { billApi } from "@/api/endpoints/billApi";
-import { BillRequest, BillStatus, BillStatusDTO, BillStatusHistoryDTO } from "@/types/Bill";
+import { BillRequest, BillStatus, BillStatusDTO } from "@/types/Bill";
 
 
 
@@ -42,30 +42,22 @@ export const billService = {
         }
     },
 
-    // API lấy lịch sử trạng thái của hóa đơn
-    getStatusHistory: async (billId: number): Promise<BillStatusHistoryDTO[]> => {
-        try {
-            const response = await billApi.getStatusHistory(billId);
-            return response.data;  // Trả về lịch sử trạng thái hóa đơn
-        } catch (error) {
-            throw new Error(`Failed to fetch bill status history for bill ID ${billId}`);
-        }
-    },
+
 
     // API tạo hóa đơn mới
     createBill: async (billRequest: BillRequest) => {
         try {
             const response = await billApi.createBill(billRequest);
-            return response;  // Trả về kết quả từ API
+            return response.data;  // Trả về kết quả từ API
         } catch (error) {
             throw new Error("Failed to create a new bill");
         }
     },
 
     // API cập nhật trạng thái hóa đơn
-    updateBillStatus: async (billId: number, newStatus: BillStatus, userId?: number): Promise<BillStatusDTO> => {
+    updateBillStatus: async (billId: number, newStatus: BillStatus): Promise<BillStatusDTO> => {
         try {
-            const response = await billApi.updateBillStatus(billId, newStatus, userId);
+            const response = await billApi.updateBillStatus(billId, newStatus);
             return response.data;  // Trả về kết quả từ API
         } catch (error) {
             throw new Error(`Failed to update bill status for bill ID ${billId}`);
