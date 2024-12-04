@@ -1,15 +1,21 @@
 import { userApi } from "@/api/endpoints/userApi";
-import { UserRequest } from "@/types/User";
+import { RegisterRequest, UserRequest, UserRequestSua } from "@/types/User";
 
 
 // Khai báo service cho user
 export const userService = {
-    createUser: async(register: UserRequest)=>{
-        const response=await userApi.create(register);
-        return response.data;
+    createUser: async(register: RegisterRequest)=>{
+        try {
+            const response = await userApi.createUser(register);  // Gọi API để tạo người dùng
+            return response.data;  // Trả về dữ liệu khi tạo thành công
+          } catch (error) {
+            // Xử lý lỗi (ví dụ: lỗi 403 hoặc lỗi khác)
+            console.error("Error creating user:", error);
+            throw new Error('Failed to create user');  // Hoặc trả về thông báo lỗi cho UI
+          }
     },
     // API sửa thông tin người dùng
-    updateUser: async (id: number, userRequest: UserRequest) => {
+    updateUser: async (id: number, userRequest: UserRequestSua) => {
         try {
             const response = await userApi.updateUser(id, userRequest);
             return response;  // Trả về kết quả từ API

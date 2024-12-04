@@ -2,8 +2,8 @@ import { api } from '../axios';
 import { ApiResponse } from '@/types/ApiResponse';
 import { User } from '@/types/Auth';
 
-import {  UserRequest, Page, ListUserActive } from '@/types/User';
-import { register } from 'module';
+import {  UserRequest,  ListUserActive, RegisterRequest, UserRequestSua } from '@/types/User';
+
 
 interface UserSearchParams {
   page?: number;
@@ -15,12 +15,18 @@ interface UserSearchParams {
 
 export const userApi = {
   //tạo người dùng
-  create: async (register:UserRequest): Promise<ApiResponse<User>> =>{
-    const response=await  api.post('/api/auth/register',register);
-    return response.data;
+  createUser: async (register:RegisterRequest): Promise<ApiResponse<User>> =>{
+    try {
+      const response = await api.post('/api/auth/register', register);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      // Thực hiện xử lý lỗi như thông báo cho người dùng
+      throw error;
+    }
   },
   // API sửa thông tin người dùng
-  updateUser: async (id: number, userRequest: UserRequest): Promise<ApiResponse<User>> => {
+  updateUser: async (id: number, userRequest: UserRequestSua): Promise<ApiResponse<User>> => {
     const response = await api.put(`/api/admin/user/${id}`, userRequest);
     return response.data;
   },
