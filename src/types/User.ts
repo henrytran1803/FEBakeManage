@@ -84,3 +84,11 @@ export interface ApiResponse<T> {
   errorcode: string;
   data: T;
 }
+
+// Cấu trúc để lấy tên của user
+export interface UserName {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}

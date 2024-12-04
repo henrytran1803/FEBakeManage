@@ -5,18 +5,33 @@ import { ingredientService } from "@/services/ingredientService";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
 import { Unit } from "@/types/Unit";
+import { IngredientErrorCode } from "@/utils/error/ingredientError";
+import { useCustomToast } from "@/hooks/CustomAlert";
 
 interface IngredientTableProps {
     ingredients: Ingredient[];
     units: Unit[];
+    isActiveFilter: boolean; 
     onRefresh: () => void;
 }
 
-const IngredientTable: React.FC<IngredientTableProps> = ({ ingredients, units, onRefresh }) => {
+const IngredientTable: React.FC<IngredientTableProps> = ({ ingredients, units, isActiveFilter, onRefresh }) => {
     const [editingIngredient, setEditingIngredient] = useState<Ingredient | null>(null); // Ingredient đang sửa
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // Hiển thị modal xác nhận xóa
     const [selectedIngredientId, setSelectedIngredientId] = useState<number | null>(null); // ID nguyên liệu cần xóa
     const [errors, setErrors] = useState<{ [key: string]: string }>({}); // Lưu lỗi từng trường khi sửa nguyên liệu
+    const { showErrorToast, showSuccessToast } = useCustomToast();
+
+    // Phân trang
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10; // Số lượng mục mỗi trang
+    const totalPages = Math.ceil(ingredients.length / itemsPerPage);
+
+    // Dữ liệu của trang hiện tại
+    const currentIngredients = ingredients.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
 
     const getStatus = (quantity: number, warningLimit: number) => {
         return quantity <= warningLimit ? "Cần nhập thêm" : "Đủ nguyên liệu";
@@ -30,10 +45,16 @@ const IngredientTable: React.FC<IngredientTableProps> = ({ ingredients, units, o
     const handleDelete = async () => {
         if (selectedIngredientId) {
             try {
-                await ingredientService.deleteIngredient(selectedIngredientId);
-                onRefresh(); // Refresh danh sách sau khi xóa thành công
+                const deleteResponse = await ingredientService.deleteIngredient(selectedIngredientId);
+                if (deleteResponse.success) {
+                    onRefresh(); // Refresh danh sách sau khi xóa thành công
+                    showSuccessToast(IngredientErrorCode.INGREDIENT_DELETE_SUCCESS);
+                } else {
+                    showErrorToast(IngredientErrorCode.INGREDIENT_DELETE_FAIL);
+                }
+                
             } catch (error) {
-                console.error("Failed to delete ingredient:", error);
+                showErrorToast(IngredientErrorCode.INGREDIENT_DELETE_FAIL);
             } finally {
                 setShowDeleteConfirm(false); // Đóng modal xác nhận
             }
@@ -47,44 +68,70 @@ const IngredientTable: React.FC<IngredientTableProps> = ({ ingredients, units, o
     const validateForm = (): boolean => {
         const newErrors: { [key: string]: string } = {};
 
-        // Kiểm tra tên nguyên liệu
-        if (!editingIngredient?.name.trim()) {
+        if (editingIngredient) {
+            if (!editingIngredient?.name.trim()) {
+                newErrors.name = "Tên nguyên liệu không được để trống.";
+                showErrorToast(IngredientErrorCode.INGREDIENT_NAME_REQUIRED);
+            }
+            if (editingIngredient?.name.length > 100 ) {
+                newErrors.name = "Tên nguyên liệu không được quá 100 ký tự";
+                showErrorToast(IngredientErrorCode.INGREDIENT_NAME_LENGTH);
+            }
+        } else {
             newErrors.name = "Tên nguyên liệu không được để trống.";
+            showErrorToast(IngredientErrorCode.INGREDIENT_NAME_REQUIRED);
         }
+        
 
-        // Kiểm tra đơn vị
         if (editingIngredient?.unit_id === 0) {
             newErrors.unit_id = "Vui lòng chọn đơn vị.";
+            showErrorToast(IngredientErrorCode.INGREDIENT_UNIT_REQUIRED);
         }
 
-        // Kiểm tra warning_limits
         if (editingIngredient && editingIngredient?.warning_limits < 0) {
             newErrors.warning_limits = "Giới hạn cảnh báo không được nhỏ hơn 0.";
+            showErrorToast(IngredientErrorCode.INGREDIENT_WARNING_LIMIT);
         }
 
-        setErrors(newErrors); // Cập nhật lỗi vào state
-
-        return Object.keys(newErrors).length === 0; // Nếu không có lỗi thì hợp lệ
+        setErrors(newErrors); 
+        return Object.keys(newErrors).length === 0; 
     };
 
     const handleEditSubmit = async () => {
         if (!validateForm()) {
-            return; // Dừng nếu form không hợp lệ
+            return; 
         }
 
         if (editingIngredient) {
             try {
-                await ingredientService.updateIngredient(editingIngredient.id, {
+                const editResponse = await ingredientService.updateIngredient(editingIngredient.id, {
                     name: editingIngredient.name,
                     unit_id: editingIngredient.unit_id,
                     warning_limits: editingIngredient.warning_limits,
                 });
-                onRefresh(); // Refresh danh sách sau khi sửa thành công
+                if (editResponse.success) {
+                    showSuccessToast(IngredientErrorCode.INGREDIENT_UPDATE_SUCCESS);
+                } else {
+                    showErrorToast(IngredientErrorCode.INGREDIENT_UPDATE_FAIL);
+                }
+                onRefresh(); 
             } catch (error) {
-                console.error("Failed to update ingredient:", error);
+                showErrorToast(IngredientErrorCode.INGREDIENT_UPDATE_FAIL);
             } finally {
-                setEditingIngredient(null); // Đóng form sửa
+                setEditingIngredient(null); 
             }
+        }
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
         }
     };
 
@@ -101,9 +148,9 @@ const IngredientTable: React.FC<IngredientTableProps> = ({ ingredients, units, o
                     </tr>
                 </thead>
                 <tbody>
-                    {ingredients.map((ingredient) => {
+                    {currentIngredients.map((ingredient) => {
                         const status = getStatus(ingredient.quantity, ingredient.warning_limits);
-                        const isLowStock = status === "Cần nhập thêm"; // Kiểm tra trạng thái Cần nhập thêm
+                        const isLowStock = status === "Cần nhập thêm"; 
                         
                         return (
                             <tr key={ingredient.id} className={isLowStock ? "bg-yellow-100" : ""}>
@@ -120,21 +167,39 @@ const IngredientTable: React.FC<IngredientTableProps> = ({ ingredients, units, o
                                     >
                                         <Edit className="w-5 h-5" />
                                     </button>
-                                    <button
-                                        className="text-red-500"
-                                        onClick={() => {
-                                            setSelectedIngredientId(ingredient.id);
-                                            setShowDeleteConfirm(true);
-                                        }}
-                                    >
-                                        <Trash className="w-5 h-5" />
-                                    </button>
+                                    {isActiveFilter && (
+                                        <button
+                                            className="text-red-500"
+                                            onClick={() => {
+                                                setSelectedIngredientId(ingredient.id);
+                                                setShowDeleteConfirm(true);
+                                            }}
+                                        >
+                                            <Trash className="w-5 h-5" />
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         );
                     })}
                 </tbody>
             </table>
+
+            {/* Phân trang */}
+            <div className="flex items-center justify-between mt-4">
+                <div>
+                    Hiển thị {currentIngredients.length} trên tổng số {ingredients.length} danh mục
+                </div>
+                <div className="flex items-center">
+                    <Button onClick={handlePrevPage} disabled={currentPage === 1}>
+                        Trước
+                    </Button>
+                    <span className="mx-2">Trang {currentPage} / {totalPages}</span>
+                    <Button onClick={handleNextPage} disabled={currentPage === totalPages}>
+                        Sau
+                    </Button>
+                </div>
+            </div>
 
             {/* Modal xác nhận xóa */}
             {showDeleteConfirm && (
