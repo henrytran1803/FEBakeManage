@@ -1,6 +1,6 @@
 // src/services/ingredientService.ts
 import { ingredientApi } from "@/api/endpoints/ingredientApi";
-import { Ingredient } from "@/types/Ingredient";
+import { Ingredient } from "@/types/Ingredient.ts";
 import { ApiResponse } from "@/types/ApiResponse";
 import { ImportIngredientsRequest } from "@/types/ImportIngredientsRequest";
 import { ExportIngredientsRequest } from "@/types/ExportIngredientsRequest";

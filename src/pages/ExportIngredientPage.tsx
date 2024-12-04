@@ -8,7 +8,7 @@ import Modal from "@/components/ui/Modal";
 import { ingredientService } from "@/services/ingredientService";
 import { recipeService } from "@/services/recipeService";
 import { ExportIngredientsRequest, IngredientDetail } from "@/types/ExportIngredientsRequest";
-import { Ingredient } from "@/types/Ingredient";
+import { Ingredient } from "@/types/Ingredient.ts";
 import { Unit } from "@/types/Unit";
 import { unitService } from "@/services/unitService";
 import { useCustomToast } from "@/hooks/CustomAlert";

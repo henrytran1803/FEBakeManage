@@ -7,8 +7,10 @@ import { IngredientErrorCode } from "@/utils/error/ingredientError";
 import { SupplierErrorCode } from "@/utils/error/supplierError";
 
 
+
 export const useCustomToast = () => {
     const { toast } = useToast();
+
     const getErrorMessage = (errorCode: ErrorCode): string => {
         const allErrorMessages  = {
             ...ProductErrorCode,
@@ -16,10 +18,12 @@ export const useCustomToast = () => {
             ...categoryErrorMessages,
             ...IngredientErrorCode,
             ...SupplierErrorCode,
+
         };
         console.log(allErrorMessages[errorCode as keyof typeof allErrorMessages] || 'Đã xảy ra lỗi')
         return allErrorMessages[errorCode as keyof typeof allErrorMessages] || 'Đã xảy ra lỗi';
     };
+
     const showErrorToast = ( message: ErrorCode) => {
         const description =  getErrorMessage(message);
 

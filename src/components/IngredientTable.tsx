@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Ingredient } from "@/types/Ingredient";
+import { Ingredient } from "@/types/Ingredient.ts";
 import { Trash, Edit } from "lucide-react";
 import { ingredientService } from "@/services/ingredientService";
 import { Button } from "@/components/ui/button";

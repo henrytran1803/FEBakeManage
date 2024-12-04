@@ -6,6 +6,7 @@ import Modal from "@/components/ui/Modal";
 import { useCustomToast } from "@/hooks/CustomAlert";
 import { SupplierErrorCode } from "@/utils/error/supplierError";
 
+
 const SupplierPage: React.FC = () => {
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
     const [showModal, setShowModal] = useState(false);
@@ -13,8 +14,7 @@ const SupplierPage: React.FC = () => {
     const [currentSupplier, setCurrentSupplier] = useState<Omit<Supplier, "id">>({ name: "", number: "" });
     const [editingSupplierId, setEditingSupplierId] = useState<number | null>(null);
     const { showErrorToast, showSuccessToast } = useCustomToast();
-    
-    // Phân trang state
+
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // Mỗi trang hiển thị 10 nhà cung cấp
     const totalPages = Math.ceil(suppliers.length / itemsPerPage);
@@ -22,6 +22,7 @@ const SupplierPage: React.FC = () => {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
+
 
     const fetchSuppliers = async () => {
         try {
@@ -34,6 +35,7 @@ const SupplierPage: React.FC = () => {
            
         } catch (error) {
             showErrorToast(SupplierErrorCode.SUPPLIER_FETCH_FAIL);
+
         }
     };
 
@@ -71,11 +73,33 @@ const SupplierPage: React.FC = () => {
             } else {
                 showErrorToast(SupplierErrorCode.SUPPLIER_ADD_FAIL)
             }
-        }
 
-        setShowModal(false);
-        setEditingSupplierId(null);
-        await fetchSuppliers();
+        }
+        return true;
+    };
+
+    const handleSave = async () => {
+        try {
+            if (!validateSupplier()) {
+                return;
+            }
+
+            if (isEditMode && editingSupplierId !== null) {
+                await supplierService.updateSupplier(editingSupplierId, currentSupplier);
+                showSuccessToast(SupplierErrorCode.UPDATE_SUCCESS);
+            } else {
+                await supplierService.createSupplier(currentSupplier);
+                showSuccessToast(SupplierErrorCode.CREATE_SUCCESS);
+            }
+
+            setShowModal(false);
+            setEditingSupplierId(null);
+            await fetchSuppliers();
+        } catch (error) {
+            showErrorToast(
+                isEditMode ? SupplierErrorCode.UPDATE_ERROR : SupplierErrorCode.CREATE_ERROR
+            );
+        }
     };
 
     const handleInputChange = (field: keyof Omit<Supplier, "id">, value: string) => {
@@ -98,12 +122,12 @@ const SupplierPage: React.FC = () => {
 
             <table className="table-auto min-w-full mt-4 border">
                 <thead>
-                    <tr>
-                        <th className="border px-4 py-2">ID</th>
-                        <th className="border px-4 py-2">Tên Nhà Cung Cấp</th>
-                        <th className="border px-4 py-2">Số Điện Thoại</th>
-                        <th className="border px-4 py-2">Thao Tác</th>
-                    </tr>
+                <tr>
+                    <th className="border px-4 py-2">ID</th>
+                    <th className="border px-4 py-2">Tên Nhà Cung Cấp</th>
+                    <th className="border px-4 py-2">Số Điện Thoại</th>
+                    <th className="border px-4 py-2">Thao Tác</th>
+                </tr>
                 </thead>
                 <tbody>
                     {currentItems.map((supplier) => (
@@ -116,6 +140,7 @@ const SupplierPage: React.FC = () => {
                             </td>
                         </tr>
                     ))}
+
                 </tbody>
             </table>
 
