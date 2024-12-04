@@ -204,6 +204,7 @@ const IngredientTable: React.FC<IngredientTableProps> = ({ ingredients, units, i
             {/* Modal xác nhận xóa */}
             {showDeleteConfirm && (
                 <Modal
+                    isOpen={showDeleteConfirm}
                     title="Xác nhận xóa"
                     onClose={() => setShowDeleteConfirm(false)}
                     actions={
@@ -222,6 +223,7 @@ const IngredientTable: React.FC<IngredientTableProps> = ({ ingredients, units, i
             {/* Form sửa */}
             {editingIngredient && (
                 <Modal
+                    isOpen={editingIngredient}
                     title="Sửa nguyên liệu"
                     onClose={() => setEditingIngredient(null)}
                     actions={
