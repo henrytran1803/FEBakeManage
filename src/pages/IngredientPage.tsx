@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { PlusCircle } from "lucide-react";
 import { ingredientService } from "@/services/ingredientService";
-import { Ingredient } from "@/types/Ingredient";
+import { Ingredient } from "@/types/Ingredient.ts";
 import LoadingScreen from "@/pages/LoadingScreen";
 import { Button } from "@/components/ui/button";
 import IngredientTable from "@/components/IngredientTable";

@@ -24,7 +24,8 @@ import { productService } from "@/services/productService";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {ImageUpload} from "@/components/ImageUpload.tsx";
 import {useCustomToast} from "@/hooks/CustomAlert.tsx";
-import {ProductErrorCode} from "@/utils/error/createProductError.tsx";
+import {ProductErrorCode} from "@/utils/error/createProductError.ts";
+import {useNavigate} from "react-router-dom";
 
 
 
@@ -42,6 +43,7 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
     const [isImageChanged, setIsImageChanged] = useState(false);
     const [deletedImages, setDeletedImages] = useState<ProductImage[]>([]);
     const { showErrorToast, showSuccessToast } = useCustomToast();
+    const navigate = useNavigate();
 
     const handleImageDeleted = (deletedImage: ProductImage) => {
         setDeletedImages(prev => [...prev, deletedImage]);
@@ -213,8 +215,6 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                 showErrorToast(ProductErrorCode.PRODUCT_WIDTH_INPUT_ERROR2);
                 return;
             }
-
-            // Height validation
             if (!formData.height) {
                 showErrorToast(ProductErrorCode.PRODUCT_HEIGHT_INPUT_ERROR1);
                 return;
@@ -323,8 +323,14 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="recipeId">Công thức</Label>
-                        <Select
+                        <Label htmlFor="recipeId">Công thức  </Label>
+                        <span
+                            onClick={() => navigate("/admin/recipe")}
+                                className="text-xs text-blue-500 hover:text-blue-600 cursor-pointer"
+                            >
+                              Chưa có công thức?
+                            </span>
+                                                    <Select
                             value={formData.recipeId.toString()}
                             onValueChange={(value) => setFormData(prev => ({
                                 ...prev,
@@ -345,6 +351,7 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                                 ))}
                             </SelectContent>
                         </Select>
+
                     </div>
 
                     <div className="space-y-2">

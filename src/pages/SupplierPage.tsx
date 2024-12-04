@@ -3,6 +3,9 @@ import { supplierService } from "@/services/supplierService";
 import { Supplier } from "@/types/Supplier";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
+import {useCustomToast} from "@/hooks/CustomAlert.tsx";
+import {SupplierErrorCode} from "@/utils/error/SupplierErrorCode.ts";
+
 
 const SupplierPage: React.FC = () => {
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -10,13 +13,14 @@ const SupplierPage: React.FC = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [currentSupplier, setCurrentSupplier] = useState<Omit<Supplier, "id">>({ name: "", number: "" });
     const [editingSupplierId, setEditingSupplierId] = useState<number | null>(null);
+    const { showErrorToast, showSuccessToast } = useCustomToast();
 
     const fetchSuppliers = async () => {
         try {
             const response = await supplierService.getSuppliers();
             setSuppliers(response.data);
         } catch (error) {
-            console.error("Error fetching suppliers:", error);
+            showErrorToast(SupplierErrorCode.FETCH_ERROR);
         }
     };
 
@@ -37,18 +41,46 @@ const SupplierPage: React.FC = () => {
         setShowModal(true);
     };
 
-    const handleSave = async () => {
-        if (isEditMode && editingSupplierId !== null) {
-            // Update supplier
-            await supplierService.updateSupplier(editingSupplierId, currentSupplier);
-        } else {
-            // Add new supplier
-            await supplierService.createSupplier(currentSupplier);
+    const validateSupplier = (): boolean => {
+        if (!currentSupplier.name.trim()) {
+            showErrorToast(SupplierErrorCode.NAME_REQUIRED);
+            return false;
         }
+        if (!currentSupplier.number.trim()) {
+            showErrorToast(SupplierErrorCode.PHONE_REQUIRED);
+            return false;
+        }
+        // Validate phone number format (assuming Vietnamese phone number)
+        const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})\b/;
+        if (!phoneRegex.test(currentSupplier.number)) {
+            showErrorToast(SupplierErrorCode.PHONE_REQUIRED);
+            return false;
+        }
+        return true;
+    };
 
-        setShowModal(false);
-        setEditingSupplierId(null);
-        await fetchSuppliers();
+    const handleSave = async () => {
+        try {
+            if (!validateSupplier()) {
+                return;
+            }
+
+            if (isEditMode && editingSupplierId !== null) {
+                await supplierService.updateSupplier(editingSupplierId, currentSupplier);
+                showSuccessToast(SupplierErrorCode.UPDATE_SUCCESS);
+            } else {
+                await supplierService.createSupplier(currentSupplier);
+                showSuccessToast(SupplierErrorCode.CREATE_SUCCESS);
+            }
+
+            setShowModal(false);
+            setEditingSupplierId(null);
+            await fetchSuppliers();
+        } catch (error) {
+            showErrorToast(
+                isEditMode ? SupplierErrorCode.UPDATE_ERROR : SupplierErrorCode.CREATE_ERROR
+            );
+        }
     };
 
     const handleInputChange = (field: keyof Omit<Supplier, "id">, value: string) => {
@@ -62,24 +94,24 @@ const SupplierPage: React.FC = () => {
 
             <table className="table-auto min-w-full mt-4 border">
                 <thead>
-                    <tr>
-                        <th className="border px-4 py-2">ID</th>
-                        <th className="border px-4 py-2">Tên Nhà Cung Cấp</th>
-                        <th className="border px-4 py-2">Số Điện Thoại</th>
-                        <th className="border px-4 py-2">Thao Tác</th>
-                    </tr>
+                <tr>
+                    <th className="border px-4 py-2">ID</th>
+                    <th className="border px-4 py-2">Tên Nhà Cung Cấp</th>
+                    <th className="border px-4 py-2">Số Điện Thoại</th>
+                    <th className="border px-4 py-2">Thao Tác</th>
+                </tr>
                 </thead>
                 <tbody>
-                    {suppliers.map((supplier) => (
-                        <tr key={supplier.id}>
-                            <td className="border px-4 py-2">{supplier.id}</td>
-                            <td className="border px-4 py-2">{supplier.name}</td>
-                            <td className="border px-4 py-2">{supplier.number}</td>
-                            <td className="border px-4 py-2">
-                                <Button onClick={() => handleOpenEditModal(supplier)}>Sửa</Button>
-                            </td>
-                        </tr>
-                    ))}
+                {suppliers.map((supplier) => (
+                    <tr key={supplier.id}>
+                        <td className="border px-4 py-2">{supplier.id}</td>
+                        <td className="border px-4 py-2">{supplier.name}</td>
+                        <td className="border px-4 py-2">{supplier.number}</td>
+                        <td className="border px-4 py-2">
+                            <Button onClick={() => handleOpenEditModal(supplier)}>Sửa</Button>
+                        </td>
+                    </tr>
+                ))}
                 </tbody>
             </table>
 

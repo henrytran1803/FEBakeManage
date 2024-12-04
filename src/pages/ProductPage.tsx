@@ -77,14 +77,12 @@ const ProductPage: React.FC = () => {
     // Handlers
     const handleCreate = () => {
         setSelectedProductId(null);
-        // setIsEdit(false);
         setIsFormOpen(true);
     };
 
     const handleEdit = (product: Product) => {
         console.log(product)
         setSelectedProductId(product.id);
-        // setIsEdit(true);
         setIsFormOpen(true);
     };
 
@@ -190,7 +188,7 @@ const ProductPage: React.FC = () => {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Bạn có chắc chắn muốn xóa danh mục này?
+                            Bạn có chắc chắn muốn xóa sản phẩm này?
                             Hành động này không thể hoàn tác.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
@@ -213,7 +211,7 @@ const ProductPage: React.FC = () => {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Xác nhận kích hoạt lại</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Bạn có chắc chắn muốn kích hoạt danh mục này?
+                            Bạn có chắc chắn muốn kích hoạt sản phẩm này?
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
