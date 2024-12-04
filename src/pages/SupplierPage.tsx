@@ -135,6 +135,7 @@ const SupplierPage: React.FC = () => {
 
             {showModal && (
                 <Modal
+                    isOpen={showModal}
                     title={isEditMode ? "Sửa Nhà Cung Cấp" : "Thêm Nhà Cung Cấp"}
                     onClose={() => setShowModal(false)}
                     actions={
