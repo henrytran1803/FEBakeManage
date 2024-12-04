@@ -7,7 +7,7 @@ export type ErrorCode =
     | UserErrorCode
     | PromotionErrorCode
     | CategoryErrorCode
-    | SupplierErrorCode;
+    | SupplierErrorCode
 
 export type ErrorMessages = {
     [key in ErrorCode]: string;

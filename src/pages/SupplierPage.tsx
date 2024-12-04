@@ -6,7 +6,6 @@ import Modal from "@/components/ui/Modal";
 import { useCustomToast } from "@/hooks/CustomAlert";
 import { SupplierErrorCode } from "@/utils/error/supplierError";
 
-
 const SupplierPage: React.FC = () => {
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
     const [showModal, setShowModal] = useState(false);
@@ -16,13 +15,12 @@ const SupplierPage: React.FC = () => {
     const { showErrorToast, showSuccessToast } = useCustomToast();
 
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10; // Mỗi trang hiển thị 10 nhà cung cấp
+    const itemsPerPage = 10;
     const totalPages = Math.ceil(suppliers.length / itemsPerPage);
     const currentItems = suppliers.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-
 
     const fetchSuppliers = async () => {
         try {
@@ -32,10 +30,9 @@ const SupplierPage: React.FC = () => {
             } else {
                 showErrorToast(SupplierErrorCode.SUPPLIER_FETCH_FAIL);
             }
-           
+
         } catch (error) {
             showErrorToast(SupplierErrorCode.SUPPLIER_FETCH_FAIL);
-
         }
     };
 
@@ -58,7 +55,6 @@ const SupplierPage: React.FC = () => {
 
     const handleSave = async () => {
         if (isEditMode && editingSupplierId !== null) {
-            // Update supplier
             const response = await supplierService.updateSupplier(editingSupplierId, currentSupplier);
             if (response.success) {
                 showSuccessToast(SupplierErrorCode.SUPPLIER_UPDATE_SUCCESS)
@@ -73,33 +69,11 @@ const SupplierPage: React.FC = () => {
             } else {
                 showErrorToast(SupplierErrorCode.SUPPLIER_ADD_FAIL)
             }
-
         }
-        return true;
-    };
 
-    const handleSave = async () => {
-        try {
-            if (!validateSupplier()) {
-                return;
-            }
-
-            if (isEditMode && editingSupplierId !== null) {
-                await supplierService.updateSupplier(editingSupplierId, currentSupplier);
-                showSuccessToast(SupplierErrorCode.UPDATE_SUCCESS);
-            } else {
-                await supplierService.createSupplier(currentSupplier);
-                showSuccessToast(SupplierErrorCode.CREATE_SUCCESS);
-            }
-
-            setShowModal(false);
-            setEditingSupplierId(null);
-            await fetchSuppliers();
-        } catch (error) {
-            showErrorToast(
-                isEditMode ? SupplierErrorCode.UPDATE_ERROR : SupplierErrorCode.CREATE_ERROR
-            );
-        }
+        setShowModal(false);
+        setEditingSupplierId(null);
+        await fetchSuppliers();
     };
 
     const handleInputChange = (field: keyof Omit<Supplier, "id">, value: string) => {
@@ -130,17 +104,16 @@ const SupplierPage: React.FC = () => {
                 </tr>
                 </thead>
                 <tbody>
-                    {currentItems.map((supplier) => (
-                        <tr key={supplier.id}>
-                            <td className="border px-4 py-2">{supplier.id}</td>
-                            <td className="border px-4 py-2">{supplier.name}</td>
-                            <td className="border px-4 py-2">{supplier.number}</td>
-                            <td className="border px-4 py-2">
-                                <Button onClick={() => handleOpenEditModal(supplier)}>Sửa</Button>
-                            </td>
-                        </tr>
-                    ))}
-
+                {currentItems.map((supplier) => (
+                    <tr key={supplier.id}>
+                        <td className="border px-4 py-2">{supplier.id}</td>
+                        <td className="border px-4 py-2">{supplier.name}</td>
+                        <td className="border px-4 py-2">{supplier.number}</td>
+                        <td className="border px-4 py-2">
+                            <Button onClick={() => handleOpenEditModal(supplier)}>Sửa</Button>
+                        </td>
+                    </tr>
+                ))}
                 </tbody>
             </table>
 
