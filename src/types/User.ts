@@ -5,12 +5,12 @@ export interface User {
     lastName: string;
     dateOfBirth: string;
     email: string;
-    active: boolean;
-    roles: Set<string>;
+    isActive: boolean;
+    roleIds: number[];
   }
   export interface ListUserActive {
     content: User[];
-    pageable: any; // Có thể thêm kiểu dữ liệu chi tiết cho pageable
+    pageable: any;
     last: boolean;
     totalElements: number;
     totalPages: number;
@@ -39,12 +39,10 @@ export interface User {
     lastName: string;
     email: string;
     password: string;
-    active: boolean; // Thay 'isActive' thành 'active' cho phù hợp với JavaScript
-    dateOfBirth: String; // Dùng kiểu Date nếu backend sử dụng Date
-    roles: Set<string>; // Dùng Set<string> cho trường roles nếu cần thiết
+    dateOfBirth: String;
+    roleIds: number[];
   }
   
- // Cập nhật Page<T> để bao gồm các trường phân trang và thông tin khác từ API
 export interface Page<T> {
   content: T[];          // Mảng dữ liệu người dùng
   totalElements: number; // Tổng số phần tử (người dùng)
