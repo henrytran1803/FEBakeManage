@@ -34,6 +34,17 @@ export const userService = {
         }
     },
 
+       // API kích hoạt tài khoản người dùng
+       activateUser: async (id: number) => {
+        try {
+            const response = await userApi.activateUser(id);
+            return response;
+        } catch (error) {
+            throw new Error("Failed to deactivate user");
+        }
+    },
+
+
     // API lấy danh sách người dùng active với phân trang
     getActiveUsers: async (page: number = 0, size: number = 10) => {
         try {

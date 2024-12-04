@@ -37,6 +37,12 @@ export const userApi = {
     return response.data;
   },
 
+    // API kích hoạt tài khoản người dùng
+    activateUser: async (id: number): Promise<ApiResponse<void>> => {
+      const response = await api.patch(`/api/admin/user/${id}/activate`);
+      return response.data;
+    },
+
  // API lấy danh sách người dùng active
 getActiveUsers: async (params: UserSearchParams): Promise<ApiResponse<ListUserActive>> => {
   const searchParams = new URLSearchParams();

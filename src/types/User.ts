@@ -5,7 +5,7 @@ export interface User {
     lastName: string;
     email: string;
     dateOfBirth: string;
-    active: boolean;
+    isActive: boolean;
     roleIds: Set<number>;
   }
   export interface ListUserActive {

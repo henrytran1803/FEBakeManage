@@ -56,7 +56,7 @@ export const billService = {
     createBill: async (billRequest: BillRequest) => {
         try {
             const response = await billApi.createBill(billRequest);
-            return response;  // Trả về kết quả từ API
+            return response.data;  // Trả về kết quả từ API
         } catch (error) {
             throw new Error("Failed to create a new bill");
         }

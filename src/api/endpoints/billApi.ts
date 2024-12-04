@@ -1,6 +1,6 @@
 import { api } from '../axios';
 import { ApiResponse } from "@/types/ApiResponse";
-import { BillResponseData, BillResponse_View_Cake, BillStatusHistoryDTO, BillRequest, BillStatusDTO, BillStatus } from "@/types/Bill";
+import { BillResponseData, BillResponse_View_Cake, BillStatusHistoryDTO, BillRequest, BillStatusDTO, BillStatus, BillResponseCreate } from "@/types/Bill";
 import { Search } from 'lucide-react';
 
 
@@ -42,7 +42,7 @@ export const billApi = {
     },
 
     // Tạo hóa đơn mới
-    createBill: async (billRequest: BillRequest): Promise<ApiResponse<BillResponseData>> => {
+    createBill: async (billRequest: BillRequest): Promise<ApiResponse<BillResponseCreate>> => {
         const response = await api.post('/api/user/bills', billRequest);
         return response.data;
     },
