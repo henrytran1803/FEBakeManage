@@ -12,25 +12,27 @@ import { Dialog, DialogClose, DialogContent, DialogOverlay } from '@/components/
 import {getImageUrl} from "@/utils/imageUtils.ts";
 import {Input} from "@/components/ui/input.tsx";
 
+
 const BillList: React.FC = () => {
   const defaultBill: BillResponse_View_Cake = {
     billId: 0,
-    customerName: '',
-    customerPhone: '',
+    customerName: "",
+    customerPhone: "",
     totalAmount: 0,
     billStatus: BillStatus.PAID,
-    paymentMethod: 'CASH',
-    nameArea: '',
-    nameTable: '',
-    diningOption: '',
-    billDetails: []
+    paymentMethod: "CASH",
+    nameArea: "",
+    nameTable: "",
+    diningOption: "",
+    billDetails: [],
   };
-   // Search-related state and functions
-   const [isSearching, setIsSearching] = useState(false);
+  // Search-related state and functions
+  const [isSearching, setIsSearching] = useState(false);
 
   const [bills, setBills] = useState<Bill[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedBill, setSelectedBill] = useState<BillResponse_View_Cake>(defaultBill);
+  const [selectedBill, setSelectedBill] =
+    useState<BillResponse_View_Cake>(defaultBill);
   const [status, setStatus] = useState<BillStatus>(BillStatus.PAID);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
@@ -38,12 +40,16 @@ const BillList: React.FC = () => {
   const [role, setRole] = useState<string | null>(null); // State to store user role
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Thêm state để theo dõi loại Dialog
+  const [dialogType, setDialogType] = useState<
+    "cancel" | "details" | "pay" | null
+  >(null);
 
   useEffect(() => {
-      // Giả sử bạn lấy role từ localStorage hoặc từ API
-      const userRole = localStorage.getItem('auth'); // Hoặc lấy từ API
-      setRole(userRole); // Lưu role vào state
-      console.log(userRole)
+    // Giả sử bạn lấy role từ localStorage hoặc từ API
+    const userRole = localStorage.getItem("auth"); // Hoặc lấy từ API
+    setRole(userRole); // Lưu role vào state
+    console.log(userRole);
     const fetchBills = async () => {
       try {
         setIsLoading(true);
@@ -51,8 +57,7 @@ const BillList: React.FC = () => {
         setBills(response.data.content);
         setTotalPages(response.data.totalPages);
       } catch (error) {
-        setError('Không thể tải danh sách hóa đơn');
-
+        setError("Không thể tải danh sách hóa đơn");
       } finally {
         setIsLoading(false);
       }
@@ -63,6 +68,7 @@ const BillList: React.FC = () => {
 
   const updateBillStatus = async (billId: number, newStatus: BillStatus) => {
     try {
+
       const userData = localStorage.getItem('user');
       if (userData) {
         const parsedUser = JSON.parse(userData);
@@ -73,32 +79,43 @@ const BillList: React.FC = () => {
           alert('Hóa đơn không tồn tại');
           return;
         }
-        if (userRole === "MANAGE" && bill.billStatus === BillStatus.NOT_PAID) {
+   
+
+      if (userRole === "MANAGE") {
+        // Quản lý có thể cập nhật tất cả trạng thái mà không bị giới hạn
+        await billService.updateBillStatus(billId, newStatus, userId);
+        alert("Trạng thái hóa đơn đã được cập nhật");
+        setDialogType("cancel"); // Điều chỉnh loại dialog khi cập nhật thành công
+      } else if (userRole === "USER") {
+        // Nhân viên không được phép chuyển từ NOT_PAID sang CANCEL
+        if (
+          bill.billStatus !== BillStatus.NOT_PAID ||
+          newStatus !== BillStatus.CANCEL
+        ) {
           await billService.updateBillStatus(billId, newStatus, userId);
-          alert('Trạng thái hóa đơn đã được cập nhật');
-          setIsDialogOpen(false);
-        } else if (userRole !== "MANAGE") {
-          alert('Bạn không có quyền cập nhật trạng thái này');
-        } else if (bill.billStatus !== BillStatus.NOT_PAID) {
-          alert('Hóa đơn không có trạng thái "NOT_PAID" để cập nhật thành "CANCEL"');
+          alert("Trạng thái hóa đơn đã được cập nhật");
+        } else {
+          alert(
+            "Nhân viên không thể chuyển trạng thái từ NOT_PAID sang CANCEL"
+          );
         }
       } else {
-        alert('Không tìm thấy dữ liệu người dùng trong localStorage');
+        alert("Bạn không có quyền cập nhật trạng thái này");
       }
     } catch (error) {
-      console.error('Lỗi khi cập nhật trạng thái hóa đơn', error);
-      alert('Đã có lỗi xảy ra khi cập nhật trạng thái hóa đơn');
+      console.error("Lỗi khi cập nhật trạng thái hóa đơn", error);
+      alert("Đã có lỗi xảy ra khi cập nhật trạng thái hóa đơn");
     }
   };
-  
 
   const handleViewDetails = async (billId: number) => {
     try {
       const response = await billService.getDetailsById(billId);
       setSelectedBill(response);
-      setIsDialogOpen(true);
+      // setIsDialogOpen(true);
+      setDialogType("details");
     } catch (error) {
-      setError('Không thể lấy chi tiết hóa đơn');
+      setError("Không thể lấy chi tiết hóa đơn");
     }
   };
 
@@ -110,35 +127,40 @@ const BillList: React.FC = () => {
 
   const [searchParams, setSearchParams] = useState<SearchParams>({
     id: undefined,
-    customerName: '',
-    customerPhone: ''
+    customerName: "",
+    customerPhone: "",
   });
 
   const [searchResults, setSearchResults] = useState<Bill[]>([]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSearchParams(prev => ({
+    setSearchParams((prev) => ({
       ...prev,
-      [name]: value === '' ? undefined : 
-              name === 'id' ? parseInt(value) : value
+      [name]:
+        value === "" ? undefined : name === "id" ? parseInt(value) : value,
     }));
   };
 
   const handleSearchSubmit = async () => {
     try {
-        // ... perform search logic using searchParams ...
-        setIsSearching(true); // Set isSearching to true upon search submission
+      // ... perform search logic using searchParams ...
+      setIsSearching(true); // Set isSearching to true upon search submission
       const response = await billService.searchBill({
         ...(searchParams.id && { id: searchParams.id }),
-        ...(searchParams.customerName && { customerName: searchParams.customerName.trim() }),
-        ...(searchParams.customerPhone && { customerPhone: searchParams.customerPhone.trim() })
+        ...(searchParams.customerName && {
+          customerName: searchParams.customerName.trim(),
+        }),
+        ...(searchParams.customerPhone && {
+          customerPhone: searchParams.customerPhone.trim(),
+        }),
       });
       setSearchResults(response.data.content);
     } catch (error) {
       console.error("Lỗi tìm kiếm", error);
     }finally {
        setIsSearching(false);
+
     }
   };
 
@@ -147,11 +169,14 @@ const BillList: React.FC = () => {
     setIsSearching(false);
   };
    const handleCancelClick = (bill: BillResponse_View_Cake) => {
+
     setSelectedBill(bill); // Chọn hóa đơn cần hủy
-    setIsDialogOpen(true); // Mở dialog xác nhận
+    // setIsDialogOpen(true); // Mở dialog xác nhận
   };
-   // Hàm chuyển đổi Bill sang BillResponse_View_Cake
-   const convertToBillResponseViewCake = (bill: Bill): BillResponse_View_Cake => {
+  // Hàm chuyển đổi Bill sang BillResponse_View_Cake
+  const convertToBillResponseViewCake = (
+    bill: Bill
+  ): BillResponse_View_Cake => {
     return {
       billId: bill.billId,
       customerName: bill.customerName,
@@ -163,11 +188,13 @@ const BillList: React.FC = () => {
       nameTable: '',
       diningOption: bill.diningOption || '',
       billDetails:  []
+
     };
   };
   const handleOpenDialog = (bill: Bill) => {
     setSelectedBill(convertToBillResponseViewCake(bill)); // Chuyển đổi Bill thành BillResponse_View_Cake
-    setIsDialogOpen(true);
+    // setIsDialogOpen(true);
+    setDialogType("cancel");
   };
   return (
       <div className="p-4 min-w-[80vw]">
@@ -332,7 +359,7 @@ const BillList: React.FC = () => {
               <p className="text-sm font-medium">Tên khu vực: {selectedBill.nameArea}</p>
               <p className="text-sm">Tên bàn: {selectedBill.nameTable}</p>
               <p className="text-sm font-semibold">Tổng tiền: {selectedBill.totalAmount.toFixed(2)} VND</p>
-            </div>
+
 
             {selectedBill.billDetails && selectedBill.billDetails.length > 0 ? (
                 <div className="mt-4">
@@ -384,7 +411,6 @@ const BillList: React.FC = () => {
             </Alert>
         )}
       </div>
-
   );
 };
 

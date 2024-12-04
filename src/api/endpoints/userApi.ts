@@ -4,6 +4,7 @@ import { User } from '@/types/Auth';
 
 import {UserRequest, ListUserActive} from '@/types/User';
 export interface UserSearchParams {
+
   page?: number;
   size?: number;
   isActive?: string;
