@@ -29,28 +29,7 @@ export const userApi = {
     return response.data;
   },
 
- tài khoản người dùng
-    activateUser: async (id: number): Promise<ApiResponse<void>> => {
-      const response = await api.patch(`/api/admin/user/${id}/activate`);
-      return response.data;
-    },
-
- // API lấy danh sách người dùng active
-getActiveUsers: async (params: UserSearchParams): Promise<ApiResponse<ListUserActive>> => {
-  const searchParams = new URLSearchParams();
-  if (params.page !== undefined) searchParams.append('page', params.page.toString());
-  if (params.size) searchParams.append('size', params.size.toString());
-  if (params.sortBy) searchParams.append('sortBy', params.sortBy);
-  if (params.sortDir) searchParams.append('sortDir', params.sortDir);
-  if (params.isActive !== undefined) searchParams.append('isActive', params.isActive.toString());
-
-  const response = await api.get(`/api/admin/user/active?${searchParams.toString()}`);
-  return response.data; // Đây là dữ liệu trả về từ API, bao gồm content và các trường khác.
-},
-
-
-  getInactiveUsers: async (params: UserSearchParams): Promise<ApiResponse<ListUserActive>> => {
-
+  getActiveUsers: async (params: UserSearchParams): Promise<ApiResponse<ListUserActive>> => {
     const searchParams = new URLSearchParams();
     searchParams.append('page', (params.page ?? 0).toString());
     searchParams.append('size', (params.size ?? 10).toString());

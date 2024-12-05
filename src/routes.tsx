@@ -29,6 +29,7 @@ import { Cancel } from "@radix-ui/react-alert-dialog";
 import CancelPage from "./pages/CancelPage";
 import QRSuccessPage from "./pages/QRssPage";
 import CancelQRPage from "./pages/CancelQRPage";
+import UserPage from "@/pages/UserPage.tsx";
 
 
 
