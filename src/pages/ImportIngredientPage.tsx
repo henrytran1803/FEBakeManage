@@ -148,7 +148,7 @@ const ImportIngredientPage: React.FC = () => {
         }
 
         const requestData: ImportIngredientsRequest = {
-            user_id: 1, 
+            user_id: 1, // Đã tự lấy bên backend
             id_supplier: selectedSupplier === "Không" ? null : Number(selectedSupplier), // Chuyển đổi thành number
             ingredients: selectedIngredients,
         };
@@ -224,6 +224,7 @@ const ImportIngredientPage: React.FC = () => {
                                         value={ingredient.quantity}
                                         onChange={(e) => handleQuantityChange(index, e.target.value)}
                                         className="w-full"
+                                        min={1}
                                     />
                                 </td>
                                 <td className="border px-4 py-2">
@@ -233,6 +234,7 @@ const ImportIngredientPage: React.FC = () => {
                                         onChange={(e) => handlePriceChange(index, e.target.value)}
                                         onBlur={(e) => handlePriceChange(index, e.target.value)}  // Tính lại khi người dùng click ra ngoài
                                         className="w-full"
+                                        min={0}
                                     />
                                 </td>
                                 <td className="border px-4 py-2">{getUnitName(ingredientData.unit_id)}</td>
