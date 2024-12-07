@@ -1,3 +1,4 @@
+// UserPage.tsx
 import React, { useEffect, useState } from "react";
 import { userApi, userService } from "@/services/userService";
 import { useForm, Controller } from "react-hook-form";
@@ -26,19 +27,38 @@ import {
   DialogContent,
   DialogOverlay,
   DialogPortal,
+  DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
-import { log } from "console";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import {
+  UserErrorCode,
+  userErrorMessages,
+} from "@/utils/error/ManageUserError";
+import { toast } from "@/hooks/use-toast";
 
 const UserPage: React.FC = () => {
+  // States
   const [users, setUsers] = useState<User[]>([]);
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeactivating, setIsDeactivating] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [userStatus, setUserStatus] = useState<string>("active");
   const [userIdToDeactivate, setUserIdToDeactivate] = useState<number | null>(
     null
   );
+  const [targetUserActive, setTargetUserActive] = useState<boolean>(true); // New state for tracking target user status
   const [searchParams, setSearchParams] = useState({
     page: 0,
     size: 10,
@@ -47,8 +67,55 @@ const UserPage: React.FC = () => {
     isActive: true,
   });
 
-  // Form for both create and update
-  const { control, handleSubmit, reset, setValue } = useForm<RegisterRequest>({
+  // 1. Thêm state để theo dõi action type
+  const [actionType, setActionType] = useState<
+    "activate" | "deactivate" | null
+  >(null);
+
+  // Validation schema
+  const userFormSchema = z.object({
+    firstName: z
+      .string()
+      .min(1, { message: userErrorMessages[UserErrorCode.FIRST_NAME_REQUIRED] })
+      .refine((value) => /^[\p{L}\s-]+$/u.test(value), {
+        message: userErrorMessages[UserErrorCode.FIRST_NAME_INVALID],
+      }),
+    lastName: z
+      .string()
+      .min(1, { message: userErrorMessages[UserErrorCode.LAST_NAME_REQUIRED] })
+      .refine((value) => /^[\p{L}\s-]+$/u.test(value), {
+        message: userErrorMessages[UserErrorCode.LAST_NAME_INVALID],
+      }),
+    email: z
+      .string()
+      .min(1, { message: userErrorMessages[UserErrorCode.EMAIL_REQUIRED] })
+      .email({ message: userErrorMessages[UserErrorCode.EMAIL_INVALID] }),
+    dateOfBirth: z
+      .string()
+      .min(1, {
+        message: userErrorMessages[UserErrorCode.DATE_OF_BIRTH_REQUIRED],
+      }),
+    password: selectedUser
+      ? z.string().optional().or(z.literal(""))
+      : z
+          .string()
+          .min(6, {
+            message: userErrorMessages[UserErrorCode.PASSWORD_INVALID],
+          }),
+    roleIds: z
+      .array(z.number())
+      .min(1, { message: userErrorMessages[UserErrorCode.ROLE_REQUIRED] }),
+  });
+
+  // Form setup
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm<RegisterRequest>({
+    resolver: zodResolver(userFormSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -59,31 +126,50 @@ const UserPage: React.FC = () => {
     },
   });
 
-  // Fetch users
+  // Status change handler
+  const handleStatusChange = (value: string) => {
+    setUserStatus(value);
+    setSearchParams((prev) => ({
+      ...prev,
+      isActive: value === "active",
+    }));
+    if (value === "active") {
+      fetchUsers();
+    } else {
+      fetchInactiveUsers();
+    }
+  };
+
+  // Fetch functions
   const fetchUsers = async () => {
     setLoading(true);
     try {
       const response = await userApi.getActiveUsers(searchParams);
       setUsers(response.data.content);
-      console.log(response.data.content);
       setTotalUsers(response.data.totalElements);
     } catch (error) {
-      console.error("Failed to fetch users:", error);
+      toast({
+        title: "Lỗi",
+        description: "Không thể tải danh sách người dùng",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch inactive users
   const fetchInactiveUsers = async () => {
     setLoading(true);
     try {
-      const response = await userApi.getInactiveUsers(searchParams); // API call for inactive users
-      setUsers(response.data.content); // Set state for users
-      console.log(response.data.content);
-      setTotalUsers(response.data.totalElements); // Set total users
+      const response = await userApi.getInactiveUsers(searchParams);
+      setUsers(response.data.content);
+      setTotalUsers(response.data.totalElements);
     } catch (error) {
-      console.error("Failed to fetch inactive users:", error);
+      toast({
+        title: "Lỗi",
+        description: "Không thể tải danh sách người dùng không hoạt động",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -98,55 +184,54 @@ const UserPage: React.FC = () => {
     setSearchParams((prev) => ({ ...prev, size }));
   };
 
-  // Fetch users on page or size change
-  useEffect(() => {
-    fetchUsers();
-  }, [searchParams.page, searchParams.size]);
-
-  // Open modal for create or edit
+  // Modal handlers
   const openModal = (user: User | null) => {
     if (user) {
-      // Edit mode
       setSelectedUser(user);
       setValue("firstName", user.firstName);
       setValue("lastName", user.lastName);
       setValue("email", user.email);
-      // Convert dateOfBirth to YYYY-MM-DD format
       const formattedDate = user.dateOfBirth
         ? new Date(user.dateOfBirth).toISOString().split("T")[0]
         : "";
       setValue("dateOfBirth", formattedDate);
       setValue("roleIds", Array.from(user.roleIds));
-      setValue("password", ""); // Clear password field for edit
+      setValue("password", "");
     } else {
-      // Create mode
       setSelectedUser(null);
-      reset(); // Reset form to default values
+      reset();
     }
     setIsModalOpen(true);
   };
 
-  // Close modal
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedUser(null);
     reset();
   };
 
-  // Create user handler
+  // User actions handlers
   const handleCreateUser = async (data: RegisterRequest) => {
     try {
       const response = await userService.createUser(data);
       if (response) {
+        toast({
+          title: "Thành công",
+          description: userErrorMessages[UserErrorCode.USER_CREATED],
+          variant: "default",
+        });
         fetchUsers();
         closeModal();
       }
     } catch (error) {
-      console.error("Failed to create user:", error);
+      toast({
+        title: "Lỗi",
+        description: userErrorMessages[UserErrorCode.CREATE_USER_ERROR],
+        variant: "destructive",
+      });
     }
   };
 
-  // Update user handler
   const handleUpdateUser = async (data: RegisterRequest) => {
     if (!selectedUser) return;
 
@@ -157,7 +242,7 @@ const UserPage: React.FC = () => {
         email: data.email,
         dateOfBirth: data.dateOfBirth,
         isActive: true,
-        password: data.password, // Always include password for backend
+        password: data.password,
         roleIds: data.roleIds,
       };
 
@@ -166,274 +251,393 @@ const UserPage: React.FC = () => {
         updateData
       );
       if (response) {
+        toast({
+          title: "Thành công",
+          description: userErrorMessages[UserErrorCode.USER_UPDATED],
+          variant: "default",
+        });
         fetchUsers();
         closeModal();
       }
     } catch (error) {
-      console.error("Failed to update user:", error);
+      toast({
+        title: "Lỗi",
+        description: userErrorMessages[UserErrorCode.UPDATE_USER_ERROR],
+        variant: "destructive",
+      });
     }
   };
 
-  // Deactivate user handler
+  // 2. Sửa lại handlers
   const handleDeactivateUser = (id: number) => {
     setUserIdToDeactivate(id);
-    setIsDeactivating(true);
+    setActionType("deactivate");
+    setIsConfirming(true);
   };
-
   const deactivateUser = async (id: number | null) => {
     if (id === null) return;
 
     try {
-      await userApi.deactivateUser(id);
+      const response =await userApi.deactivateUser(id);
+      toast({
+        title: "Thành công",
+        description: response.message,
+        variant: "default",
+      });
       fetchUsers();
-      setIsDeactivating(false);
     } catch (error) {
-      console.error("Failed to deactivate user:", error);
+      toast({
+        title: "Lỗi",
+        description: "Không thể khóa tài khoản người dùng",
+        variant: "destructive",
+      });
+    } finally {
+      setIsConfirming(false);
     }
   };
+  const handleActivateUser = (id: number) => {
+    setUserIdToDeactivate(id);
+    setActionType("activate");
+    setIsConfirming(true);
+  };
+ // 5. Sửa lại hàm activateUser để refresh đúng dữ liệu
+const activateUser = async (id: number | null) => {
+  if (id === null) return;
+
+  try {
+    await userApi.activateUser(id);
+    toast({
+      title: "Thành công",
+      description: "Đã kích hoạt tài khoản người dùng",
+      variant: "default",
+    });
+   
+      fetchInactiveUsers();
+ 
+  } catch (error) {
+    toast({
+      title: "Lỗi",
+      description: "Không thể kích hoạt tài khoản người dùng",
+      variant: "destructive",
+    });
+  } finally {
+    setIsConfirming(false);
+    setActionType(null);
+  }
+};
+
+  useEffect(() => {
+    if (userStatus === "active") {
+      fetchUsers();
+    } else {
+      fetchInactiveUsers();
+    }
+  }, [searchParams.page, searchParams.size]);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Quản lý người dùng</h1>
-      <Button onClick={() => openModal(null)}>Tạo Người Dùng</Button>
-      <Button
-        onClick={fetchUsers}
-        className="bg-blue-500 text-white hover:bg-blue-700 p-2 rounded"
-      >
-        Xem người dùng kích hoạt
-      </Button>
-
-      <Button
-        onClick={fetchInactiveUsers}
-        className="bg-gray-500 text-white hover:bg-gray-700 p-2 rounded"
-      >
-        Xem người dùng chưa kích hoạt
-      </Button>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Id</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Last Name</TableHead>
-            <TableHead>First Name</TableHead>
-            <TableHead>Date of birth</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Active</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.id}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.lastName}</TableCell>
-              <TableCell>{user.firstName}</TableCell>
-              <TableCell>{user.dateOfBirth}</TableCell>
-              <TableCell>
-                {
-                  Array.from(user.roleIds) // Chuyển Set thành mảng
+    <div className="p-4">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-bold">Quản lý người dùng</h1>
+          <Button onClick={() => openModal(null)}>Tạo Người Dùng</Button>
+        </div>
+        <Select value={userStatus} onValueChange={handleStatusChange}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Chọn trạng thái" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">Hoạt động</SelectItem>
+            <SelectItem value="inactive">Không hoạt động</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Id</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Tên</TableHead>
+              <TableHead>Họ</TableHead>
+              <TableHead>Ngày sinh</TableHead>
+              <TableHead>Vai trò</TableHead>
+              <TableHead>Trạng thái</TableHead>
+              <TableHead>Thao tác</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>{user.id}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.lastName}</TableCell>
+                <TableCell>{user.firstName}</TableCell>
+                <TableCell>{user.dateOfBirth}</TableCell>
+                <TableCell>
+                  {Array.from(user.roleIds)
                     .map((roleId) => {
                       if (roleId === 1) return "Quản lý";
                       if (roleId === 2) return "Nhân viên";
-                      return null; // Trường hợp roleId khác
+                      return null;
                     })
-                    .filter(Boolean) // Loại bỏ giá trị null
-                    .join(" - ") // Nối các vai trò bằng dấu "-".
-                }
-              </TableCell>
-
-              <TableCell>
-  <span
-    className={`px-3 py-1 rounded-full text-xs ${
-      user.isActive === true 
-        ? 'bg-green-500 text-white'  // Nếu active = 1 thì là người dùng hoạt động
-        : 'bg-red-500 text-white'    // Nếu active = 0 thì là người dùng không hoạt động
-    }`}
-  >
-    {user.isActive === true ? 'Đang hoạt động' : 'Không hoạt động'}
-  </span>
-</TableCell>
-
-
-
-
-              <TableCell>
-                <Button onClick={() => handleDeactivateUser(user.id)}>
-                  Khóa
-                </Button>
-                <Button onClick={() => openModal(user)}>Sửa</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      <TablePagination
-        page={searchParams.page}
-        setPage={handlePageChange}
-        size={searchParams.size}
-        setSize={handleSizeChange}
-        totalPages={Math.ceil(totalUsers / searchParams.size)}
-        totalElements={totalUsers}
-        currentPageElements={users.length}
-      />
-
-      {/* Deactivate Confirmation Dialog */}
-      <Dialog open={isDeactivating} onOpenChange={setIsDeactivating}>
-        <DialogPortal>
-          <DialogOverlay />
-          <DialogContent>
-            <DialogClose></DialogClose>
-            <h2>
-              Bạn có muốn khóa tài khoản có id là: {userIdToDeactivate} không?
-            </h2>
+                    .filter(Boolean)
+                    .join(" - ")}
+                </TableCell>
+                <TableCell>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs ${
+                      user.isActive
+                        ? "bg-green-500 text-white"
+                        : "bg-red-500 text-white"
+                    }`}
+                  >
+                    {user.isActive ? "Đang hoạt động" : "Không hoạt động"}
+                  </span>
+                </TableCell>
+                {/* // 4. Sửa lại các buttons trong table */}
+                <TableCell>
+                  {user.isActive ? (
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDeactivateUser(user.id)}
+                      className="mr-2"
+                    >
+                      Khóa
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={() => handleActivateUser(user.id)}
+                      className="mr-2 bg-green-500 text-white hover:bg-green-600"
+                    >
+                      Kích hoạt
+                    </Button>
+                  )}
+                  <Button onClick={() => openModal(user)}>Sửa</Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="mt-4">
+        <TablePagination
+          page={searchParams.page}
+          setPage={handlePageChange}
+          size={searchParams.size}
+          setSize={handleSizeChange}
+          totalPages={Math.ceil(totalUsers / searchParams.size)}
+          totalElements={totalUsers}
+          currentPageElements={users.length}
+        />
+      </div>
+      {/* // 3. Sửa lại Dialog content */}
+      <Dialog open={isConfirming} onOpenChange={setIsConfirming}>
+        <DialogContent>
+          <DialogTitle>
+            {actionType === "activate"
+              ? "Xác nhận kích hoạt tài khoản"
+              : "Xác nhận khóa tài khoản"}
+          </DialogTitle>
+          <p>
+            Bạn có chắc chắn muốn{" "}
+            {actionType === "activate" ? "kích hoạt" : "khóa"} tài khoản này?
+          </p>
+          <DialogFooter>
             <Button
+              variant="outline"
               onClick={() => {
-                deactivateUser(userIdToDeactivate);
+                setIsConfirming(false);
+                setActionType(null);
               }}
             >
-              Có
+              Hủy
             </Button>
-            <Button onClick={() => setIsDeactivating(false)}>Không</Button>
-          </DialogContent>
-        </DialogPortal>
+            <Button
+              variant={actionType === "deactivate" ? "destructive" : "default"}
+              onClick={() => {
+                if (actionType === "deactivate") {
+                  deactivateUser(userIdToDeactivate);
+                } else {
+                  activateUser(userIdToDeactivate);
+                }
+              }}
+            >
+              {actionType === "activate" ? "Kích hoạt" : "Khóa"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
-
-      {/* Create/Edit User Modal */}
       {isModalOpen && (
         <Modal
           isOpen={isModalOpen}
           title={selectedUser ? "Sửa người dùng" : "Tạo người dùng"}
           onClose={closeModal}
-          actions={
-            <>
-              <Button onClick={closeModal}>Đóng</Button>
-            </>
-          }
         >
           <form
             onSubmit={handleSubmit(
               selectedUser ? handleUpdateUser : handleCreateUser
             )}
+            className="space-y-4"
           >
             {/* First Name */}
-            <div className="mb-4">
+            <div className="space-y-2">
               <Label htmlFor="firstName">Họ</Label>
               <Controller
                 control={control}
                 name="firstName"
                 render={({ field }) => (
-                  <Input {...field} id="firstName" placeholder="Nhập họ" />
+                  <div>
+                    <Input {...field} id="firstName" placeholder="Nhập họ" />
+                    {errors.firstName && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.firstName.message}
+                      </p>
+                    )}
+                  </div>
                 )}
               />
             </div>
 
             {/* Last Name */}
-            <div className="mb-4">
+            <div className="space-y-2">
               <Label htmlFor="lastName">Tên</Label>
               <Controller
                 control={control}
                 name="lastName"
                 render={({ field }) => (
-                  <Input {...field} id="lastName" placeholder="Nhập tên" />
+                  <div>
+                    <Input {...field} id="lastName" placeholder="Nhập tên" />
+                    {errors.lastName && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.lastName.message}
+                      </p>
+                    )}
+                  </div>
                 )}
               />
             </div>
 
             {/* Email */}
-            <div className="mb-4">
+            <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Controller
                 control={control}
                 name="email"
                 render={({ field }) => (
-                  <Input {...field} id="email" placeholder="Nhập email" />
+                  <div>
+                    <Input {...field} id="email" placeholder="Nhập email" />
+                    {errors.email && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.email.message}
+                      </p>
+                    )}
+                  </div>
                 )}
               />
             </div>
 
             {/* Date of Birth */}
-            <div className="mb-4">
+            <div className="space-y-2">
               <Label htmlFor="dateOfBirth">Ngày Sinh</Label>
               <Controller
                 control={control}
                 name="dateOfBirth"
                 render={({ field }) => (
-                  <Input
-                    {...field}
-                    id="dateOfBirth"
-                    type="date"
-                    value={String(field.value)} // Ép kiểu value về string nếu cần
-                  />
+                  <div>
+                    <Input
+                      {...field}
+                      id="dateOfBirth"
+                      type="date"
+                      value={String(field.value)}
+                    />
+                    {errors.dateOfBirth && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.dateOfBirth.message}
+                      </p>
+                    )}
+                  </div>
                 )}
               />
             </div>
 
-            {/* Password */}
-            <div className="mb-4">
-              <Label htmlFor="password">
-                {selectedUser ? "Mật khẩu mới (tùy chọn)" : "Mật khẩu"}
-              </Label>
-              <Controller
-                control={control}
-                name="password"
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    id="password"
-                    type="password"
-                    placeholder={
-                      selectedUser
-                        ? "Để trống nếu không muốn thay đổi"
-                        : "Nhập mật khẩu"
-                    }
-                  />
-                )}
-              />
-            </div>
+           {/* Password */}
+<div className="space-y-2">
+  <Label htmlFor="password" className="flex gap-1">
+    Mật khẩu
+    <span className="text-red-500">*</span>
+  </Label>
+  <Controller
+    control={control}
+    name="password"
+    rules={{ required: 'Vui lòng nhập mật khẩu' }}
+    render={({ field }) => (
+      <div>
+        <Input
+          {...field}
+          id="password"
+          type="password"
+          placeholder="Nhập mật khẩu"
+          required
+        />
+        {errors.password && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.password.message}
+          </p>
+        )}
+      </div>
+    )}
+  />
+</div>
 
             {/* Roles */}
-            <div className="mb-4">
-              <Label htmlFor="roleIds" className="block mb-2 font-medium">
-                Vai trò
-              </Label>
+            <div className="space-y-2">
+              <Label htmlFor="roleIds">Vai trò</Label>
               <Controller
                 control={control}
                 name="roleIds"
                 render={({ field }) => (
-                  <select
-                    {...field}
-                    multiple
-                    className="form-select mt-1 block w-full"
-                    value={field.value.map(String)}
-                    onChange={(e) => {
-                      const selectedOptions = Array.from(
-                        e.target.selectedOptions,
-                        (option) => Number(option.value)
-                      );
+                  <div>
+                    <select
+                      {...field}
+                      multiple
+                      className="form-select mt-1 block w-full rounded-md border border-input bg-background px-3 py-2"
+                      value={field.value.map(String)}
+                      onChange={(e) => {
+                        const selectedOptions = Array.from(
+                          e.target.selectedOptions,
+                          (option) => Number(option.value)
+                        );
 
-                      // Handle special case for "Cả 2"
-                      if (selectedOptions.includes(3)) {
-                        field.onChange([1, 2]);
-                      } else {
-                        field.onChange(selectedOptions);
-                      }
-                    }}
-                  >
-                    <option value="1">Quản lý</option>
-                    <option value="2">Nhân viên</option>
-                    <option value="3">Cả 2</option>
-                  </select>
+                        if (selectedOptions.includes(3)) {
+                          field.onChange([1, 2]);
+                        } else {
+                          field.onChange(selectedOptions);
+                        }
+                      }}
+                    >
+                      <option value="1">Quản lý</option>
+                      <option value="2">Nhân viên</option>
+                      <option value="3">Cả 2</option>
+                    </select>
+                    {errors.roleIds && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.roleIds.message}
+                      </p>
+                    )}
+                  </div>
                 )}
               />
             </div>
 
-            {/* Submit button */}
-            <Button type="submit" className="w-full mt-4">
-              {selectedUser ? "Sửa người dùng" : "Tạo người dùng"}
-            </Button>
+            <div className="flex justify-end gap-3 pt-4">
+              <Button type="button" variant="outline" onClick={closeModal}>
+                Hủy
+              </Button>
+              <Button type="submit">
+                {selectedUser ? "Cập nhật" : "Tạo mới"}
+              </Button>
+            </div>
           </form>
         </Modal>
       )}

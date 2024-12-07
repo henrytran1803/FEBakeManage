@@ -579,7 +579,9 @@ const BillList: React.FC = () => {
                       className="w-16 h-16 object-cover rounded"
                     />
                     <div className="flex-1">
+                    <p className="font-semibold">Mã lô bánh: {item.id}</p>
                       <p className="font-semibold">{item.productName}</p>
+
                       <p className="text-sm text-gray-500">
                         Số lượng: {item.quantity}
                       </p>

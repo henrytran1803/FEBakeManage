@@ -5,7 +5,7 @@ interface ModalProps {
     isOpen: boolean;  // Thêm prop isOpen để điều khiển trạng thái hiển thị modal
     title: string;
     onClose: () => void;
-    actions: React.ReactNode;
+    actions?: React.ReactNode;
     children: React.ReactNode;
     onConfirm?: () => void;
 }

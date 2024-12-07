@@ -1,7 +1,7 @@
 // types/ApiResponse.ts
 export interface ApiResponse<T> {
     success: boolean;
-    message: string | null;
     errorcode: string | null;
+    message: string | null;
     data: T;
 }

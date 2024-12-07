@@ -65,6 +65,7 @@ const Cart: React.FC = () => {
   const { toast } = useToast(); // Toast thông báo
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
+
   useEffect(() => {
     const loadProductDetails = async () => {
       setIsLoadingCart(true);
@@ -83,6 +84,17 @@ const Cart: React.FC = () => {
 
     loadProductDetails();
   }, [currentCart.carts, discountCode]);
+
+
+    // Thêm useEffect để lấy tableId từ localStorage khi component mount
+    useEffect(() => {
+      const savedTableId = localStorage.getItem('tableId');
+      if (savedTableId) {
+        setTableId(savedTableId);
+      }
+    }, []);
+
+    //
 
   const handleCheckout = async () => {
     // Log kiểm tra form data
@@ -107,7 +119,7 @@ const Cart: React.FC = () => {
         customerName: !customerName,
         customerPhone: !customerPhone,
         paymentMethod: !paymentMethod,
-        tableId: !tableId,
+    
         diningOption: !diningOption,
       });
       toast({
@@ -120,11 +132,12 @@ const Cart: React.FC = () => {
 
     try {
       setIsCreatingBill(true);
+      const savedTableId = localStorage.getItem('tableId'); // Lấy lại tableId từ localStorage
       const billRequest: BillRequest = {
         customerName,
         customerPhone,
         paymentMethod: paymentMethod as PaymentMethod,
-        tableId: parseInt(tableId, 10),
+        tableId: parseInt(savedTableId || "1", 10), // Sử dụng savedTableId, nếu không có thì dùng 0 hoặc giá trị mặc định khác
         diningOption: diningOption as DiningOption,
         billDetails: currentCart.carts.map((item) => ({
           productBatchId: item.productBatchId,

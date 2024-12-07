@@ -33,6 +33,7 @@ export default function HomePage() {
             setTable('1')
         }
         console.log(id)
+        console.log(localStorage.getItem('tableId'));
         const fetchCategories = async () => {
             const data = await categoryService.getAllCategories();
             setCategories(data.data);
@@ -73,6 +74,7 @@ export default function HomePage() {
     };
 
     return (
+        
         <div className="bg-gray-50 min-h-screen">
             <div className="container mx-auto px-4 py-2">
                 <SearchFilter
