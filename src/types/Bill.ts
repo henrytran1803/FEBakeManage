@@ -21,6 +21,7 @@ export interface Bill {
     paymentMethod:PaymentMethod;
     diningOption: DiningOption;
     billStatus: BillStatus;
+    createdAt:string;
     totalAmount: number;
   }
 
@@ -39,6 +40,7 @@ export interface BillResponseCreate {
     paymentMethod:string;
     diningOption: string;
     billStatus: string;
+    createdAt:string;
     totalAmount: number;
     billDetails: billDetails[];
 }

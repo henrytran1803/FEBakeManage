@@ -389,6 +389,7 @@ const BillList: React.FC = () => {
               <TableHead>Phương thức thanh toán</TableHead>
               <TableHead>Hình thức dùng</TableHead>
               <TableHead>Trạng thái</TableHead>
+              <TableHead>Thời gian tạo</TableHead>
               <TableHead className="text-right">Tổng tiền</TableHead>
               <TableHead>Thao tác</TableHead>
               {role === "MANAGE" && status === BillStatus.NOT_PAID && (
@@ -415,6 +416,7 @@ const BillList: React.FC = () => {
           {bill.billStatus}
         </Badge>
       </TableCell>
+      <TableCell>{bill.createdAt}</TableCell>
       <TableCell className="text-right font-medium">
         {new Intl.NumberFormat('vi-VN', { 
           style: 'currency', 
@@ -468,6 +470,7 @@ const BillList: React.FC = () => {
           {bill.billStatus}
         </Badge>
       </TableCell>
+      <TableCell>{bill.createdAt}</TableCell>
       <TableCell className="text-right font-medium">
         {new Intl.NumberFormat('vi-VN', { 
           style: 'currency', 
