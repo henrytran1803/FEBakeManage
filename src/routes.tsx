@@ -78,7 +78,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="supplier" element={<SupplierPage />} />
             </Route>
             {/*employee*/}
-            <Route path="/employee" element={<ProtectedRoute role="manage" element={<EmployeeLayout />} />}>
+            <Route path="/employee" element={<ProtectedRoute role="user" element={<EmployeeLayout />} />}>
 
                 <Route path="bill" element={<BillList />} />
             </Route>
