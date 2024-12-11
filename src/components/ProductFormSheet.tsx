@@ -143,20 +143,15 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
 
         try {
             setLoading(true);
-
-            // Category validation
             if (formData.categoryId === 0) {
                 showErrorToast(ProductErrorCode.CATEGORY_REQUIRED_ERROR);
                 return;
             }
-
-            // Recipe validation
             if (formData.recipeId === 0) {
                 showErrorToast(ProductErrorCode.RECIPE_REQUIRED_ERROR);
                 return;
             }
 
-            // Name validation
             if (!formData.name) {
                 showErrorToast(ProductErrorCode.PRODUCT_NAME_INPUT_ERROR);
                 return;
@@ -165,18 +160,14 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                 showErrorToast(ProductErrorCode.PRODUCT_NAME_LENGTH_ERROR);
                 return;
             }
-
-            // Description validation
             if (!formData.description) {
                 showErrorToast(ProductErrorCode.PRODUCT_DESC_INPUT_ERROR);
                 return;
             }
-            if (formData.description.length > 250) {
+            if (formData.description.length > 500) {
                 showErrorToast(ProductErrorCode.PRODUCT_DESC_LENGTH_ERROR);
                 return;
             }
-
-            // Price validation
             if (!formData.price) {
                 showErrorToast(ProductErrorCode.PRODUCT_PRICE_INPUT_ERROR);
                 return;
@@ -186,7 +177,6 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                 return;
             }
 
-            // Weight validation
             if (!formData.weight) {
                 showErrorToast(ProductErrorCode.PRODUCT_WEIGHT_INPUT_ERROR1);
                 return;
@@ -196,7 +186,6 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                 return;
             }
 
-            // Length validation
             if (!formData.length) {
                 showErrorToast(ProductErrorCode.PRODUCT_LENGTH_INPUT_ERROR1);
                 return;
@@ -206,7 +195,6 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                 return;
             }
 
-            // Width validation
             if (!formData.width) {
                 showErrorToast(ProductErrorCode.PRODUCT_WIDTH_INPUT_ERROR1);
                 return;
@@ -232,9 +220,16 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                 showErrorToast(ProductErrorCode.PRODUCT_EXPIRY_INPUT_ERROR2);
                 return;
             }
-
-            if (formData.shelfLifeDaysWarning <= 0) {
+            if (!formData.shelfLifeDaysWarning ) {
                 showErrorToast(ProductErrorCode.PRODUCT_EXPIRY_WARNING_ERROR);
+                return;
+            }
+            if (formData.shelfLifeDaysWarning <= 0) {
+                showErrorToast(ProductErrorCode.PRODUCT_EXPIRY_WARNING_ERROR1);
+                return;
+            }
+            if ((formData.shelfLifeDaysWarning/24) > formData.shelfLifeDays ) {
+                showErrorToast(ProductErrorCode.PRODUCT_EXPIRY_WARNING_ERROR2);
                 return;
             }
 
@@ -260,13 +255,13 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                     deletedImages
                 );
                 if (response.success) {
-                    showSuccessToast(ProductErrorCode.POST_SUCCESS);
+                    showSuccessToast(ProductErrorCode.POST_PRODUCT_SUCCESS);
                     onSuccess();
                 }
             } else {
                 const response = await productService.create(formData, files);
                 if (response.success) {
-                    showSuccessToast(ProductErrorCode.POST_SUCCESS);
+                    showSuccessToast(ProductErrorCode.POST_PRODUCT_SUCCESS);
                     onSuccess();
                 }
             }
@@ -363,7 +358,6 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                                 ...prev,
                                 name: e.target.value
                             }))}
-                            required
                         />
                     </div>
 
@@ -377,7 +371,7 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                                 ...prev,
                                 price: parseFloat(e.target.value)
                             }))}
-                            required
+                            
                         />
                     </div>
 
@@ -392,7 +386,7 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                                     ...prev,
                                     weight: parseFloat(e.target.value)
                                 }))}
-                                required
+                                
                             />
                         </div>
                         <div className="space-y-2">
@@ -405,7 +399,7 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                                     ...prev,
                                     discountLimit: parseFloat(e.target.value)
                                 }))}
-                                required
+                                
                             />
                         </div>
                     </div>
@@ -421,7 +415,7 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                                     ...prev,
                                     length: parseFloat(e.target.value)
                                 }))}
-                                required
+                                
                             />
                         </div>
                         <div className="space-y-2">
@@ -434,7 +428,7 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                                     ...prev,
                                     width: parseFloat(e.target.value)
                                 }))}
-                                required
+                                
                             />
                         </div>
                         <div className="space-y-2">
@@ -447,7 +441,7 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                                     ...prev,
                                     height: parseFloat(e.target.value)
                                 }))}
-                                required
+                                
                             />
                         </div>
                     </div>
@@ -463,7 +457,7 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                                     ...prev,
                                     shelfLifeDays: parseInt(e.target.value)
                                 }))}
-                                required
+                                
                             />
                         </div>
                         <div className="space-y-2">
@@ -476,7 +470,7 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                                     ...prev,
                                     shelfLifeDaysWarning: parseInt(e.target.value)
                                 }))}
-                                required
+                                
                             />
                         </div>
                     </div>
@@ -490,7 +484,7 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                                 ...prev,
                                 description: e.target.value
                             }))}
-                            required
+                            
                         />
                     </div>
 
@@ -499,7 +493,6 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                             <div>Loading...</div>
                         </div>
                     ) : (
-                        // <form onSubmit={handleSubmit} className="space-y-4 mt-4">
                             <div className="space-y-2">
                                 <Label>Hình ảnh</Label>
                                 <ImageUpload

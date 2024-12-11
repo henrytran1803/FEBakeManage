@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { PlusCircle } from "lucide-react";
 import { ingredientService } from "@/services/ingredientService";
-import { Ingredient } from "@/types/Ingredient.ts";
+import { Ingredient } from "@/types/Ingredient";
 import LoadingScreen from "@/pages/LoadingScreen";
 import { Button } from "@/components/ui/button";
 import IngredientTable from "@/components/IngredientTable";
@@ -31,7 +31,7 @@ const IngredientPage: React.FC = () => {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const navigate = useNavigate();
     const { showErrorToast, showSuccessToast } = useCustomToast();
-    
+
     // Fetch danh sách nguyên liệu
     const fetchIngredients = async () => {
         try {
@@ -134,7 +134,7 @@ const IngredientPage: React.FC = () => {
             showErrorToast(IngredientErrorCode.UNIT_NAME_LENGTH);
             return;
         }
-    
+
         try {
             await unitService.createUnit(newUnit.name.trim());
             showSuccessToast(IngredientErrorCode.UNIT_ADD_SUCCESS);
@@ -146,7 +146,7 @@ const IngredientPage: React.FC = () => {
             showErrorToast(IngredientErrorCode.UNIT_ADD_FAIL);
         }
     };
-    
+
 
     useEffect(() => {
         fetchIngredients();
@@ -227,6 +227,7 @@ const IngredientPage: React.FC = () => {
 
             {showAddModal && (
                 <Modal
+                    isOpen={showAddModal}
                     title="Thêm nguyên liệu mới"
                     onClose={() => setShowAddModal(false)}
                     actions={
@@ -285,6 +286,7 @@ const IngredientPage: React.FC = () => {
 
             {showAddUnitModal && (
                 <Modal
+                    isOpen={showAddUnitModal}
                     title="Thêm đơn vị mới"
                     onClose={() => setShowAddUnitModal(false)}
                     actions={

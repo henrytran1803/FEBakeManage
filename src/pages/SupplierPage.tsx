@@ -14,8 +14,9 @@ const SupplierPage: React.FC = () => {
     const [editingSupplierId, setEditingSupplierId] = useState<number | null>(null);
     const { showErrorToast, showSuccessToast } = useCustomToast();
 
+    // Phân trang state
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 10; // Mỗi trang hiển thị 10 nhà cung cấp
     const totalPages = Math.ceil(suppliers.length / itemsPerPage);
     const currentItems = suppliers.slice(
         (currentPage - 1) * itemsPerPage,
@@ -53,28 +54,62 @@ const SupplierPage: React.FC = () => {
         setShowModal(true);
     };
 
+    const validateSupplier = (supplier: Omit<Supplier, "id">): string | null => {
+        if (!supplier.name.trim()) {
+            return SupplierErrorCode.SUPPLIER_NAME_REQUIRED;
+        }
+        if (supplier.name.length > 50) {
+            return SupplierErrorCode.SUPPLIER_NAME_LENGTH;
+        }
+        if (!supplier.number.trim()) {
+            return SupplierErrorCode.SUPPLIER_NUMBER_REQUIRED;
+        }
+        if (supplier.number.trim().length < 8 || supplier.number.trim().length > 15) {
+            return SupplierErrorCode.SUPPLIER_NUMBER_LENGTH;
+        }
+        return null; // Dữ liệu hợp lệ
+    };
+
+
     const handleSave = async () => {
-        if (isEditMode && editingSupplierId !== null) {
-            const response = await supplierService.updateSupplier(editingSupplierId, currentSupplier);
-            if (response.success) {
-                showSuccessToast(SupplierErrorCode.SUPPLIER_UPDATE_SUCCESS)
-            } else {
-                showErrorToast(SupplierErrorCode.SUPPLIER_UPDATE_FAIL)
-            }
-        } else {
-            // Add new supplier
-            const response = await supplierService.createSupplier(currentSupplier);
-            if (response.success) {
-                showSuccessToast(SupplierErrorCode.SUPPLIER_ADD_SUCCESS)
-            } else {
-                showErrorToast(SupplierErrorCode.SUPPLIER_ADD_FAIL)
-            }
+        const validationError = validateSupplier(currentSupplier);
+
+        if (validationError) {
+            showErrorToast(validationError);
+            return;
         }
 
-        setShowModal(false);
-        setEditingSupplierId(null);
-        await fetchSuppliers();
+        try {
+            let response;
+            if (isEditMode && editingSupplierId !== null) {
+                // Update supplier
+                response = await supplierService.updateSupplier(editingSupplierId, currentSupplier);
+            } else {
+                // Add new supplier
+                response = await supplierService.createSupplier(currentSupplier);
+            }
+
+            if (response.success) {
+                showSuccessToast(
+                    isEditMode
+                        ? SupplierErrorCode.SUPPLIER_UPDATE_SUCCESS
+                        : SupplierErrorCode.SUPPLIER_ADD_SUCCESS
+                );
+                await fetchSuppliers(); // Cập nhật danh sách nhà cung cấp
+                setShowModal(false); // Đóng modal
+                setEditingSupplierId(null);
+            } else {
+                showErrorToast(
+                    isEditMode
+                        ? SupplierErrorCode.SUPPLIER_UPDATE_FAIL
+                        : SupplierErrorCode.SUPPLIER_ADD_FAIL
+                );
+            }
+        } catch (error) {
+            showErrorToast(SupplierErrorCode.SUPPLIER_UPDATE_FAIL);
+        }
     };
+
 
     const handleInputChange = (field: keyof Omit<Supplier, "id">, value: string) => {
         setCurrentSupplier({ ...currentSupplier, [field]: value });
@@ -135,6 +170,7 @@ const SupplierPage: React.FC = () => {
 
             {showModal && (
                 <Modal
+                    isOpen={showModal}
                     title={isEditMode ? "Sửa Nhà Cung Cấp" : "Thêm Nhà Cung Cấp"}
                     onClose={() => setShowModal(false)}
                     actions={

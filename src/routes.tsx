@@ -25,11 +25,13 @@ import BakeryDashboard from "@/pages/DashBoardPage.tsx";
 import AreaPage from "@/pages/AreaPage"
 import {EmployeeLayout} from "@/layouts/EmployeeLayout.tsx";
 import CheckoutedBill from "./pages/CheckoutedBill";
-import { Cancel } from "@radix-ui/react-alert-dialog";
 import CancelPage from "./pages/CancelPage";
 import QRSuccessPage from "./pages/QRssPage";
 import CancelQRPage from "./pages/CancelQRPage";
-import UserPage from "./pages/UserPage";
+
+import UserPage from "@/pages/UserPage.tsx";
+import DisposeHistoryPage from "@/pages/DisposeHistoryPage.tsx";
+
 
 
 
@@ -52,7 +54,7 @@ const AppRoutes: React.FC = () => {
             
             <Route path="/product/:id" element={<ProductDetailPage />} />
             {/*admin*/}
-            <Route path="/admin" element={<ProtectedRoute role="MANAGE" element={<AdminLayout />} />}>
+            <Route path="/admin" element={<ProtectedRoute role="manage" element={<AdminLayout />} />}>
                 <Route index element={<BakeryDashboard />} />
                 <Route path="home" element={<BakeryDashboard />} />
                 <Route path="product" element={<ProductPage />} />
@@ -61,6 +63,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="recipe" element={<RecipePage />} />
                 <Route path="bill" element={<BillList />} />
                 <Route path="manageexpiry" element={<ManageExpiryPage />} />
+                <Route path="disposehistory" element={<DisposeHistoryPage />} />
                 <Route path="nearexpiry" element={<NearExpiryPage />} />
                 <Route path="expired" element={<ExpiredPage />} />
                 <Route path="area-table" element={<AreaPage />} />
@@ -73,7 +76,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="supplier" element={<SupplierPage />} />
             </Route>
             {/*employee*/}
-            <Route path="/employee" element={<ProtectedRoute role="USER" element={<EmployeeLayout />} />}>
+            <Route path="/employee" element={<ProtectedRoute role="manage" element={<EmployeeLayout />} />}>
 
                 <Route path="bill" element={<BillList />} />
             </Route>
