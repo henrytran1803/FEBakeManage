@@ -80,10 +80,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                     className="hidden"
                 />
             </div>
-
-            {/* Grid container for all images */}
             <div className="grid grid-cols-2 gap-4">
-                {/* Existing Images */}
                 {displayedImages.map((image) => (
                     <div key={`existing-${image.id}`} className="relative">
                         <img
@@ -104,8 +101,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                         </div>
                     </div>
                 ))}
-
-                {/* New Image Previews */}
                 {previewUrls.map((url, index) => (
                     <div key={`preview-${index}`} className="relative">
                         <img

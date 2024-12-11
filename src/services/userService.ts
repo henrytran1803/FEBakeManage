@@ -1,18 +1,17 @@
 import {userApi, UserSearchParams} from "@/api/endpoints/userApi";
-import { UserRequest } from "@/types/User";
+import {UserRequest} from "@/types/User.ts";
 
 
 
 export const userService = {
-    createUser: async(register: RegisterRequest)=>{
+    createUser: async(userRequest: UserRequest)=>{
         try {
-            const response = await userApi.createUser(register);  // Gọi API để tạo người dùng
-            return response.data;  // Trả về dữ liệu khi tạo thành công
-          } catch (error) {
-            // Xử lý lỗi (ví dụ: lỗi 403 hoặc lỗi khác)
+            const response = await userApi.create(userRequest);
+            return response.data;
+        } catch (error) {
             console.error("Error creating user:", error);
-            throw new Error('Failed to create user');  // Hoặc trả về thông báo lỗi cho UI
-          }
+            throw new Error('Failed to create user');
+        }
     },
     updateUser: async (id: number, userRequest: UserRequest) => {
 
@@ -27,15 +26,6 @@ export const userService = {
     deactivateUser: async (id: number) => {
         try {
             const response = await userApi.deactivateUser(id);
-            return response;
-        } catch (error) {
-            throw new Error("Failed to deactivate user");
-        }
-    },
-
-       activateUser: async (id: number) => {
-        try {
-            const response = await userApi.activateUser(id);
             return response;
         } catch (error) {
             throw new Error("Failed to deactivate user");

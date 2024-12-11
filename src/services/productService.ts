@@ -85,7 +85,6 @@ export const productService = {
                 ...data,
                 imageUrls
             };
-            console.log(productData)
             const response = await productApi.create(productData);
             return response;
 

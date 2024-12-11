@@ -3,7 +3,6 @@ export interface Category {
     name: string;
     imageUrl: string;
     isActive: boolean;
-
 }
 export interface CategoryCreate {
     name: string;
