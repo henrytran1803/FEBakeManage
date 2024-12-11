@@ -3,6 +3,8 @@ import { supplierService } from "@/services/supplierService";
 import { Supplier } from "@/types/Supplier";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
+import { useCustomToast } from "@/hooks/CustomAlert";
+import { SupplierErrorCode } from "@/utils/error/supplierError";
 
 const SupplierPage: React.FC = () => {
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -10,13 +12,27 @@ const SupplierPage: React.FC = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [currentSupplier, setCurrentSupplier] = useState<Omit<Supplier, "id">>({ name: "", number: "" });
     const [editingSupplierId, setEditingSupplierId] = useState<number | null>(null);
+    const { showErrorToast, showSuccessToast } = useCustomToast();
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(suppliers.length / itemsPerPage);
+    const currentItems = suppliers.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
 
     const fetchSuppliers = async () => {
         try {
             const response = await supplierService.getSuppliers();
-            setSuppliers(response.data);
+            if (response.success) {
+                setSuppliers(response.data);
+            } else {
+                showErrorToast(SupplierErrorCode.SUPPLIER_FETCH_FAIL);
+            }
+
         } catch (error) {
-            console.error("Error fetching suppliers:", error);
+            showErrorToast(SupplierErrorCode.SUPPLIER_FETCH_FAIL);
         }
     };
 
@@ -39,11 +55,20 @@ const SupplierPage: React.FC = () => {
 
     const handleSave = async () => {
         if (isEditMode && editingSupplierId !== null) {
-            // Update supplier
-            await supplierService.updateSupplier(editingSupplierId, currentSupplier);
+            const response = await supplierService.updateSupplier(editingSupplierId, currentSupplier);
+            if (response.success) {
+                showSuccessToast(SupplierErrorCode.SUPPLIER_UPDATE_SUCCESS)
+            } else {
+                showErrorToast(SupplierErrorCode.SUPPLIER_UPDATE_FAIL)
+            }
         } else {
             // Add new supplier
-            await supplierService.createSupplier(currentSupplier);
+            const response = await supplierService.createSupplier(currentSupplier);
+            if (response.success) {
+                showSuccessToast(SupplierErrorCode.SUPPLIER_ADD_SUCCESS)
+            } else {
+                showErrorToast(SupplierErrorCode.SUPPLIER_ADD_FAIL)
+            }
         }
 
         setShowModal(false);
@@ -55,6 +80,15 @@ const SupplierPage: React.FC = () => {
         setCurrentSupplier({ ...currentSupplier, [field]: value });
     };
 
+    // Phân trang logic
+    const handlePrevPage = () => {
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+
     return (
         <div className="p-4 min-w-[80vw]">
             <h1 className="text-2xl font-bold mb-4">Danh Sách Nhà Cung Cấp</h1>
@@ -62,26 +96,42 @@ const SupplierPage: React.FC = () => {
 
             <table className="table-auto min-w-full mt-4 border">
                 <thead>
-                    <tr>
-                        <th className="border px-4 py-2">ID</th>
-                        <th className="border px-4 py-2">Tên Nhà Cung Cấp</th>
-                        <th className="border px-4 py-2">Số Điện Thoại</th>
-                        <th className="border px-4 py-2">Thao Tác</th>
-                    </tr>
+                <tr>
+                    <th className="border px-4 py-2">ID</th>
+                    <th className="border px-4 py-2">Tên Nhà Cung Cấp</th>
+                    <th className="border px-4 py-2">Số Điện Thoại</th>
+                    <th className="border px-4 py-2">Thao Tác</th>
+                </tr>
                 </thead>
                 <tbody>
-                    {suppliers.map((supplier) => (
-                        <tr key={supplier.id}>
-                            <td className="border px-4 py-2">{supplier.id}</td>
-                            <td className="border px-4 py-2">{supplier.name}</td>
-                            <td className="border px-4 py-2">{supplier.number}</td>
-                            <td className="border px-4 py-2">
-                                <Button onClick={() => handleOpenEditModal(supplier)}>Sửa</Button>
-                            </td>
-                        </tr>
-                    ))}
+                {currentItems.map((supplier) => (
+                    <tr key={supplier.id}>
+                        <td className="border px-4 py-2">{supplier.id}</td>
+                        <td className="border px-4 py-2">{supplier.name}</td>
+                        <td className="border px-4 py-2">{supplier.number}</td>
+                        <td className="border px-4 py-2">
+                            <Button onClick={() => handleOpenEditModal(supplier)}>Sửa</Button>
+                        </td>
+                    </tr>
+                ))}
                 </tbody>
             </table>
+
+            {/* Phân trang */}
+            <div className="flex items-center justify-between mt-4">
+                <div>
+                    Hiển thị {currentItems.length} trên tổng số {suppliers.length} nhà cung cấp
+                </div>
+                <div className="flex items-center">
+                    <Button onClick={handlePrevPage} disabled={currentPage === 1}>
+                        Trước
+                    </Button>
+                    <span className="mx-2">Trang {currentPage} / {totalPages}</span>
+                    <Button onClick={handleNextPage} disabled={currentPage === totalPages}>
+                        Sau
+                    </Button>
+                </div>
+            </div>
 
             {showModal && (
                 <Modal

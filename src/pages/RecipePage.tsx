@@ -27,11 +27,11 @@ import {
 } from "@/components/ui/alert-dialog"
 import {recipeService} from "@/services/recipeService.ts";
 import {ingredientService} from "@/services/ingredientService.ts";
-import {Ingredient} from "@/types/ingredient.ts";
 import {GetRecipe, Recipe} from "@/types/recipe.ts";
 import {useToast} from "@/hooks/use-toast.ts";
 import CreateRecipeSheet from "@/components/CreateRecipeSheet.tsx";
 import RecipeDetailSheet from "@/components/RecipeDetailSheet.tsx";
+import {Ingredient} from "@/types/Ingredient.ts";
 
 const RecipePage = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);

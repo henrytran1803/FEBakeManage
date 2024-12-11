@@ -10,6 +10,7 @@ import { CategoryListForCheckBox } from "@/components/CategoryListForCheckBox.ts
 import { Menu, X } from 'lucide-react';
 import {useParams} from "react-router-dom";
 import {useCartStore} from "@/store/useCartStore.ts";
+import Header from "@/components/Header.tsx";
 
 export default function HomePage() {
     const { id } = useParams();
@@ -76,6 +77,7 @@ export default function HomePage() {
     return (
         
         <div className="bg-gray-50 min-h-screen">
+            <Header />
             <div className="container mx-auto px-4 py-2">
                 <SearchFilter
                     searchTerm={searchTerm} 

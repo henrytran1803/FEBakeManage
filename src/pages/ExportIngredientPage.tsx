@@ -8,9 +8,12 @@ import Modal from "@/components/ui/Modal";
 import { ingredientService } from "@/services/ingredientService";
 import { recipeService } from "@/services/recipeService";
 import { ExportIngredientsRequest, IngredientDetail } from "@/types/ExportIngredientsRequest";
-import { Ingredient } from "@/types/Ingredient";
+import { Ingredient } from "@/types/Ingredient.ts";
 import { Unit } from "@/types/Unit";
 import { unitService } from "@/services/unitService";
+import { useCustomToast } from "@/hooks/CustomAlert";
+import { IngredientErrorCode } from "@/utils/error/ingredientError";
+import { RecipeErrorCode } from "@/utils/error/recipeError";
 
 const ExportIngredientPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
@@ -24,7 +27,7 @@ const ExportIngredientPage: React.FC = () => {
     const [canExport, setCanExport] = useState<boolean>(true);
     const [units, setUnits] = useState<Unit[]>([]); // Danh sách đơn vị
     const navigate = useNavigate();
-
+    const { showErrorToast, showSuccessToast } = useCustomToast();
     
 
     // Lấy danh sách sản phẩm từ API
@@ -34,14 +37,20 @@ const ExportIngredientPage: React.FC = () => {
             const response = await productService.getAllProducts();
             const ingredientResponse = await ingredientService.getAllIngredients();
     
-            if (response.success && ingredientResponse.success) {
+            if (response.success) {
                 // Lọc sản phẩm theo status = true
                 // setProducts(response.data.filter((product) => product.status));
                 const data = response.data as unknown as { content: Product[] };
                 const filteredProducts = data.content.filter((product) => product.status);
-                setProducts(filteredProducts);
+                setProducts(filteredProducts); 
+            } else {
+                showErrorToast(IngredientErrorCode.PRODUCT_FETCH_ERROR);
+            }
 
+            if (ingredientResponse.success) {
                 setIngredients(ingredientResponse.data);
+            } else {
+                showErrorToast(IngredientErrorCode.INGREDIENT_FETCH_FAIL);
             }
         } catch (error) {
             console.error("Error fetching products:", error);
@@ -56,9 +65,11 @@ const ExportIngredientPage: React.FC = () => {
             const response = await unitService.getAllUnits();
             if (response.success) {
                 setUnits(response.data);
+            } else {
+                showErrorToast(IngredientErrorCode.UNIT_FETCH_FAIL);
             }
         } catch (error) {
-            console.error("Error fetching units:", error);
+            showErrorToast(IngredientErrorCode.UNIT_FETCH_FAIL);
         }
     };
 
@@ -83,11 +94,11 @@ const ExportIngredientPage: React.FC = () => {
                 return recipeResponse;
             } else {
                 console.error(`Lỗi từ API khi lấy công thức cho sản phẩm ID: ${id}`, recipeResponse.message);
-                alert("Lỗi khi lấy công thức. Vui lòng thử lại.");
+                showErrorToast(RecipeErrorCode.CONNECT_ERROR);
             }
         } catch (error) {
             console.error(`Lỗi không mong muốn khi lấy công thức cho sản phẩm ID: ${id}`, error);
-            alert("Đã xảy ra lỗi khi lấy công thức. Vui lòng thử lại.");
+            showErrorToast(RecipeErrorCode.CONNECT_ERROR);
         }
     };
     
@@ -122,6 +133,22 @@ const ExportIngredientPage: React.FC = () => {
 
     const handleConfirm = async () => {
         try {
+            if (selectedProducts.length === 0) {
+                showErrorToast(IngredientErrorCode.EXPORT_INGREDIENT_PRODUCT_EMPTY);
+                return;
+            }
+
+            for (const product of selectedProducts) {
+                if (product.quantity <= 0) {
+                    showErrorToast(IngredientErrorCode.EXPORT_INGREDIENT_PRODUCT_QUANTITY);
+                    return;
+                }
+                if (product.quantity === null ) {
+                    showErrorToast(IngredientErrorCode.EXPORT_INGREDIENT_PRODUCT_QUANTITY_EMPTY);
+                    return;
+                }
+            }
+
             const ingredientMap: Record<number, number> = {};
     
             for (const selected of selectedProducts) {
@@ -143,7 +170,7 @@ const ExportIngredientPage: React.FC = () => {
                     });
                 } else {
                     console.error(`Lỗi khi lấy công thức cho sản phẩm ${selected.product.name}`);
-                    alert(`Không thể lấy công thức cho sản phẩm ${selected.product.name}`);
+                    showErrorToast(RecipeErrorCode.CONNECT_ERROR);
                 }
             }
     
@@ -166,7 +193,7 @@ const ExportIngredientPage: React.FC = () => {
         } catch (error) {
             // Thêm log để kiểm tra lỗi trong toàn bộ quá trình
             console.error("Lỗi trong handleConfirm:", error);
-            alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+            showErrorToast(IngredientErrorCode.EXPORT_INGREDIENT_FAIL);
         }
     };
     
@@ -174,12 +201,12 @@ const ExportIngredientPage: React.FC = () => {
 
     const handleExport = async () => {
         if (ingredientsNeeded.length === 0) {
-            alert("Không có nguyên liệu để xuất.");
+            showErrorToast(IngredientErrorCode.EXPORT_INGREDIENT_PRODUCT_EMPTY);
             return;
         }
 
         const exportRequest: ExportIngredientsRequest = {
-            sender_id: 2, 
+            sender_id: 1, 
             total_amount: selectedProducts.reduce((sum, ing) => sum + ing.quantity, 0),
             ingredients: ingredientsNeeded,
             products: selectedProducts.map((sp) => ({
@@ -191,14 +218,14 @@ const ExportIngredientPage: React.FC = () => {
         try {
             const response = await ingredientService.exportIngredients(exportRequest);
             if (response.success) {
-                alert("Xuất nguyên liệu thành công!");
+                showSuccessToast(IngredientErrorCode.EXPORT_INGREDIENT_SUCCESS);
                 setShowIngredientsModal(false);
             } else {
-                alert("Xuất nguyên liệu thất bại.");
+                showErrorToast(IngredientErrorCode.EXPORT_INGREDIENT_FAIL);
             }
         } catch (error) {
             console.error("Error exporting ingredients:", error);
-            alert("Đã xảy ra lỗi khi xuất nguyên liệu.");
+            showErrorToast(IngredientErrorCode.EXPORT_INGREDIENT_FAIL);
         }
     };
 
