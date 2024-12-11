@@ -107,9 +107,7 @@ const CheckoutedBill: React.FC = () => {
                             <div className="space-y-2">
                                 <p><span className="font-medium">Tên:</span> {billDetails?.customerName}</p>
                                 <p><span className="font-medium">Số điện thoại:</span> {billDetails?.customerPhone}</p>
-                                {billDetails?.diningOption === 'DINE_IN' && (
-                                    <p><span className="font-medium">Số bàn:</span> {billDetails?.tableId}</p>
-                                )}
+                                <p><span className="font-medium">Mã hóa đơn:</span> {billId}</p>
                             </div>
                         </div>
 

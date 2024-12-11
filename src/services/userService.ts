@@ -45,6 +45,32 @@ export const userService = {
             throw new Error("Failed to fetch active users");
         }
     },
+    getActive: async (params: UserSearchParams = {}) => {
+        try {
+            const response = await userApi.getActive({
+                page: params.page ?? 0,
+                size: params.size ?? 10,
+                isActive: params.isActive
+            });
+            console.log(response);
+            return response;
+        } catch (error) {
+            throw new Error("Failed to fetch active users");
+        }
+    },
+    getInActive: async (params: UserSearchParams = {}) => {
+        try {
+            const response = await userApi.getInActive({
+                page: params.page ?? 0,
+                size: params.size ?? 10,
+                isActive: params.isActive
+            });
+            console.log(response);
+            return response;
+        } catch (error) {
+            throw new Error("Failed to fetch active users");
+        }
+    },
 
     getUserById: async (id: number) => {
         try {
