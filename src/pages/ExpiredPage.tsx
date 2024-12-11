@@ -95,6 +95,12 @@ export function ExpiredPage() {
                         Back
                     </Button>
                     <Button
+                        variant="secondary"
+                        onClick={() => navigate('/admin/disposehistory')}
+                    >
+                        Disposal History
+                    </Button>
+                    <Button
                         variant="destructive"
                         onClick={() => setShowDeleteDialog(true)}
                         disabled={selectedIds.length === 0}

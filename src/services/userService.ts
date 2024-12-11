@@ -1,12 +1,12 @@
 import {userApi, UserSearchParams} from "@/api/endpoints/userApi";
-import {RegisterRequest, UserRequest} from "@/types/User";
+import {UserRequest} from "@/types/User.ts";
 
 
 
 export const userService = {
-    createUser: async(register: RegisterRequest)=>{
+    createUser: async(userRequest: UserRequest)=>{
         try {
-            const response = await userApi.create(register);
+            const response = await userApi.create(userRequest);
             return response.data;
         } catch (error) {
             console.error("Error creating user:", error);

@@ -1,5 +1,3 @@
-// src/services/ingredientService.ts
-import { ingredientApi } from "@/api/endpoints/ingredientApi";
 import { Ingredient } from "@/types/Ingredient.ts";
 import { ApiResponse } from "@/types/ApiResponse";
 import { ImportIngredientsRequest } from "@/types/ImportIngredientsRequest";

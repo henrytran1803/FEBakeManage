@@ -12,9 +12,9 @@ export interface UserSearchParams {
 }
 
 export const userApi = {
-  create: async (register:UserRequest): Promise<ApiResponse<User>> =>{
-    console.log(register)
-    const response=await  api.post('/api/auth/register',register);
+  create: async (userRequest: UserRequest): Promise<ApiResponse<User>> =>{
+    console.log(userRequest)
+    const response=await  api.post('/api/auth/register',userRequest);
     return response.data;
   },
   updateUser: async (id: number, userRequest: UserRequest): Promise<ApiResponse<User>> => {

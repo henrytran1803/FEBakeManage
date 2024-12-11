@@ -17,11 +17,13 @@ export enum ProductErrorCode {
     RECIPE_REQUIRED_ERROR = 'RECIPE_REQUIRED_ERROR',
     PRODUCT_NAME_LENGTH_ERROR = 'PRODUCT_NAME_LENGTH_ERROR',
     PRODUCT_DESC_LENGTH_ERROR = 'PRODUCT_DESC_LENGTH_ERROR',
-    PRODUCT_EXPIRY_WARNING_ERROR = 'PRODUCT_EXPIRY_WARNING_ERROR',
+    PRODUCT_EXPIRY_WARNING_ERROR= 'PRODUCT_EXPIRY_WARNING_ERROR',
+    PRODUCT_EXPIRY_WARNING_ERROR1 = 'PRODUCT_EXPIRY_WARNING_ERROR1',
+    PRODUCT_EXPIRY_WARNING_ERROR2 = 'PRODUCT_EXPIRY_WARNING_ERROR2',
     PRODUCT_DISCOUNT_LIMIT_ERROR = 'PRODUCT_DISCOUNT_LIMIT_ERROR',
     PRODUCT_IMAGE_REQUIRED_ERROR = 'PRODUCT_IMAGE_REQUIRED_ERROR',
     CONNECT_ERROR = 'CONNECT_ERROR',
-    POST_SUCCESS = 'POST_SUCCESS',
+    POST_PRODUCT_SUCCESS = 'POST_SUCCESS',
 }
 export const errorProductMessages: { [key in ProductErrorCode]: string } = {
     [ProductErrorCode.PRODUCT_NAME_INPUT_ERROR]: 'Vui lòng nhập tên sản phẩm',
@@ -41,12 +43,14 @@ export const errorProductMessages: { [key in ProductErrorCode]: string } = {
     [ProductErrorCode.CATEGORY_REQUIRED_ERROR]: 'Vui lòng chọn danh mục',
     [ProductErrorCode.RECIPE_REQUIRED_ERROR]: 'Vui lòng chọn công thức',
     [ProductErrorCode.PRODUCT_NAME_LENGTH_ERROR]: 'Tên sản phẩm không được vượt quá 250 ký tự',
-    [ProductErrorCode.PRODUCT_DESC_LENGTH_ERROR]: 'Mô tả không được vượt quá 250 ký tự',
-    [ProductErrorCode.PRODUCT_EXPIRY_WARNING_ERROR]: 'Cảnh báo hạn sử dụng phải lớn hơn 0',
+    [ProductErrorCode.PRODUCT_DESC_LENGTH_ERROR]: 'Mô tả không được vượt quá 500 ký tự',
+    [ProductErrorCode.PRODUCT_EXPIRY_WARNING_ERROR]: 'Cảnh báo hạn sử dụng không được bỏ trống',
+    [ProductErrorCode.PRODUCT_EXPIRY_WARNING_ERROR1]: 'Cảnh báo hạn sử dụng không được âm',
+    [ProductErrorCode.PRODUCT_EXPIRY_WARNING_ERROR2]: 'Cảnh báo hạn sử dụng không được lớn hơn hạn sử dụng',
     [ProductErrorCode.PRODUCT_DISCOUNT_LIMIT_ERROR]: 'Giới hạn giảm giá phải từ 0 đến 100',
     [ProductErrorCode.PRODUCT_IMAGE_REQUIRED_ERROR]: 'Vui lòng chọn ít nhất một ảnh',
     [ProductErrorCode.CONNECT_ERROR	]: 'Có lỗi xảy ra khi lưu sản phẩm',
-    [ProductErrorCode.POST_SUCCESS	]: 'Lưu sản phẩm hành công'
+    [ProductErrorCode.POST_PRODUCT_SUCCESS	]: 'Lưu sản phẩm hành công'
 
 
 };
