@@ -49,6 +49,7 @@ import { useToast } from "@/hooks/use-toast";
 import { billApi } from "@/api/endpoints/billApi";
 import axios from "axios";
 import { paymentApi } from "@/api/endpoints/paymentApi";
+import ErrorMessageManager from "@/utils/errorMessages";
 
 const Cart: React.FC = () => {
   const navigate = useNavigate();
@@ -64,6 +65,7 @@ const Cart: React.FC = () => {
   const [diningOption, setDiningOption] = useState("");
   const { toast } = useToast(); // Toast thông báo
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+
 
   useEffect(() => {
     const loadProductDetails = async () => {
@@ -84,25 +86,36 @@ const Cart: React.FC = () => {
     loadProductDetails();
   }, [currentCart.carts, discountCode]);
 
-  const handleCheckout = async () => {
-    // Log kiểm tra form data
-    console.log("Form Data:", {
-      customerName,
-      customerPhone,
-      paymentMethod,
-      tableId,
-      diningOption,
-      cartItems: currentCart.carts,
-    });
 
-    // Kiểm tra validation
-    if (
-      !customerName ||
-      !customerPhone ||
-      !paymentMethod ||
-      !tableId ||
-      !diningOption
-    ) {
+    // Thêm useEffect để lấy tableId từ localStorage khi component mount
+    useEffect(() => {
+      const savedTableId = localStorage.getItem('tableId');
+      if (savedTableId) {
+        setTableId(savedTableId);
+      }
+    }, []);
+
+    //
+
+    const handleCheckout = async () => {
+      console.log("Form Data:", {
+        customerName,
+        customerPhone,
+        paymentMethod,
+        tableId,
+        diningOption,
+        cartItems: currentCart.carts,
+      });
+  
+        // Kiểm tra validation với mã lỗi
+    const errors = [];
+    if (!customerName) errors.push('Q10001');
+    if (!customerPhone) errors.push('Q10002');
+    if (!paymentMethod) errors.push('Q10003');
+    if (!tableId) errors.push('Q10004');
+    if (!diningOption) errors.push('Q10005');
+
+    if (errors.length > 0) {
       console.log("Validation failed:", {
         customerName: !customerName,
         customerPhone: !customerPhone,
@@ -110,88 +123,90 @@ const Cart: React.FC = () => {
         tableId: !tableId,
         diningOption: !diningOption,
       });
+      
+      const errorMessages = errors.map(code => ({
+        code,
+        message: ErrorMessageManager.getMessage(code)
+      }));
+
       toast({
-        title: "Thông báo",
-        description: "Vui lòng điền đầy đủ thông tin!",
+        title: `Lỗi: ${errorMessages[0].code}`,
+        description: errorMessages.map(e => e.message).join('\n'),
         variant: "destructive",
       });
       return;
     }
-
-    try {
-      setIsCreatingBill(true);
-      const billRequest: BillRequest = {
-        customerName,
-        customerPhone,
-        paymentMethod: paymentMethod as PaymentMethod,
-        tableId: parseInt(tableId, 10),
-        diningOption: diningOption as DiningOption,
-        billDetails: currentCart.carts.map((item) => ({
-          productBatchId: item.productBatchId,
-          quantity: item.quantity,
-        })),
-      };
-
-      // Log request
-      console.log("Sending request:", billRequest);
-
-      const result = await billApi.createBill(billRequest);
-      console.log("API Response:", result.data);
-
-      // Kiểm tra response có đúng cấu trúc không
-      if (result?.data?.billId) {
-        clearCart();
-
-        if (paymentMethod === PaymentMethod.CASH) {
-          navigate(`/bills/${result.data.billId}/checkouted`);
-          toast({
-            title: "Thành công",
-            description: "Đặt hàng thành công!",
-          });
-        } else if (paymentMethod === PaymentMethod.QR_CODE) {
-          try {
-            // Gọi API tạo payment link
-            const paymentResponse = await paymentApi.getCreatePayment(result.data.billId);
-            // đẩy id lên local
-            localStorage.setItem('pendingBillId', result.data.billId.toString());
-
-            if (
-              paymentResponse.success===true &&
-              paymentResponse.data.checkoutUrl
-            ) {
-              // Chuyển hướng đến trang thanh toán
-              window.location.href = paymentResponse.data.checkoutUrl;
-            } else {
-              throw new Error("Không thể tạo link thanh toán");
-            }
-          } catch (paymentError) {
-            console.error("Payment error:", paymentError);
+  
+      try {
+        setIsCreatingBill(true);
+        const savedTableId = localStorage.getItem('tableId');
+        const billRequest: BillRequest = {
+          customerName,
+          customerPhone,
+          paymentMethod: paymentMethod as PaymentMethod,
+          tableId: parseInt(savedTableId || "1", 10),
+          diningOption: diningOption as DiningOption,
+          billDetails: currentCart.carts.map((item) => ({
+            productBatchId: item.productBatchId,
+            quantity: item.quantity,
+          })),
+        };
+  
+        console.log("Sending request:", billRequest);
+        const result = await billApi.createBill(billRequest);
+        console.log("API Response:", result.data);
+  
+        if (result?.data?.billId) {
+          clearCart();
+  
+          if (paymentMethod === PaymentMethod.CASH) {
+            navigate(`/bills/${result.data.billId}/checkouted`);
             toast({
-              title: "Lỗi",
-              description: "Không thể tạo link thanh toán. Vui lòng thử lại!",
-              variant: "destructive",
+              title: "Thành công",
+              description: "Đặt hàng thành công!",
             });
+          } else if (paymentMethod === PaymentMethod.QR_CODE) {
+            try {
+              const paymentResponse = await paymentApi.getCreatePayment(result.data.billId);
+              localStorage.setItem('pendingBillId', result.data.billId.toString());
+  
+              if (paymentResponse.success === true && paymentResponse.data.checkoutUrl) {
+                window.location.href = paymentResponse.data.checkoutUrl;
+              } else {
+                throw new Error("Không thể tạo link thanh toán");
+              }
+            } catch (paymentError) {
+              console.error("Payment error:", paymentError);
+              toast({
+                title: "Lỗi",
+                description: "Không thể tạo link thanh toán. Vui lòng thử lại!",
+                variant: "destructive",
+              });
+            }
           }
+        } else {
+          toast({
+            title: "Lỗi: "+ result.message,
+            description: "Message: "+result.errorcode,
+            variant: "destructive",
+          });
         }
-      } else {
-        throw new Error("Response không hợp lệ từ server");
+      } catch (error) {
+        console.error("Detailed error:", error);
+        let errorMessage = "Có lỗi xảy ra khi tạo đơn hàng.";
+  
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+  
+        toast({
+          title: "Lỗi",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      } finally {
+        setIsCreatingBill(false);
       }
-    } catch (error) {
-      console.error("Detailed error:", error);
-      let errorMessage = "Có lỗi xảy ra khi tạo đơn hàng.";
-
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-
-      toast({
-        title: "Lỗi",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsCreatingBill(false);
-    }
   };
   if (isLoadingCart) {
     return (

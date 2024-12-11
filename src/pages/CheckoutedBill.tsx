@@ -160,6 +160,7 @@ const CheckoutedBill: React.FC = () => {
                                 />
                                 <div className="flex-1">
                                     <h3 className="font-medium text-lg mb-2">{item.productName}</h3>
+                                    <h3 className="font-medium text-lg mb-2">Mã lô bánh: {item.productBatchId}</h3>
                                     <div className="flex justify-between items-center">
                                         <p className="text-gray-600">
                                             Số lượng: {item.quantity}

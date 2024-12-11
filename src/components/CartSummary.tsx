@@ -112,12 +112,12 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   customerPhone,
   paymentMethod,
   diningOption,
-  tableId,
+
   onCustomerNameChange,
   onCustomerPhoneChange,
   onPaymentMethodChange,
   onDiningOptionChange,
-  onTableIdChange,
+
   isLoading,
 }) => {
   const calculateTotal = () => {
@@ -181,16 +181,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Table Number</label>
-            <Input
-              type="number"
-              value={tableId}
-              onChange={(e) => onTableIdChange(e.target.value)}
-              placeholder="Enter table number"
-              required
-            />
-          </div>
+       
           <div className="space-y-2">
             <label className="block text-sm font-medium">Discount Code</label>
             <Input
