@@ -1,10 +1,16 @@
 import { api } from '../axios';
 import { ApiResponse } from "@/types/ApiResponse";
-import { BillResponseData, BillResponse_View_Cake, BillRequest, BillStatusDTO, BillStatus, BillResponseCreate } from "@/types/Bill";
-import { Search } from 'lucide-react';
+import {
+    BillResponseData,
+    BillResponse_View_Cake,
+    BillRequest,
+    BillStatusDTO,
+    BillStatus,
+    BillResponseCreate,
+    BillStatistic
+} from "@/types/Bill";
 
 
-// Interface cho các tham số tìm kiếm hóa đơn
 interface BillSearchParams {
     status?: string;
     page?: number;
@@ -16,9 +22,7 @@ interface SearchParams {
     customerPhone?: string;
  }
 
-// Định nghĩa API cho các thao tác liên quan đến hóa đơn
 export const billApi = {
-    // Lấy danh sách hóa đơn theo trạng thái
     search: async (params: BillSearchParams): Promise<ApiResponse<BillResponseData>> => {
         const searchParams = new URLSearchParams();
         if (params.status) searchParams.append('status', params.status);
@@ -29,7 +33,6 @@ export const billApi = {
         return response.data;
     },
 
-    // Lấy chi tiết hóa đơn theo ID
     getDetailsById: async (billId: number): Promise<ApiResponse<BillResponse_View_Cake>> => {
         const response = await api.get(`/api/user/bills/${billId}`);
         return response.data;
@@ -64,18 +67,35 @@ export const billApi = {
                 }
             });
         
-            // Thêm các tham số phân trang
             searchParams.append('page', page.toString());
             searchParams.append('size', size.toString());
-        
-            // Gọi API với các tham số query động
             const response = await api.get(`/api/user/bills/search?${searchParams.toString()}`);
             return response.data;
         } catch (error) {
             console.error('Lỗi tìm kiếm hóa đơn:', error);
             throw new Error("Không thể tìm kiếm hóa đơn");
         }
+    },
+    getTotalToday: async () : Promise<ApiResponse<BillStatistic>> => {
+        const response = await api.get('/api/user/bills/today');
+        return response.data;
+    },
+    getTotalMonth: async () : Promise<ApiResponse<BillStatistic>> => {
+        const response = await api.get('/api/user/bills/month');
+        return response.data;
+    },
+    getTotalYear: async () : Promise<ApiResponse<BillStatistic>> => {
+        const response = await api.get('/api/user/bills/year');
+        return response.data;
+    },
+    getTotalFromdateToDate: async (fromDate: string, toDate: string): Promise<ApiResponse<BillStatistic>> => {
+        const response = await api.get('/api/user/bills/custom', {
+            params: {
+                fromDate,
+                toDate
+            }
+        });
+        console.log(response);
+        return response.data;
     }
-
-
 };

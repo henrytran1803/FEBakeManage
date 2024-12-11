@@ -1,3 +1,17 @@
+export interface Billfull {
+    billId: number;
+    customerName: string;
+    customerPhone: string;
+    paymentMethod:string;
+    diningOption: string;
+    billStatus: string;
+    createdAt:string;
+    totalAmount: number;
+}
+export interface BillStatistic {
+    totalRevenue:number;
+    bills:Billfull[]
+}
 export enum PaymentMethod{
     CASH="CASH",
     QR_CODE="QR_CODE"
@@ -13,7 +27,7 @@ export enum BillStatus{
     COMPLETED="COMPLETED",
     CANCEL="CANCEL"
 }
-// response cho
+
 export interface Bill {
     billId: number;
     customerName: string;
@@ -23,7 +37,7 @@ export interface Bill {
     billStatus: BillStatus;
     createdAt:string;
     totalAmount: number;
-  }
+}
 
 export interface billDetails {
     id: number;
@@ -32,7 +46,7 @@ export interface billDetails {
     price: number;
 }
 
-  // response cho tạo bill
+
 export interface BillResponseCreate {
     billId: number;
     customerName: string;

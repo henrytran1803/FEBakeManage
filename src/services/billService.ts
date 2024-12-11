@@ -62,5 +62,38 @@ export const billService = {
         } catch (error) {
             throw new Error(`Failed to update bill status for bill ID ${billId}`);
         }
-    }
+    },
+
+    getTotalToday: async () => {
+        try{
+            const response = await billApi.getTotalToday();
+            return response;
+        }catch(error){
+            throw new Error("Failed to get total total");
+        }
+    },
+    getTotalMonth: async () => {
+        try{
+            const response = await billApi.getTotalMonth();
+            return response;
+        }catch(error){
+            throw new Error("Failed to get total total");
+        }
+    },
+    getTotalYear: async () => {
+        try{
+            const response = await billApi.getTotalYear();
+            return response;
+        }catch(error){
+            throw new Error("Failed to get total total");
+        }
+    },
+    getFromDateToDate: async (fromDate: string, toDate:string) => {
+        try{
+            const response = await billApi.getTotalFromdateToDate(fromDate, toDate);
+            return response;
+        }catch(error){
+            throw new Error("Failed to get total total");
+        }
+    },
 };
