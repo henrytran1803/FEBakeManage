@@ -1,7 +1,20 @@
 'use client'
 
 
-import { Ticket, ChevronUp, Home, Boxes, Settings, User2 , Box,FileText, Grid2X2Icon, Truck, Milk} from 'lucide-react'
+import {
+    Ticket,
+    ChevronUp,
+    Home,
+    Boxes,
+    Settings,
+    User2,
+    Box,
+    FileText,
+    Grid2X2Icon,
+    Truck,
+    Milk,
+    ChartArea
+} from 'lucide-react'
 
 
 import {
@@ -79,6 +92,11 @@ const items = [
         title: "Supplier",
         url: "/admin/supplier",
         icon: Truck,
+    },
+    {
+        title: "Statistic",
+        url: "/admin/statistic",
+        icon: ChartArea,
     },
 
 ]

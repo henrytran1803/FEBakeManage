@@ -30,6 +30,7 @@ import QRSuccessPage from "./pages/QRssPage";
 import CancelQRPage from "./pages/CancelQRPage";
 import UserPage from "@/pages/UserPage.tsx";
 import DisposeHistoryPage from "@/pages/DisposeHistoryPage.tsx";
+import StatisticsPage from "@/pages/StatisticsPage.tsx";
 
 
 
@@ -71,6 +72,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="export-history" element={<ExportHistoryPage />} />
                 <Route path="import-ingredient" element={<ImportIngredientPage />} />
                 <Route path="export-ingredient" element={<ExportIngredientPage />} />
+                <Route path="statistic" element={<StatisticsPage />} />
                 <Route path="supplier" element={<SupplierPage />} />
             </Route>
             {/*employee*/}
