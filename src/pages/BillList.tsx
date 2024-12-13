@@ -78,7 +78,7 @@ const BillList: React.FC = () => {
             } catch (error) {
                 toast({
                     title: "Lỗi",
-                    description: billErrorMessages[BillErrorCode.LOAD_BILLS_ERROR],
+                    description: "Không thể tải danh sách hóa đơn",
                     variant: "destructive",
                 });
             } finally {
@@ -94,21 +94,19 @@ const BillList: React.FC = () => {
             const userData = localStorage.getItem("user");
             if (!userData) {
                 toast({
-                    title: 'Lỗi',
-                    description: billErrorMessages[BillErrorCode.NO_USER_DATA],
-                    variant: 'destructive',
+                    title: "Lỗi",
+                    description: "Không tìm thấy thông tin người dùng",
+                    variant: "destructive",
                 });
                 return;
             }
 
-            const parsedUser = JSON.parse(userData);
             const userRole = localStorage.getItem("auth");
-
             if (!userRole) {
                 toast({
-                    title: 'Lỗi',
-                    description: billErrorMessages[BillErrorCode.NO_USER_ROLE],
-                    variant: 'destructive',
+                    title: "Lỗi",
+                    description: "Không tìm thấy quyền người dùng",
+                    variant: "destructive",
                 });
                 return;
             }
@@ -119,18 +117,17 @@ const BillList: React.FC = () => {
 
             if (!foundBill) {
                 toast({
-                    title: 'Lỗi',
-                    description: billErrorMessages[BillErrorCode.BILL_NOT_FOUND],
-                    variant: 'destructive',
+                    title: "Lỗi",
+                    description: "Không tìm thấy hóa đơn",
+                    variant: "destructive",
                 });
                 return;
             }
 
-            if (userRole === ROLES.MANAGE) {
+            if (userRole === "manage") {
                 await billService.updateBillStatus(billId, newStatus);
                 setDialogType(null);
 
-                // Load lại dữ liệu ngay lập tức
                 const reloadData = async () => {
                     if (isSearching) {
                         const searchResponse = await billService.searchBill({
@@ -144,7 +141,6 @@ const BillList: React.FC = () => {
                         });
                         setSearchResults(searchResponse.data.content);
                     }
-                    // Luôn load lại danh sách gốc để đồng bộ
                     const response = await billService.search(status, page, size);
                     setBills(response.data.content);
                     setTotalPages(response.data.totalPages);
@@ -153,11 +149,11 @@ const BillList: React.FC = () => {
                 await reloadData();
 
                 toast({
-                    title: 'Thành công',
-                    description: billErrorMessages[BillErrorCode.STATUS_UPDATE_SUCCESS],
-                    variant: 'default',
+                    title: "Thành công",
+                    description: "Cập nhật trạng thái hóa đơn thành công",
+                    variant: "default",
                 });
-            } else if (userRole === ROLES.USER) {
+            } else if (userRole === "user") {
                 if (
                     foundBill.billStatus !== BillStatus.NOT_PAID ||
                     newStatus !== BillStatus.CANCEL
@@ -165,7 +161,6 @@ const BillList: React.FC = () => {
                     await billService.updateBillStatus(billId, newStatus);
                     setDialogType(null);
 
-                    // Load lại dữ liệu ngay lập tức
                     const reloadData = async () => {
                         if (isSearching) {
                             const searchResponse = await billService.searchBill({
@@ -179,7 +174,6 @@ const BillList: React.FC = () => {
                             });
                             setSearchResults(searchResponse.data.content);
                         }
-                        // Luôn load lại danh sách gốc để đồng bộ
                         const response = await billService.search(status, page, size);
                         setBills(response.data.content);
                         setTotalPages(response.data.totalPages);
@@ -188,30 +182,30 @@ const BillList: React.FC = () => {
                     await reloadData();
 
                     toast({
-                        title: 'Thành công',
-                        description: billErrorMessages[BillErrorCode.STATUS_UPDATE_SUCCESS],
-                        variant: 'default',
+                        title: "Thành công",
+                        description: "Cập nhật trạng thái hóa đơn thành công",
+                        variant: "default",
                     });
                 } else {
                     toast({
-                        title: 'Lỗi',
-                        description: billErrorMessages[BillErrorCode.STAFF_STATUS_RESTRICTION],
-                        variant: 'destructive',
+                        title: "Lỗi",
+                        description: "Bạn không có quyền hủy hóa đơn chưa thanh toán",
+                        variant: "destructive",
                     });
                 }
             } else {
                 toast({
-                    title: 'Lỗi',
-                    description: billErrorMessages[BillErrorCode.PERMISSION_DENIED],
-                    variant: 'destructive',
+                    title: "Lỗi",
+                    description: "Bạn không có quyền thực hiện thao tác này",
+                    variant: "destructive",
                 });
             }
         } catch (error) {
-            console.error(billErrorMessages[BillErrorCode.UPDATE_STATUS_ERROR], error);
+            console.error("Lỗi cập nhật trạng thái:", error);
             toast({
-                title: 'Lỗi',
-                description: billErrorMessages[BillErrorCode.UPDATE_STATUS_ERROR],
-                variant: 'destructive',
+                title: "Lỗi",
+                description: "Không thể cập nhật trạng thái hóa đơn",
+                variant: "destructive",
             });
         }
     };
@@ -224,19 +218,10 @@ const BillList: React.FC = () => {
         } catch (error) {
             toast({
                 title: "Lỗi",
-                description: billErrorMessages[BillErrorCode.BILL_DETAILS_ERROR],
+                description: "Không thể xem chi tiết hóa đơn",
                 variant: "destructive",
             });
         }
-    };
-
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setSearchParams((prev) => ({
-            ...prev,
-            [name]:
-                value === "" ? undefined : name === "id" ? parseInt(value) : value,
-        }));
     };
 
     const handleSearchSubmit = async () => {
@@ -251,28 +236,38 @@ const BillList: React.FC = () => {
                 }),
             });
             setSearchResults(response.data.content);
-            setIsSearching(true); // Chuyển xuống sau khi có kết quả
+            setIsSearching(true);
+
             if (response.data.content.length > 0) {
                 toast({
-                    title: 'Tìm kiếm thành công',
+                    title: "Tìm kiếm thành công",
                     description: `Đã tìm thấy ${response.data.content.length} kết quả`,
-                    variant: 'default',
+                    variant: "default",
                 });
             } else {
                 toast({
-                    title: 'Thông báo',
-                    description: 'Không tìm thấy kết quả phù hợp',
-                    variant: 'destructive',
+                    title: "Thông báo",
+                    description: "Không tìm thấy kết quả phù hợp",
+                    variant: "destructive",
                 });
             }
         } catch (error) {
-            console.error(billErrorMessages[BillErrorCode.SEARCH_ERROR], error);
+            console.error("Lỗi tìm kiếm:", error);
             toast({
-                title: 'Lỗi',
-                description: billErrorMessages[BillErrorCode.SEARCH_ERROR],
-                variant: 'destructive',
+                title: "Lỗi",
+                description: "Không thể thực hiện tìm kiếm",
+                variant: "destructive",
             });
         }
+    };
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setSearchParams((prev) => ({
+            ...prev,
+            [name]:
+                value === "" ? undefined : name === "id" ? parseInt(value) : value,
+        }));
     };
 
     const clearSearch = () => {
@@ -306,11 +301,7 @@ const BillList: React.FC = () => {
                         <Badge variant="secondary">
                             {searchResults.length} kết quả tìm thấy
                         </Badge>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={clearSearch}
-                        >
+                        <Button variant="outline" size="sm" onClick={clearSearch}>
                             <X className="h-4 w-4 mr-1" />
                             Xóa tìm kiếm
                         </Button>
@@ -346,12 +337,15 @@ const BillList: React.FC = () => {
                         <Button
                             className="flex-1"
                             onClick={handleSearchSubmit}
-                            disabled={!searchParams.id && !searchParams.customerName && !searchParams.customerPhone}
+                            disabled={
+                                !searchParams.id &&
+                                !searchParams.customerName &&
+                                !searchParams.customerPhone
+                            }
                         >
                             <Search className="h-4 w-4 mr-1" />
                             Tìm kiếm
                         </Button>
-
                     </div>
                 </div>
             </div>
@@ -389,9 +383,10 @@ const BillList: React.FC = () => {
                                 <TableHead>Phương thức thanh toán</TableHead>
                                 <TableHead>Hình thức dùng</TableHead>
                                 <TableHead>Trạng thái</TableHead>
+                                <TableHead>Thời gian tạo</TableHead>
                                 <TableHead className="text-right">Tổng tiền</TableHead>
                                 <TableHead>Thao tác</TableHead>
-                                {role === "MANAGE" && status === BillStatus.NOT_PAID && (
+                                {role === "manage" && status === BillStatus.NOT_PAID && (
                                     <TableHead>Hủy</TableHead>
                                 )}
                             </TableRow>
@@ -406,19 +401,25 @@ const BillList: React.FC = () => {
                                     <TableCell>{bill.paymentMethod}</TableCell>
                                     <TableCell>{bill.diningOption}</TableCell>
                                     <TableCell>
-                                        <Badge variant={
-                                            bill.billStatus === BillStatus.PAID ? "success" :
-                                                bill.billStatus === BillStatus.NOT_PAID ? "destructive" :
-                                                    bill.billStatus === BillStatus.CANCEL ? "secondary" :
-                                                        "default"
-                                        }>
+                                        <Badge
+                                            variant={
+                                                bill.billStatus === BillStatus.PAID
+                                                    ? "success"
+                                                    : bill.billStatus === BillStatus.NOT_PAID
+                                                        ? "destructive"
+                                                        : bill.billStatus === BillStatus.CANCEL
+                                                            ? "secondary"
+                                                            : "default"
+                                            }
+                                        >
                                             {bill.billStatus}
                                         </Badge>
                                     </TableCell>
+                                    <TableCell>{bill.createdAt}</TableCell>
                                     <TableCell className="text-right font-medium">
-                                        {new Intl.NumberFormat('vi-VN', {
-                                            style: 'currency',
-                                            currency: 'VND'
+                                        {new Intl.NumberFormat("vi-VN", {
+                                            style: "currency",
+                                            currency: "VND",
                                         }).format(bill.totalAmount)}
                                     </TableCell>
                                     <TableCell>
@@ -430,81 +431,41 @@ const BillList: React.FC = () => {
                                             Xem chi tiết
                                         </Button>
                                     </TableCell>
-                                    {(role === "MANAGE" && bill.billStatus === BillStatus.NOT_PAID) && (
-                                        <TableCell>
-                                            <Button
-                                                variant="destructive"
-                                                size="sm"
-                                                onClick={() => handleOpenDialog(bill)}
-                                            >
-                                                Hủy hóa đơn
-                                            </Button>
-                                        </TableCell>
-                                    )}
+                                    {role === "manage" &&
+                                        bill.billStatus === BillStatus.NOT_PAID && (
+                                            <TableCell>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    onClick={() => handleOpenDialog(bill)}
+                                                >
+                                                    Hủy hóa đơn
+                                                </Button>
+                                            </TableCell>
+                                        )}
                                 </TableRow>
                             ))}
                             {isSearching && searchResults.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan={9} className="text-center py-8">
-                                        <div className="text-gray-500">Không tìm thấy kết quả phù hợp</div>
+                                        <div className="text-gray-500">
+                                            Không tìm thấy kết quả phù hợp
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             )}
-                        </TableBody><TableBody>
-                        {(isSearching ? searchResults : bills).map((bill) => (
-                            <TableRow key={bill.billId}>
-                                <TableCell>{bill.billId}</TableCell>
-                                <TableCell>{bill.customerName}</TableCell>
-                                <TableCell>{bill.customerPhone}</TableCell>
-                                <TableCell>{bill.paymentMethod}</TableCell>
-                                <TableCell>{bill.diningOption}</TableCell>
-                                <TableCell>
-                                    <Badge variant={
-                                        bill.billStatus === BillStatus.PAID ? "success" :
-                                            bill.billStatus === BillStatus.NOT_PAID ? "destructive" :
-                                                bill.billStatus === BillStatus.CANCEL ? "secondary" :
-                                                    "default"
-                                    }>
-                                        {bill.billStatus}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="text-right font-medium">
-                                    {new Intl.NumberFormat('vi-VN', {
-                                        style: 'currency',
-                                        currency: 'VND'
-                                    }).format(bill.totalAmount)}
-                                </TableCell>
-                                <TableCell>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleViewDetails(bill.billId)}
-                                    >
-                                        Xem chi tiết
-                                    </Button>
-                                </TableCell>
-                                {/* Thêm cột cho nút hủy hóa đơn */}
-                                <TableCell>
-                                    {role === "MANAGE" && bill.billStatus === BillStatus.NOT_PAID && (
-                                        <Button
-                                            variant="destructive"
-                                            size="sm"
-                                            onClick={() => handleOpenDialog(bill)}
-                                        >
-                                            Hủy hóa đơn
-                                        </Button>
-                                    )}
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                        {isSearching && searchResults.length === 0 && (
-                            <TableRow>
-                                <TableCell colSpan={9} className="text-center py-8">
-                                    <div className="text-gray-500">Không tìm thấy kết quả phù hợp</div>
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
+
+
+                            {isSearching && searchResults.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={9} className="text-center py-8">
+                                        <div className="text-gray-500">
+                                            Không tìm thấy kết quả phù hợp
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
                     </Table>
                 </div>
             )}

@@ -78,8 +78,8 @@ export const TABLE_COLUMNS = {
 
 // Role definitions
 export const ROLES = {
-    MANAGE: 'MANAGE',
-    USER: 'USER',
+    MANAGE: 'manage',
+    USER: 'user',
 };
 
 // Pagination defaults

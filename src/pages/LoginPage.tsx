@@ -21,6 +21,7 @@ const LoginPage: React.FC = () => {
       const result: ApiResponse<LoginData> = await login(email, password);
       if (result.success) {
         const roles = result.data.user.roles;
+        console.log(roles)
         navigate(roles.includes("manage") ? "/admin/home" : "/employee");
 
         console.log(roles);
