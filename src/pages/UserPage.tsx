@@ -9,7 +9,7 @@ import { TablePagination } from "@/components/TablePagination.tsx";
 import { UserSearchParams } from "@/api/endpoints/userApi.ts";
 import { UserFormSheet } from "@/components/UserFormSheet";
 import {useCustomToast} from "@/hooks/CustomAlert.tsx";
-import {UserErrorCode} from "@/utils/error/UserError.ts";
+import {ErrorCode} from "@/utils/error/ErrorCode.ts";
 
 const UserPage = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -54,10 +54,10 @@ const UserPage = () => {
         try {
             await userService.deactivateUser(userId);
             fetchUsers();
-            showSuccessToast(UserErrorCode.DEACTIVATE_SUCCESS);
+            showSuccessToast(ErrorCode.USER_DEACTIVATE_ERROR);
         } catch (error) {
             console.error('Error deactivating user:', error);
-            showErrorToast(UserErrorCode.DEACTIVATE_ERROR);
+            showErrorToast(ErrorCode.USER_DEACTIVATE_ERROR);
         }
     };
 
@@ -77,7 +77,7 @@ const UserPage = () => {
             setTotalElements(response.data.totalElements);
         } catch (error) {
             console.error('Error fetching users:', error);
-            showErrorToast(UserErrorCode.FETCH_ERROR);
+            showErrorToast(ErrorCode.USER_FETCH_ERROR);
         } finally {
             setLoading(false);
         }

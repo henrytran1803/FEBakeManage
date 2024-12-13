@@ -5,8 +5,8 @@ import { ingredientService } from "@/services/ingredientService";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
 import { Unit } from "@/types/Unit";
-import { IngredientErrorCode } from "@/utils/error/ingredientError";
 import { useCustomToast } from "@/hooks/CustomAlert";
+import {ErrorCode} from "@/utils/error/ErrorCode.ts";
 
 interface IngredientTableProps {
     ingredients: Ingredient[];
@@ -48,13 +48,13 @@ const IngredientTable: React.FC<IngredientTableProps> = ({ ingredients, units, i
                 const deleteResponse = await ingredientService.deleteIngredient(selectedIngredientId);
                 if (deleteResponse.success) {
                     onRefresh(); // Refresh danh sách sau khi xóa thành công
-                    showSuccessToast(IngredientErrorCode.INGREDIENT_DELETE_SUCCESS);
+                    showSuccessToast(ErrorCode.INGREDIENT_DELETE_SUCCESS);
                 } else {
-                    showErrorToast(IngredientErrorCode.INGREDIENT_DELETE_FAIL);
+                    showErrorToast(ErrorCode.INGREDIENT_DELETE_FAIL);
                 }
                 
             } catch (error) {
-                showErrorToast(IngredientErrorCode.INGREDIENT_DELETE_FAIL);
+                showErrorToast(ErrorCode.INGREDIENT_DELETE_FAIL);
             } finally {
                 setShowDeleteConfirm(false); // Đóng modal xác nhận
             }
@@ -71,26 +71,26 @@ const IngredientTable: React.FC<IngredientTableProps> = ({ ingredients, units, i
         if (editingIngredient) {
             if (!editingIngredient?.name.trim()) {
                 newErrors.name = "Tên nguyên liệu không được để trống.";
-                showErrorToast(IngredientErrorCode.INGREDIENT_NAME_REQUIRED);
+                showErrorToast(ErrorCode.INGREDIENT_NAME_REQUIRED);
             }
             if (editingIngredient?.name.length > 100 ) {
                 newErrors.name = "Tên nguyên liệu không được quá 100 ký tự";
-                showErrorToast(IngredientErrorCode.INGREDIENT_NAME_LENGTH);
+                showErrorToast(ErrorCode.INGREDIENT_NAME_LENGTH);
             }
         } else {
             newErrors.name = "Tên nguyên liệu không được để trống.";
-            showErrorToast(IngredientErrorCode.INGREDIENT_NAME_REQUIRED);
+            showErrorToast(ErrorCode.INGREDIENT_NAME_REQUIRED);
         }
         
 
         if (editingIngredient?.unit_id === 0) {
             newErrors.unit_id = "Vui lòng chọn đơn vị.";
-            showErrorToast(IngredientErrorCode.INGREDIENT_UNIT_REQUIRED);
+            showErrorToast(ErrorCode.INGREDIENT_UNIT_REQUIRED);
         }
 
         if (editingIngredient && editingIngredient?.warning_limits < 0) {
             newErrors.warning_limits = "Giới hạn cảnh báo không được nhỏ hơn 0.";
-            showErrorToast(IngredientErrorCode.INGREDIENT_WARNING_LIMIT);
+            showErrorToast(ErrorCode.INGREDIENT_WARNING_LIMIT);
         }
 
         setErrors(newErrors); 
@@ -110,13 +110,13 @@ const IngredientTable: React.FC<IngredientTableProps> = ({ ingredients, units, i
                     warning_limits: editingIngredient.warning_limits,
                 });
                 if (editResponse.success) {
-                    showSuccessToast(IngredientErrorCode.INGREDIENT_UPDATE_SUCCESS);
+                    showSuccessToast(ErrorCode.INGREDIENT_UPDATE_SUCCESS);
                 } else {
-                    showErrorToast(IngredientErrorCode.INGREDIENT_UPDATE_FAIL);
+                    showErrorToast(ErrorCode.INGREDIENT_UPDATE_FAIL);
                 }
                 onRefresh(); 
             } catch (error) {
-                showErrorToast(IngredientErrorCode.INGREDIENT_UPDATE_FAIL);
+                showErrorToast(ErrorCode.INGREDIENT_UPDATE_FAIL);
             } finally {
                 setEditingIngredient(null); 
             }
@@ -204,7 +204,6 @@ const IngredientTable: React.FC<IngredientTableProps> = ({ ingredients, units, i
             {/* Modal xác nhận xóa */}
             {showDeleteConfirm && (
                 <Modal
-                    isOpen={showDeleteConfirm}
                     title="Xác nhận xóa"
                     onClose={() => setShowDeleteConfirm(false)}
                     actions={
@@ -223,7 +222,6 @@ const IngredientTable: React.FC<IngredientTableProps> = ({ ingredients, units, i
             {/* Form sửa */}
             {editingIngredient && (
                 <Modal
-                    isOpen={editingIngredient}
                     title="Sửa nguyên liệu"
                     onClose={() => setEditingIngredient(null)}
                     actions={

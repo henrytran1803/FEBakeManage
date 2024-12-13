@@ -23,8 +23,8 @@ import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 import {Switch} from "@/components/ui/switch.tsx";
 import {getImageUrl} from "@/utils/imageUtils.ts";
-import {CategoryErrorCode} from "@/utils/error/categoryError.ts";
 import {useCustomToast} from "@/hooks/CustomAlert.tsx";
+import {ErrorCode} from "@/utils/error/ErrorCode.ts";
 
 
 
@@ -71,12 +71,12 @@ export default function CategorySheet({
         const file = event.target.files?.[0];
         if (file) {
             if (file.size > 5 * 1024 * 1024) {
-                showErrorToast(CategoryErrorCode.CATEGORY_IMAGE_SIZE);
+                showErrorToast(ErrorCode.CATEGORY_IMAGE_SIZE);
                 return;
             }
 
             if (!file.type.startsWith('image/')) {
-                showErrorToast(CategoryErrorCode.CATEGORY_IMAGE_TYPE);
+                showErrorToast(ErrorCode.CATEGORY_IMAGE_TYPE);
                 return;
             }
             setSelectedFile(file);
@@ -93,23 +93,20 @@ export default function CategorySheet({
 
             // Validate name
             if (!data.name.trim()) {
-                showErrorToast(CategoryErrorCode.CATEGORY_NAME_REQUIRED);
+                showErrorToast(ErrorCode.CATEGORY_NAME_REQUIRED);
                 return;
             }
 
             if (data.name.length > 250) {
-                showErrorToast(CategoryErrorCode.CATEGORY_NAME_LENGTH);
+                showErrorToast(ErrorCode.CATEGORY_NAME_LENGTH);
                 return;
             }
-
-            // Handle update
             if (category) {
                 if (!selectedFile && !data.name) {
-                    showErrorToast(CategoryErrorCode.CONNECT_ERROR);
+                    showErrorToast(ErrorCode.CONNECT_ERROR);
                     onSuccess(false);
                     return;
                 }
-
                 const response = await categoryService.updateCategory(
                     category.id,
                     data.name,
@@ -118,17 +115,15 @@ export default function CategorySheet({
                     selectedFile || new File([], ""),
                     category.imageUrl
                 );
-
                 if (response.success) {
-                    showSuccessToast(CategoryErrorCode.UPDATE_SUCCESS);
+                    showSuccessToast(ErrorCode.UPDATE_CATEGORY_SUCCESS);
                     onSuccess(true);
                     onClose();
                 }
             }
-            // Handle create
             else {
                 if (!selectedFile) {
-                    showErrorToast(CategoryErrorCode.CATEGORY_IMAGE_REQUIRED);
+                    showErrorToast(ErrorCode.CATEGORY_IMAGE_REQUIRED);
                     return;
                 }
 
@@ -138,13 +133,13 @@ export default function CategorySheet({
                 );
 
                 if (response.success) {
-                    showSuccessToast(CategoryErrorCode.POST_SUCCESS);
+                    showSuccessToast(ErrorCode.POST_CATEGORY_SUCCESS);
                     onSuccess(true);
                     onClose();
                 }
             }
         } catch (error) {
-            showErrorToast(CategoryErrorCode.CONNECT_ERROR);
+            showErrorToast(ErrorCode.CONNECT_ERROR);
         } finally {
             setLoading(false);
         }

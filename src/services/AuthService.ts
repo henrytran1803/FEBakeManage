@@ -29,7 +29,7 @@ export const login = async (email: string, password: string): Promise<ApiRespons
 const setAuthData = (authData: LoginData) => {
     localStorage.setItem('token', authData.token);
     localStorage.setItem('user', JSON.stringify(authData.user));
-    localStorage.setItem('auth', authData.user.roles.includes('ROLE_MANAGE') ? 'manage' : 'user');
+    localStorage.setItem('auth', authData.user.roles.includes('manage') ? 'manage' : 'user');
 };
 
 export const getAuthState = (): { isAuthenticated: boolean; user: User | null; token: string | null } => {

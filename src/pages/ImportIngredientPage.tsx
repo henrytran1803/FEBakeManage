@@ -9,8 +9,7 @@ import Modal from "@/components/ui/Modal";
 import { Unit } from "@/types/Unit";
 import { unitService } from "@/services/unitService";
 import { useCustomToast } from "@/hooks/CustomAlert";
-import { IngredientErrorCode } from "@/utils/error/ingredientError";
-import { SupplierErrorCode } from "@/utils/error/supplierError";
+import {ErrorCode} from "@/utils/error/ErrorCode.ts";
 
 
 const ImportIngredientPage: React.FC = () => {
@@ -32,10 +31,10 @@ const ImportIngredientPage: React.FC = () => {
             if (response.success) {
                 setSuppliers(response.data);
             } else {
-                showErrorToast(SupplierErrorCode.SUPPLIER_FETCH_FAIL);
+                showErrorToast(ErrorCode.SUPPLIER_FETCH_FAIL);
             }
         } catch (error) {
-            showErrorToast(SupplierErrorCode.SUPPLIER_FETCH_FAIL);
+            showErrorToast(ErrorCode.SUPPLIER_FETCH_FAIL);
         }
     };
 
@@ -46,10 +45,10 @@ const ImportIngredientPage: React.FC = () => {
             if (response.success) {
                 setUnits(response.data);
             } else {
-                showErrorToast(IngredientErrorCode.UNIT_FETCH_FAIL);
+                showErrorToast(ErrorCode.UNIT_FETCH_FAIL);
             }
         } catch (error) {
-            showErrorToast(IngredientErrorCode.UNIT_FETCH_FAIL);
+            showErrorToast(ErrorCode.UNIT_FETCH_FAIL);
         }
     };
 
@@ -70,10 +69,10 @@ const ImportIngredientPage: React.FC = () => {
                     price: 0,  
                 })));
             } else {
-                showErrorToast(IngredientErrorCode.INGREDIENT_FETCH_FAIL);
+                showErrorToast(ErrorCode.INGREDIENT_FETCH_FAIL);
             }
         } catch (error) {
-            showErrorToast(IngredientErrorCode.INGREDIENT_FETCH_FAIL);
+            showErrorToast(ErrorCode.INGREDIENT_FETCH_FAIL);
         } finally {
             setLoading(false);
         }
@@ -128,21 +127,21 @@ const ImportIngredientPage: React.FC = () => {
 
     const handleSubmit = async () => {
         if (selectedIngredients.length === 0) {
-            showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_EMPTY);
+            showErrorToast(ErrorCode.IMPORT_INGREDIENT_EMPTY);
             return;
         }
 
         for (const ingredient of selectedIngredients) {
             if (ingredient.quantity <= 0) {
-                showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_QUANTITY);
+                showErrorToast(ErrorCode.IMPORT_INGREDIENT_QUANTITY);
                 return;
             }
             if (ingredient.price === null ) {
-                showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_PRICE_EMPTY);
+                showErrorToast(ErrorCode.IMPORT_INGREDIENT_PRICE_EMPTY);
                 return;
             }
             if (ingredient.price < 0) {
-                showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_PRICE);
+                showErrorToast(ErrorCode.IMPORT_INGREDIENT_PRICE);
                 return;
             }
         }
@@ -156,14 +155,14 @@ const ImportIngredientPage: React.FC = () => {
         try {
             const response = await ingredientService.importIngredients(requestData);
             if (response.success) {
-                showSuccessToast(IngredientErrorCode.IMPORT_INGREDIENT_SUCCESS);
+                showSuccessToast(ErrorCode.IMPORT_INGREDIENT_SUCCESS);
                 setSelectedIngredients([]); // Reset lại danh sách nguyên liệu đã chọn
             } else {
-                showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_FAIL);
+                showErrorToast(ErrorCode.IMPORT_INGREDIENT_FAIL);
             }
         } catch (error) {
             console.error("Error importing ingredients:", error);
-            showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_FAIL);
+            showErrorToast(ErrorCode.IMPORT_INGREDIENT_FAIL);
         }
     };
 

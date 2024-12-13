@@ -22,7 +22,6 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {CheckCircle, ExpandIcon} from "lucide-react";
 
 export function CategoryPage() {
-    // States
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');

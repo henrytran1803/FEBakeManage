@@ -1,4 +1,3 @@
-// components/stats-cards.tsx
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BillStatistic } from '@/types/Bill';

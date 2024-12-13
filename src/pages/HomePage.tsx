@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { SearchFilter } from "@/components/SearchFilter";
 import { TablePagination } from "@/components/TablePagination";
 import {
   SearchProductActiveParams,
