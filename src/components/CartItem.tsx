@@ -44,7 +44,7 @@ const CartItem: React.FC<CartItemProps> = ({
                 <p className="text-sm text-gray-600">Mã lô: {productDetails.productBatchId}</p>
                 <div className="flex items-center gap-2 mt-2">
           <span className="font-medium">
-            ${productDetails.price.toFixed(2)}
+            {productDetails.price.toFixed(2)} đ
           </span>
                     {productDetails.dailyDiscount > 0 && (
                         <span className="text-red-500">

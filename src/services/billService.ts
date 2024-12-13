@@ -9,15 +9,21 @@ interface SearchParams {
     customerName?: string;
     customerPhone?: string;
 }
-// Khai báo service cho bill (hóa đơn)
 export const billService = {
-    // API tìm kiếm hóa đơn theo trạng thái
     search: async (status: string, page: number = 0, size: number = 10) => {
         try {
             const response = await billApi.search({ status, page, size });
             return response;  // Trả về kết quả từ API
         } catch (error) {
             throw new Error("Failed to search bills");
+        }
+    },
+    getTodayBills: async (page: number = 0, size: number = 10) => {
+        try {
+            const response = await billApi.getTodayBills({ page, size });
+            return response;
+        } catch (error) {
+            throw new Error("Failed to fetch today's bills");
         }
     },
     searchBill: async (params: SearchParams) => {

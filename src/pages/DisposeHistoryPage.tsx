@@ -9,7 +9,7 @@ import {Button} from "@/components/ui/button.tsx";
 const DisposeHistoryPage = () => {
     const [disposals, setDisposals] = useState<DisposedProductSummaryDTO[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [error] = useState<string | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {

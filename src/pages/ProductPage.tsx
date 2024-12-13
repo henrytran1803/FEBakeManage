@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import {ProductFormSheet} from "@/components/ProductFormSheet.tsx";
 import {useNavigate} from "react-router-dom";
+import {useCustomToast} from "@/hooks/CustomAlert.tsx";
+import {ErrorCode} from "@/utils/error/ErrorCode.ts";
 
 const ProductPage: React.FC = () => {
     // State declarations
@@ -33,6 +35,7 @@ const ProductPage: React.FC = () => {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isDeleteOpenActive, setIsDeleteOpenActive] = useState(false);
     const [idDelete, setIdDelete] = useState(0);
+    const {  showSuccessToast } = useCustomToast();
 
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
@@ -95,6 +98,7 @@ const ProductPage: React.FC = () => {
             setIdDelete(id)
 
         }
+
     };
     const navigate = useNavigate();
 
@@ -107,9 +111,10 @@ const ProductPage: React.FC = () => {
             if (response.success) {
                 fetchProducts();
             }
+            showSuccessToast(ErrorCode.CHANGE_STATUS_PRODUCT_SUCCESS)
         } catch (error) {
-            console.error('Failed to change product status:', error);
-            alert('Có lỗi xảy ra khi thay đổi trạng thái sản phẩm');
+            showSuccessToast(ErrorCode.CONNECT_ERROR)
+
         }
     }
     // const handleFormClose = () => {

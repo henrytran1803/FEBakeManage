@@ -11,6 +11,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { billApi } from '@/api/endpoints/billApi';
+import {getImageUrl} from "@/utils/imageUtils.ts";
 
 const CheckoutedBill: React.FC = () => {
     const { billId } = useParams<{ billId: string }>();
@@ -152,7 +153,7 @@ const CheckoutedBill: React.FC = () => {
                         >
                             <div className="flex items-center gap-4">
                                 <img
-                                    src={item.productImages || '/api/placeholder/100/100'}
+                                    src={getImageUrl(item.productImages) || '/api/placeholder/100/100'}
                                     alt={item.productName}
                                     className="w-24 h-24 object-cover rounded"
                                 />

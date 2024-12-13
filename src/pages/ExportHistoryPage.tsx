@@ -19,7 +19,7 @@ const ExportHistoryPage: React.FC = () => {
     const [selectedExport, setSelectedExport] = useState<any | null>(null);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [users, setUsers] = useState<UserName[]>([]);
-    const { showErrorToast, showSuccessToast } = useCustomToast();
+    const { showErrorToast } = useCustomToast();
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);

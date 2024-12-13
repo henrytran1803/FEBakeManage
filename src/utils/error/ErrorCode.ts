@@ -45,6 +45,7 @@ export enum ErrorCode {
     PRODUCT_DISCOUNT_LIMIT_ERROR = 'PRODUCT_DISCOUNT_LIMIT_ERROR',
     PRODUCT_IMAGE_REQUIRED_ERROR = 'PRODUCT_IMAGE_REQUIRED_ERROR',
     POST_PRODUCT_SUCCESS = 'POST_PRODUCT_SUCCESS',
+    CHANGE_STATUS_PRODUCT_SUCCESS = 'CHANGE_STATUS_PRODUCT_SUCCESS',
     // ingredient error
     INGREDIENT_FETCH_FAIL = 'INGREDIENT_FETCH_FAIL',
     UNIT_FETCH_FAIL = 'UNIT_FETCH_FAIL',
@@ -185,6 +186,7 @@ export const errorCodeMessage: { [key in ErrorCode]: string } = {
     [ErrorCode.PRODUCT_DISCOUNT_LIMIT_ERROR]: 'Giới hạn giảm giá phải từ 0 đến 100',
     [ErrorCode.PRODUCT_IMAGE_REQUIRED_ERROR]: 'Vui lòng chọn ít nhất một ảnh',
     [ErrorCode.POST_PRODUCT_SUCCESS]:'Thêm sản phẩm thành công',
+    [ErrorCode.CHANGE_STATUS_PRODUCT_SUCCESS]:'Đã đổi trạng thaí thành công',
     //Ingredient error
     [ErrorCode.INGREDIENT_NAME_REQUIRED]: "Vui lòng nhập tên danh mục",
     [ErrorCode.INGREDIENT_NAME_LENGTH]: "Tên nguyên liệu không được quá 100 ký tự",

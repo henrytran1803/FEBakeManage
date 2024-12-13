@@ -21,7 +21,7 @@ const ImportHistoryPage: React.FC = () => {
     const [suppliers, setSuppliers] = useState<any[]>([]);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [users, setUsers] = useState<UserName[]>([]);
-    const { showErrorToast, showSuccessToast } = useCustomToast();
+    const { showErrorToast } = useCustomToast();
     
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
