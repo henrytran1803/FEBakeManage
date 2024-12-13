@@ -78,34 +78,41 @@ export default function ProductDetailPage() {
 
 
     return (
-        <div className="fixed inset-0 bg-gray-50">
-            {/* Back Button */}
-            <Button
-                variant="ghost"
-                className="mb-6 flex items-center gap-2"
-                onClick={() => navigate(-1)}
-            >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Products
-            </Button>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="min-h-screen bg-gray-50">
+            {/* Header cố định */}
+            <div className="sticky top-0 bg-white z-10 p-4 border-b flex items-center">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate(-1)}
+                    className="mr-2"
+                >
+                    <ArrowLeft className="h-5 w-5" />
+                </Button>
+                <h1 className="text-lg font-semibold truncate">{product?.active.name}</h1>
+            </div>
+
+            <div className="p-4 pb-20">
                 {/* Image Section */}
-                <div className="space-y-6 h-[calc(100vh-200px)] flex flex-col">
-                    <div className="w-full relative rounded-xl overflow-hidden border shadow-sm flex-1">
+                <div className="space-y-4 mb-6">
+                    <div className="w-full aspect-square relative rounded-lg overflow-hidden border">
                         <img
                             src={getImageUrl(selectedImage || product.active.imageUrls[0])}
                             alt={product.active.name}
-                            className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-cover"
                         />
                     </div>
+
+                    {/* Image Carousel */}
                     <div className="relative">
                         <Carousel className="w-full">
-                            <CarouselContent className="-ml-2 md:-ml-4">
+                            <CarouselContent className="-ml-2">
                                 {product.active.imageUrls.map((image, index) => (
-                                    <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/4">
+                                    <CarouselItem key={index} className="pl-2 basis-1/4">
                                         <div
-                                            className={`aspect-square rounded-lg overflow-hidden border-2 cursor-pointer transition-all
-                                ${selectedImage === image ? 'border-primary' : 'border-transparent hover:border-gray-200'}`}
+                                            className={`aspect-square rounded-lg overflow-hidden border-2 ${
+                                                selectedImage === image ? 'border-primary' : 'border-transparent'
+                                            }`}
                                             onClick={() => setSelectedImage(image)}
                                         >
                                             <img
@@ -117,131 +124,114 @@ export default function ProductDetailPage() {
                                     </CarouselItem>
                                 ))}
                             </CarouselContent>
-                            <CarouselPrevious className="-left-4"/>
-                            <CarouselNext className="-right-4"/>
+                            <CarouselPrevious className="-left-2 h-8 w-8"/>
+                            <CarouselNext className="-right-2 h-8 w-8"/>
                         </Carousel>
                     </div>
                 </div>
 
-                {/* Info Section */}
-                <div className="space-y-8">
-                    <div className="space-y-4">
-                        <h1 className="text-4xl font-bold tracking-tight">{product.active.name}</h1>
-                        <p className="text-gray-600 leading-relaxed">{product.active.description}</p>
-                    </div>
-
+                {/* Product Info */}
+                <div className="space-y-4">
                     <div className="space-y-2">
-                        <span className="text-3xl font-bold text-primary">
-                            {product.active.currentPrice.toLocaleString()}đ
-                        </span>
                         <p className="text-sm text-gray-600">
                             Danh mục: <span className="font-medium">{product.active.category.name}</span>
                         </p>
+                        <h2 className="text-2xl font-bold">{product.active.currentPrice.toLocaleString()}đ</h2>
+                        <p className="text-sm text-gray-600 leading-relaxed">{product.active.description}</p>
                     </div>
 
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Chọn lô hàng:</label>
-                            <Select
-                                value={selectedBatchId?.toString()}
-                                onValueChange={(value) => setSelectedBatchId(Number(value))}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Chọn lô hàng"/>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {product.active.productBatches
-                                        .filter(batch => batch.status)
-                                        .map((batch) => (
-                                            <SelectItem key={batch.id} value={batch.id.toString()}>
-                                                {`HSD: ${new Date(batch.expirationDate).toLocaleDateString()} - Giảm: ${batch.dailyDiscount}%`}
-                                            </SelectItem>
-                                        ))}
-                                </SelectContent>
-                            </Select>
+                    {/* Product Batch Selection */}
+                    <div className="space-y-3">
+                        <Select
+                            value={selectedBatchId?.toString()}
+                            onValueChange={(value) => setSelectedBatchId(Number(value))}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Chọn lô hàng"/>
+                            </SelectTrigger>
+                            <SelectContent>
+                                {product.active.productBatches
+                                    .filter(batch => batch.status)
+                                    .map((batch) => (
+                                        <SelectItem key={batch.id} value={batch.id.toString()}>
+                                            {`HSD: ${new Date(batch.expirationDate).toLocaleDateString()} - Giảm: ${batch.dailyDiscount}%`}
+                                        </SelectItem>
+                                    ))}
+                            </SelectContent>
+                        </Select>
+
+                        {/* Quantity Selection */}
+                        <div className="flex items-center justify-between bg-white rounded-lg p-3 border">
+                            <span className="text-sm font-medium">Số lượng:</span>
+                            <div className="flex items-center gap-3">
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                    disabled={quantity <= 1}
+                                >
+                                    -
+                                </Button>
+                                <span className="w-8 text-center">{quantity}</span>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => setQuantity(quantity + 1)}
+                                >
+                                    +
+                                </Button>
+                            </div>
                         </div>
 
-                        <div className="flex items-center space-x-4">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                disabled={quantity <= 1}
-                            >
-                                -
-                            </Button>
-                            <span className="w-12 text-center">{quantity}</span>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => setQuantity(quantity + 1)}
-                            >
-                                +
-                            </Button>
-                        </div>
-
+                        {/* Price Info */}
                         {selectedBatch && (
-                            <div className="space-y-2">
-                                <p className="text-sm text-gray-600">
-                                    Giảm giá: {selectedBatch.dailyDiscount}%
-                                </p>
-                                <p className="text-xl font-bold">
-                                    Giá sau
-                                    giảm: {(product.active.currentPrice * (1 - selectedBatch.dailyDiscount / 100)).toLocaleString()}đ
+                            <div className="bg-white rounded-lg p-3 border space-y-1">
+                                <p className="text-sm">Giảm giá: <span className="text-red-500 font-medium">{selectedBatch.dailyDiscount}%</span></p>
+                                <p className="font-bold">
+                                    Giá sau giảm: {(product.active.currentPrice * (1 - selectedBatch.dailyDiscount / 100)).toLocaleString()}đ
                                 </p>
                             </div>
                         )}
-
-                        <Button
-                            className="w-full"
-                            size="lg"
-                            onClick={handleAddToCart}
-                            disabled={!selectedBatch}
-                        >
-                            Thêm vào giỏ hàng
-                        </Button>
-                        <Card className="shadow-lg mb-8">
-                            <CardContent className="p-6">
-                                <h3 className="text-xl font-semibold mb-6">Lịch sử giá</h3>
-                                <div className="h-[300px]">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={priceData}>
-                                            <XAxis
-                                                dataKey="date"
-                                                tick={{fill: '#6B7280'}}
-                                                tickLine={{stroke: '#E5E7EB'}}
-                                            />
-                                            <YAxis
-                                                tick={{fill: '#6B7280'}}
-                                                tickLine={{stroke: '#E5E7EB'}}
-                                                width={80}
-                                                tickFormatter={value => `${value.toLocaleString()}đ`}
-                                            />
-                                            <Tooltip
-                                                contentStyle={{
-                                                    background: 'white',
-                                                    border: '1px solid #E5E7EB',
-                                                    borderRadius: '8px',
-                                                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                                                }}
-                                                formatter={value => [`${value.toLocaleString()}đ`]}
-                                            />
-                                            <Line
-                                                type="monotone"
-                                                dataKey="price"
-                                                stroke="#2563eb"
-                                                strokeWidth={2}
-                                                dot={{fill: '#2563eb', strokeWidth: 2}}
-                                                activeDot={{r: 6}}
-                                            />
-                                        </LineChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </CardContent>
-                        </Card>
-
                     </div>
+
+                    {/* Price History Chart */}
+                    <Card className="mt-6">
+                        <CardContent className="p-4">
+                            <h3 className="text-base font-semibold mb-4">Lịch sử giá</h3>
+                            <div className="h-[200px]">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={priceData}>
+                                        <XAxis
+                                            dataKey="date"
+                                            tick={{fontSize: 12}}
+                                            tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                                        />
+                                        <YAxis
+                                            tick={{fontSize: 12}}
+                                            width={70}
+                                            tickFormatter={value => `${(value/1000)}k`}
+                                        />
+                                        <Tooltip />
+                                        <Line type="monotone" dataKey="price" stroke="#2563eb" />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
+            </div>
+
+            {/* Fixed Bottom Button */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
+                <Button
+                    className="w-full h-12"
+                    onClick={handleAddToCart}
+                    disabled={!selectedBatch}
+                >
+                    Thêm vào giỏ hàng
+                </Button>
             </div>
         </div>
     );

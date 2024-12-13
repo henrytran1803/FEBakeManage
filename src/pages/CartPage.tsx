@@ -1,38 +1,3 @@
-{
-  /* Success Dialog for Cash Payment
-             <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle>Đặt hàng thành công!</DialogTitle>
-                        <DialogDescription className="space-y-4">
-                            <p>Vui lòng ra quầy thanh toán và cung cấp một trong các thông tin sau:</p>
-                            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                                <div className="flex justify-between">
-                                    <span className="font-medium">Tên:</span>
-                                    <span>{customerName}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="font-medium">Số điện thoại:</span>
-                                    <span>{customerPhone}</span>
-                                </div>
-                                {diningOption === 'DINE_IN' && (
-                                    <div className="flex justify-between">
-                                        <span className="font-medium">Số bàn:</span>
-                                        <span>{tableId}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="flex justify-end mt-4">
-                        <Button onClick={handleCloseDialog}>
-                            Đã hiểu
-                        </Button>
-                    </div>
-                </DialogContent>
-            </Dialog> */
-}
-// Cart.tsx
 import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ProductCart } from "@/types/product";
@@ -50,6 +15,7 @@ import { billApi } from "@/api/endpoints/billApi";
 import axios from "axios";
 import { paymentApi } from "@/api/endpoints/paymentApi";
 import ErrorMessageManager from "@/utils/errorMessages";
+import { CartPageErrorCode, cartPageErrorMessages } from "@/utils/error/CartPageError";
 
 const Cart: React.FC = () => {
   const navigate = useNavigate();
@@ -65,7 +31,6 @@ const Cart: React.FC = () => {
   const [diningOption, setDiningOption] = useState("");
   const { toast } = useToast(); // Toast thông báo
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-
 
   useEffect(() => {
     const loadProductDetails = async () => {
@@ -86,127 +51,138 @@ const Cart: React.FC = () => {
     loadProductDetails();
   }, [currentCart.carts, discountCode]);
 
-
-    // Thêm useEffect để lấy tableId từ localStorage khi component mount
-    useEffect(() => {
-      const savedTableId = localStorage.getItem('tableId');
-      if (savedTableId) {
-        setTableId(savedTableId);
-      }
-      }, []);
-
-    //
-
-    const handleCheckout = async () => {
-      console.log("Form Data:", {
-        customerName,
-        customerPhone,
-        paymentMethod,
-        tableId,
-        diningOption,
-        cartItems: currentCart.carts,
-      });
-  
-        // Kiểm tra validation với mã lỗi
-    const errors = [];
-    if (!customerName) errors.push('Q10001');
-    if (!customerPhone) errors.push('Q10002');
-    if (!paymentMethod) errors.push('Q10003');
-    if (!tableId) errors.push('Q10004');
-    if (!diningOption) errors.push('Q10005');
-
-    if (errors.length > 0) {
-      console.log("Validation failed:", {
-        customerName: !customerName,
-        customerPhone: !customerPhone,
-        paymentMethod: !paymentMethod,
-        tableId: !tableId,
-        diningOption: !diningOption,
-      });
-      
-      const errorMessages = errors.map(code => ({
-        code,
-        message: ErrorMessageManager.getMessage(code)
-      }));
-
-      toast({
-        title: `Lỗi: ${errorMessages[0].code}`,
-        description: errorMessages.map(e => e.message).join('\n'),
-        variant: "destructive",
-      });
-      return;
+  // Thêm useEffect để lấy tableId từ localStorage khi component mount
+  useEffect(() => {
+    const savedTableId = localStorage.getItem("tableId");
+    if (savedTableId) {
+      setTableId(savedTableId);
     }
-  
-      try {
-        setIsCreatingBill(true);
-        const savedTableId = localStorage.getItem('tableId');
-        const billRequest: BillRequest = {
-          customerName,
-          customerPhone,
-          paymentMethod: paymentMethod as PaymentMethod,
-          tableId: parseInt(savedTableId || "1", 10),
-          diningOption: diningOption as DiningOption,
-          billDetails: currentCart.carts.map((item) => ({
-            productBatchId: item.productBatchId,
-            quantity: item.quantity,
-          })),
-        };
-  
-        console.log("Sending request:", billRequest);
-        const result = await billApi.createBill(billRequest);
-        console.log("API Response:", result.data);
-  
-        if (result?.data?.billId) {
-          clearCart();
-  
-          if (paymentMethod === PaymentMethod.CASH) {
-            navigate(`/bills/${result.data.billId}/checkouted`);
-            toast({
-              title: "Thành công",
-              description: "Đặt hàng thành công!",
-            });
-          } else if (paymentMethod === PaymentMethod.QR_CODE) {
-            try {
-              const paymentResponse = await paymentApi.getCreatePayment(result.data.billId);
-              localStorage.setItem('pendingBillId', result.data.billId.toString());
-  
-              if (paymentResponse.success === true && paymentResponse.data.checkoutUrl) {
-                window.location.href = paymentResponse.data.checkoutUrl;
-              } else {
-                throw new Error("Không thể tạo link thanh toán");
-              }
-            } catch (paymentError) {
-              console.error("Payment error:", paymentError);
-              toast({
-                title: "Lỗi",
-                description: "Không thể tạo link thanh toán. Vui lòng thử lại!",
-                variant: "destructive",
-              });
-            }
-          }
-        } else {
-          toast({
-            title: "Lỗi: "+ result.message,
-            description: "Message: "+result.errorcode,
-            variant: "destructive",
-          });
-        }
-      } catch (error) {
-        console.error("Detailed error:", error);
-        let errorMessage = "Có lỗi xảy ra khi tạo đơn hàng.";
-  
-        if (error instanceof Error) {
-          errorMessage = error.message;
-        }
-  
+  }, []);
+
+  //
+
+  const handleCheckout = async () => {
+    console.log("Form Data:", {
+      customerName,
+      customerPhone,
+      paymentMethod,
+      tableId,
+      diningOption,
+      cartItems: currentCart.carts,
+    });
+
+    // Kiểm tra validation
+    const validationErrors = [];
+    if (!customerName) validationErrors.push(CartPageErrorCode.CUSTOMER_NAME_REQUIRED);
+    if (!customerPhone) validationErrors.push(CartPageErrorCode.PHONE_NUMBER_REQUIRED);
+    if (!paymentMethod) validationErrors.push(CartPageErrorCode.PAYMENT_METHOD_REQUIRED);
+    if (!tableId) validationErrors.push(CartPageErrorCode.TABLE_REQUIRED);
+    if (!diningOption) validationErrors.push(CartPageErrorCode.DINING_OPTION_REQUIRED);
+
+    if (validationErrors.length > 0) {
+      // Nếu có nhiều hơn 1 lỗi, hiển thị tất cả
+      if (validationErrors.length > 1) {
         toast({
-          title: "Lỗi",
-          description: errorMessage,
+          title: "Vui lòng kiểm tra lại thông tin",
+          description: (
+            <ul className="list-disc pl-4">
+              {validationErrors.map((error, index) => (
+                <li key={index}>{cartPageErrorMessages[error]}</li>
+              ))}
+            </ul>
+          ),
           variant: "destructive",
         });
-      } finally {
-        setIsCreatingBill(false);
+      } else {
+        // Nếu chỉ có 1 lỗi, hiển thị như cũ
+        toast({
+          title: "Lỗi",
+          description: cartPageErrorMessages[validationErrors[0]],
+          variant: "destructive",
+        });
       }
+      return;
+    
+    }
+
+    try {
+      setIsCreatingBill(true);
+      const savedTableId = localStorage.getItem("tableId");
+      const billRequest: BillRequest = {
+        customerName,
+        customerPhone,
+        paymentMethod: paymentMethod as PaymentMethod,
+        tableId: parseInt(savedTableId || "1", 10),
+        diningOption: diningOption as DiningOption,
+        billDetails: currentCart.carts.map((item) => ({
+          productBatchId: item.productBatchId,
+          quantity: item.quantity,
+        })),
+      };
+
+      console.log("Sending request:", billRequest);
+      const result = await billApi.createBill(billRequest);
+      console.log("API Response:", result.data);
+
+      if (result?.data?.billId) {
+        clearCart();
+
+        if (paymentMethod === PaymentMethod.CASH) {
+          navigate(`/bills/${result.data.billId}/checkouted`);
+          toast({
+            title: "Thành công",
+            description: "Đặt hàng thành công!",
+          });
+        } else if (paymentMethod === PaymentMethod.QR_CODE) {
+          try {
+            const paymentResponse = await paymentApi.getCreatePayment(
+              result.data.billId
+            );
+            localStorage.setItem(
+              "pendingBillId",
+              result.data.billId.toString()
+            );
+
+            if (
+              paymentResponse.success === true &&
+              paymentResponse.data.checkoutUrl
+            ) {
+              window.location.href = paymentResponse.data.checkoutUrl;
+            } else {
+              throw new Error("Không thể tạo link thanh toán");
+            }
+          } catch (paymentError) {
+            console.error("Payment error:", paymentError);
+            toast({
+              title: "Lỗi",
+              description: "Không thể tạo link thanh toán. Vui lòng thử lại!",
+              variant: "destructive",
+            });
+          }
+        }
+      } else {
+        toast({
+          title: "Lỗi: " + result.message,
+          description: "Message: " + result.errorcode,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Detailed error:", error);
+      let errorMessage = "Có lỗi xảy ra khi tạo đơn hàng.";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      toast({
+        title: "Lỗi",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingBill(false);
+    }
   };
   if (isLoadingCart) {
     return (
@@ -217,25 +193,28 @@ const Cart: React.FC = () => {
   }
 
   return (
-    <div className="fixed inset-0 bg-gray-50 p-10">
-      <div className="flex items-center gap-4 mb-6">
+    <div className="bg-gray-50 min-h-screen pb-20">
+      {/* Header */}
+      <div className="sticky top-0 bg-white z-10 p-4 border-b flex items-center gap-4">
         <Button
           variant="ghost"
-          size="icon"
+          size="sm"
           onClick={() => navigate(-1)}
-          className="hover:bg-gray-200"
+          className="hover:bg-gray-100"
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-2xl font-bold">Shopping Cart</h1>
+        <h1 className="text-lg font-bold">Giỏ hàng</h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      {/* Main Content */}
+      <div className="p-4">
+        {/* Cart Items */}
+        <div className="mb-6">
           <Card>
             {currentCart.carts.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
-                Your cart is empty
+                Giỏ hàng trống
               </div>
             ) : (
               currentCart.carts.map((item) => {
@@ -249,33 +228,33 @@ const Cart: React.FC = () => {
                     productDetails={details}
                     onUpdateQuantity={updateItem}
                     onRemove={removeItem}
-                    onCheckout={handleCheckout} // Truyền hàm handleCheckout vào
+                    onCheckout={handleCheckout}
                   />
                 ) : null;
               })
             )}
           </Card>
         </div>
-        <div>
-          <CartSummary
-            cartItems={currentCart.carts}
-            productDetails={productDetails}
-            discountCode={discountCode}
-            onDiscountChange={setDiscountCode}
-            onCheckout={handleCheckout}
-            customerName={customerName}
-            customerPhone={customerPhone}
-            paymentMethod={paymentMethod}
-            diningOption={diningOption}
-            tableId={tableId}
-            onCustomerNameChange={setCustomerName}
-            onCustomerPhoneChange={setCustomerPhone}
-            onPaymentMethodChange={setPaymentMethod}
-            onDiningOptionChange={setDiningOption}
-            onTableIdChange={setTableId}
-            isLoading={isCreatingBill}
-          />
-        </div>
+
+        {/* Summary Card */}
+        <CartSummary
+          cartItems={currentCart.carts}
+          productDetails={productDetails}
+          discountCode={discountCode}
+          onDiscountChange={setDiscountCode}
+          onCheckout={handleCheckout}
+          customerName={customerName}
+          customerPhone={customerPhone}
+          paymentMethod={paymentMethod}
+          diningOption={diningOption}
+          tableId={tableId}
+          onCustomerNameChange={setCustomerName}
+          onCustomerPhoneChange={setCustomerPhone}
+          onPaymentMethodChange={setPaymentMethod}
+          onDiningOptionChange={setDiningOption}
+          onTableIdChange={setTableId}
+          isLoading={isCreatingBill}
+        />
       </div>
     </div>
   );

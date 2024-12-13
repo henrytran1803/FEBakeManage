@@ -40,6 +40,28 @@ export const userApi = {
 
     return response.data;
   },
+  getActive: async (params: UserSearchParams): Promise<ApiResponse<ListUserActive>> => {
+    const searchParams = new URLSearchParams();
+    searchParams.append('page', (params.page ?? 0).toString());
+    searchParams.append('size', (params.size ?? 10).toString());
+    searchParams.append('isActive', (params.isActive ?? "active").toString());
+    const response = await api.get<ApiResponse<ListUserActive>>(
+        `/api/admin/user/active?${searchParams.toString()}`
+    );
+
+    return response.data;
+  },
+  getInActive: async (params: UserSearchParams): Promise<ApiResponse<ListUserActive>> => {
+    const searchParams = new URLSearchParams();
+    searchParams.append('page', (params.page ?? 0).toString());
+    searchParams.append('size', (params.size ?? 10).toString());
+    searchParams.append('isActive', (params.isActive ?? "inactive").toString());
+    const response = await api.get<ApiResponse<ListUserActive>>(
+        `/api/admin/user/active?${searchParams.toString()}`
+    );
+
+    return response.data;
+  },
 
 
   getUserById: async (id: number): Promise<ApiResponse<User>> => {

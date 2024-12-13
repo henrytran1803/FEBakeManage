@@ -41,7 +41,8 @@ const CartItem: React.FC<CartItemProps> = ({
             />
             <div className="flex-1">
                 <h3 className="font-medium">{productDetails.name}</h3>
-                <p className="text-sm text-gray-600">{productDetails.categoryName}</p>
+                <p className="text-sm text-gray-600">Loại: {productDetails.categoryName}</p>
+                <p className="text-sm text-gray-600">Mã lô: {productDetails.productBatchId}</p>
                 <div className="flex items-center gap-2 mt-2">
           <span className="font-medium">
             ${productDetails.price.toFixed(2)}
