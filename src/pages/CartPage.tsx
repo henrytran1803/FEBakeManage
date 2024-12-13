@@ -1,4 +1,3 @@
-// Cart.tsx
 import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ProductCart } from "@/types/product";
