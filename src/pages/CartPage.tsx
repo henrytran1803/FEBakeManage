@@ -9,13 +9,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { BillRequest, DiningOption, PaymentMethod } from "@/types/Bill";
-import { billService } from "@/services/billService";
 import { useToast } from "@/hooks/use-toast";
 import { billApi } from "@/api/endpoints/billApi";
-import axios from "axios";
 import { paymentApi } from "@/api/endpoints/paymentApi";
-import ErrorMessageManager from "@/utils/errorMessages";
-import { CartPageErrorCode, cartPageErrorMessages } from "@/utils/error/CartPageError";
+import {ErrorCode} from "@/utils/error/ErrorCode.ts";
+import {useCustomToast} from "@/hooks/CustomAlert.tsx";
 
 const Cart: React.FC = () => {
   const navigate = useNavigate();
@@ -23,35 +21,40 @@ const Cart: React.FC = () => {
   const [productDetails, setProductDetails] = useState<ProductCart[]>([]);
   const [discountCode, setDiscountCode] = useState("");
   const [isLoadingCart, setIsLoadingCart] = useState(true);
-  const [isCreatingBill, setIsCreatingBill] = useState(false); // State để kiểm tra xem đang tạo hóa đơn không
+  const [isCreatingBill, setIsCreatingBill] = useState(false);
+  const [isApplyingDiscount, setIsApplyingDiscount] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [tableId, setTableId] = useState<string>("");
   const [diningOption, setDiningOption] = useState("");
-  const { toast } = useToast(); // Toast thông báo
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const { toast } = useToast();
+  const { showErrorToast, showSuccessToast } = useCustomToast();
+
+  const loadProductDetails = async (code?: string) => {
+    setIsLoadingCart(true);
+    try {
+      const response = await productService.getProductCart({
+        discountCode: code || "",
+        productBatchCarts: currentCart.carts,
+      });
+      setProductDetails(response.data);
+    } catch (error) {
+      console.error("Chi tiết lỗi:", error);
+      toast({
+        title: "Lỗi",
+        description: "Không thể áp dụng mã giảm giá. Vui lòng thử lại!",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingCart(false);
+    }
+  };
 
   useEffect(() => {
-    const loadProductDetails = async () => {
-      setIsLoadingCart(true);
-      try {
-        const response = await productService.getProductCart({
-          discountCode,
-          productBatchCarts: currentCart.carts,
-        });
-        setProductDetails(response.data);
-      } catch (error) {
-        console.error("Chi tiết lỗi:", error);
-      } finally {
-        setIsLoadingCart(false);
-      }
-    };
-
     loadProductDetails();
-  }, [currentCart.carts, discountCode]);
+  }, [currentCart.carts]);
 
-  // Thêm useEffect để lấy tableId từ localStorage khi component mount
   useEffect(() => {
     const savedTableId = localStorage.getItem("tableId");
     if (savedTableId) {
@@ -59,6 +62,11 @@ const Cart: React.FC = () => {
     }
   }, []);
 
+  const handleApplyDiscount = async () => {
+    setIsApplyingDiscount(true);
+    await loadProductDetails(discountCode);
+    setIsApplyingDiscount(false);
+  };
   //
 
   const handleCheckout = async () => {
@@ -70,40 +78,31 @@ const Cart: React.FC = () => {
       diningOption,
       cartItems: currentCart.carts,
     });
-
-    // Kiểm tra validation
-    const validationErrors = [];
-    if (!customerName) validationErrors.push(CartPageErrorCode.CUSTOMER_NAME_REQUIRED);
-    if (!customerPhone) validationErrors.push(CartPageErrorCode.PHONE_NUMBER_REQUIRED);
-    if (!paymentMethod) validationErrors.push(CartPageErrorCode.PAYMENT_METHOD_REQUIRED);
-    if (!tableId) validationErrors.push(CartPageErrorCode.TABLE_REQUIRED);
-    if (!diningOption) validationErrors.push(CartPageErrorCode.DINING_OPTION_REQUIRED);
-
-    if (validationErrors.length > 0) {
-      // Nếu có nhiều hơn 1 lỗi, hiển thị tất cả
-      if (validationErrors.length > 1) {
-        toast({
-          title: "Vui lòng kiểm tra lại thông tin",
-          description: (
-            <ul className="list-disc pl-4">
-              {validationErrors.map((error, index) => (
-                <li key={index}>{cartPageErrorMessages[error]}</li>
-              ))}
-            </ul>
-          ),
-          variant: "destructive",
-        });
-      } else {
-        // Nếu chỉ có 1 lỗi, hiển thị như cũ
-        toast({
-          title: "Lỗi",
-          description: cartPageErrorMessages[validationErrors[0]],
-          variant: "destructive",
-        });
-      }
+    if (!customerName) {
+      showErrorToast(ErrorCode.CUSTOMER_NAME_REQUIRED);
       return;
-    
     }
+
+    if (!customerPhone) {
+      showErrorToast(ErrorCode.PHONE_NUMBER_REQUIRED);
+      return;
+    }
+
+    if (!paymentMethod) {
+      showErrorToast(ErrorCode.PAYMENT_METHOD_REQUIRED);
+      return;
+    }
+
+    if (!tableId) {
+      showErrorToast(ErrorCode.TABLE_REQUIRED);
+      return;
+    }
+
+    if (!diningOption) {
+      showErrorToast(ErrorCode.DINING_OPTION_REQUIRED);
+      return;
+    }
+
 
     try {
       setIsCreatingBill(true);
@@ -186,77 +185,75 @@ const Cart: React.FC = () => {
   };
   if (isLoadingCart) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        Loading...
-      </div>
+        <div className="flex justify-center items-center min-h-[400px]">
+          Loading...
+        </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-20">
-      {/* Header */}
-      <div className="sticky top-0 bg-white z-10 p-4 border-b flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="hover:bg-gray-100"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <h1 className="text-lg font-bold">Giỏ hàng</h1>
-      </div>
-
-      {/* Main Content */}
-      <div className="p-4">
-        {/* Cart Items */}
-        <div className="mb-6">
-          <Card>
-            {currentCart.carts.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                Giỏ hàng trống
-              </div>
-            ) : (
-              currentCart.carts.map((item) => {
-                const details = productDetails.find(
-                  (p) => p.productBatchId === item.productBatchId
-                );
-                return details ? (
-                  <CartItem
-                    key={item.productBatchId}
-                    item={item}
-                    productDetails={details}
-                    onUpdateQuantity={updateItem}
-                    onRemove={removeItem}
-                    onCheckout={handleCheckout}
-                  />
-                ) : null;
-              })
-            )}
-          </Card>
+      <div className="bg-gray-50 min-h-screen pb-20">
+        <div className="sticky top-0 bg-white z-10 p-4 border-b flex items-center gap-4">
+          <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(-1)}
+              className="hover:bg-gray-100"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-lg font-bold">Giỏ hàng</h1>
         </div>
 
-        {/* Summary Card */}
-        <CartSummary
-          cartItems={currentCart.carts}
-          productDetails={productDetails}
-          discountCode={discountCode}
-          onDiscountChange={setDiscountCode}
-          onCheckout={handleCheckout}
-          customerName={customerName}
-          customerPhone={customerPhone}
-          paymentMethod={paymentMethod}
-          diningOption={diningOption}
-          tableId={tableId}
-          onCustomerNameChange={setCustomerName}
-          onCustomerPhoneChange={setCustomerPhone}
-          onPaymentMethodChange={setPaymentMethod}
-          onDiningOptionChange={setDiningOption}
-          onTableIdChange={setTableId}
-          isLoading={isCreatingBill}
-        />
+        <div className="p-4">
+          <div className="mb-6">
+            <Card>
+              {currentCart.carts.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    Giỏ hàng trống
+                  </div>
+              ) : (
+                  currentCart.carts.map((item) => {
+                    const details = productDetails.find(
+                        (p) => p.productBatchId === item.productBatchId
+                    );
+                    return details ? (
+                        <CartItem
+                            key={item.productBatchId}
+                            item={item}
+                            productDetails={details}
+                            onUpdateQuantity={updateItem}
+                            onRemove={removeItem}
+                            onCheckout={handleCheckout}
+                        />
+                    ) : null;
+                  })
+              )}
+            </Card>
+          </div>
+
+          <CartSummary
+              cartItems={currentCart.carts}
+              productDetails={productDetails}
+              discountCode={discountCode}
+              onDiscountChange={setDiscountCode}
+              onApplyDiscount={handleApplyDiscount}
+              isApplyingDiscount={isApplyingDiscount}
+              onCheckout={handleCheckout}
+              customerName={customerName}
+              customerPhone={customerPhone}
+              paymentMethod={paymentMethod}
+              diningOption={diningOption}
+              tableId={tableId}
+              onCustomerNameChange={setCustomerName}
+              onCustomerPhoneChange={setCustomerPhone}
+              onPaymentMethodChange={setPaymentMethod}
+              onDiningOptionChange={setDiningOption}
+              onTableIdChange={setTableId}
+              isLoading={isCreatingBill}
+          />
+        </div>
       </div>
-    </div>
   );
 };
 

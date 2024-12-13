@@ -15,10 +15,10 @@ import {
     PromotionUpdate
 } from "@/types/promotion";
 import { ProductBatch } from "@/types/productBatch";
-import { PromotionErrorCode, validatePromotionDates, validatePromotionName } from "@/utils/error/promotionError";
 import { NormalPromotionForm } from "./NormalPromotionForm";
 import { DailyPromotionForm } from "./DailyPromotionForm";
 import { ProductSelection } from "./ProductSelection";
+import {ErrorCode, validatePromotionDates, validatePromotionName} from "@/utils/error/ErrorCode.ts";
 
 export default function PromotionSheet({
                                            isOpen,
@@ -110,35 +110,35 @@ export default function PromotionSheet({
             if (promotionType === "normal" || isEditing) {
                 // Name validation
                 if (!name.trim()) {
-                    showErrorToast(PromotionErrorCode.PROMOTION_NAME_REQUIRED);
+                    showErrorToast(ErrorCode.PROMOTION_NAME_REQUIRED);
                     return;
                 }
                 if (!validatePromotionName(name)) {
-                    showErrorToast(PromotionErrorCode.PROMOTION_NAME_NO_SPECIAL_CHARS);
+                    showErrorToast(ErrorCode.PROMOTION_NAME_NO_SPECIAL_CHARS);
                     return;
                 }
                 if (name.length > 250) {
-                    showErrorToast(PromotionErrorCode.PROMOTION_NAME_LENGTH);
+                    showErrorToast(ErrorCode.PROMOTION_NAME_LENGTH);
                     return;
                 }
 
                 // Description validation
                 if (!description.trim()) {
-                    showErrorToast(PromotionErrorCode.PROMOTION_DESC_REQUIRED);
+                    showErrorToast(ErrorCode.PROMOTION_DESC_REQUIRED);
                     return;
                 }
                 if (description.length > 250) {
-                    showErrorToast(PromotionErrorCode.PROMOTION_DESC_LENGTH);
+                    showErrorToast(ErrorCode.PROMOTION_DESC_LENGTH);
                     return;
                 }
 
                 // Date validation
                 if (!startDate) {
-                    showErrorToast(PromotionErrorCode.PROMOTION_START_DATE_REQUIRED);
+                    showErrorToast(ErrorCode.PROMOTION_START_DATE_REQUIRED);
                     return;
                 }
                 if (!endDate) {
-                    showErrorToast(PromotionErrorCode.PROMOTION_END_DATE_REQUIRED);
+                    showErrorToast(ErrorCode.PROMOTION_END_DATE_REQUIRED);
                     return;
                 }
 
@@ -151,17 +151,17 @@ export default function PromotionSheet({
 
             // Common validations
             if (!discount) {
-                showErrorToast(PromotionErrorCode.PROMOTION_DISCOUNT_REQUIRED);
+                showErrorToast(ErrorCode.PROMOTION_DISCOUNT_REQUIRED);
                 return;
             }
             const discountValue = parseInt(discount);
             if (discountValue < 0 || discountValue > 100) {
-                showErrorToast(PromotionErrorCode.PROMOTION_DISCOUNT_RANGE);
+                showErrorToast(ErrorCode.PROMOTION_DISCOUNT_RANGE);
                 return;
             }
 
             if (selectedProducts.length === 0) {
-                showErrorToast(PromotionErrorCode.PROMOTION_PRODUCTS_REQUIRED);
+                showErrorToast(ErrorCode.PROMOTION_PRODUCTS_REQUIRED);
                 return;
             }
             //
@@ -221,7 +221,7 @@ export default function PromotionSheet({
                 }
             }
 
-            showSuccessToast(PromotionErrorCode.POST_SUCCESS);
+            showSuccessToast(ErrorCode.PROMOTION_POST_SUCCESS);
             onSuccess(true);
             onClose();
             resetForm();

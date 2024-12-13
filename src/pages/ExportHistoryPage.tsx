@@ -8,7 +8,7 @@ import { userService } from "@/services/userService";
 import { Unit } from "@/types/Unit";
 import { unitService } from "@/services/unitService";
 import { useCustomToast } from "@/hooks/CustomAlert";
-import { IngredientErrorCode } from "@/utils/error/ingredientError";
+import {ErrorCode} from "@/utils/error/ErrorCode.ts";
 
 const ExportHistoryPage: React.FC = () => {
     const navigate = useNavigate();
@@ -44,24 +44,24 @@ const ExportHistoryPage: React.FC = () => {
                     setExportIngredients(sortedData);
                     
                 } else {
-                    showErrorToast(IngredientErrorCode.EXPORT_INGREDIENT_FETCH_FAIL);
+                    showErrorToast(ErrorCode.EXPORT_INGREDIENT_FETCH_FAIL);
                 }
 
                 if (ingredientResponse.success) {
                     setIngredients(ingredientResponse.data);
                 } else {
-                    showErrorToast(IngredientErrorCode.INGREDIENT_FETCH_FAIL);
+                    showErrorToast(ErrorCode.INGREDIENT_FETCH_FAIL);
                 }
 
                 const UserResponse = await userService.getAllUser();
                 if(UserResponse.success) {
                     setUsers(UserResponse.data);
                 } else {
-                    showErrorToast(IngredientErrorCode.USER_FETCH_FAIL);
+                    showErrorToast(ErrorCode.USER_FETCH_FAIL);
                 }
 
             } catch (error) {
-                showErrorToast(IngredientErrorCode.EXPORT_INGREDIENT_FETCH_FAIL);
+                showErrorToast(ErrorCode.EXPORT_INGREDIENT_FETCH_FAIL);
             } finally {
                 setLoading(false);
             }
@@ -74,10 +74,10 @@ const ExportHistoryPage: React.FC = () => {
                 if (response.success) {
                     setUnits(response.data);
                 } else {
-                    showErrorToast(IngredientErrorCode.UNIT_FETCH_FAIL);
+                    showErrorToast(ErrorCode.UNIT_FETCH_FAIL);
                 }
             } catch (error) {
-                showErrorToast(IngredientErrorCode.UNIT_FETCH_FAIL);
+                showErrorToast(ErrorCode.UNIT_FETCH_FAIL);
             }
         };
 

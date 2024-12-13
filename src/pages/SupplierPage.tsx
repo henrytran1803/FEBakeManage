@@ -4,7 +4,7 @@ import { Supplier } from "@/types/Supplier";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
 import { useCustomToast } from "@/hooks/CustomAlert";
-import { SupplierErrorCode } from "@/utils/error/supplierError";
+import {ErrorCode} from "@/utils/error/ErrorCode.ts";
 
 const SupplierPage: React.FC = () => {
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -29,11 +29,11 @@ const SupplierPage: React.FC = () => {
             if (response.success) {
                 setSuppliers(response.data);
             } else {
-                showErrorToast(SupplierErrorCode.SUPPLIER_FETCH_FAIL);
+                showErrorToast(ErrorCode.SUPPLIER_FETCH_FAIL);
             }
 
         } catch (error) {
-            showErrorToast(SupplierErrorCode.SUPPLIER_FETCH_FAIL);
+            showErrorToast(ErrorCode.SUPPLIER_FETCH_FAIL);
         }
     };
 
@@ -56,16 +56,16 @@ const SupplierPage: React.FC = () => {
 
     const validateSupplier = (supplier: Omit<Supplier, "id">): string | null => {
         if (!supplier.name.trim()) {
-            return SupplierErrorCode.SUPPLIER_NAME_REQUIRED;
+            return ErrorCode.SUPPLIER_NAME_REQUIRED;
         }
         if (supplier.name.length > 50) {
-            return SupplierErrorCode.SUPPLIER_NAME_LENGTH;
+            return ErrorCode.SUPPLIER_NAME_LENGTH;
         }
         if (!supplier.number.trim()) {
-            return SupplierErrorCode.SUPPLIER_NUMBER_REQUIRED;
+            return ErrorCode.SUPPLIER_NUMBER_REQUIRED;
         }
         if (supplier.number.trim().length < 8 || supplier.number.trim().length > 15) {
-            return SupplierErrorCode.SUPPLIER_NUMBER_LENGTH;
+            return ErrorCode.SUPPLIER_NUMBER_LENGTH;
         }
         return null; // Dữ liệu hợp lệ
     };
@@ -92,8 +92,8 @@ const SupplierPage: React.FC = () => {
             if (response.success) {
                 showSuccessToast(
                     isEditMode
-                        ? SupplierErrorCode.SUPPLIER_UPDATE_SUCCESS
-                        : SupplierErrorCode.SUPPLIER_ADD_SUCCESS
+                        ? ErrorCode.SUPPLIER_UPDATE_SUCCESS
+                        : ErrorCode.SUPPLIER_ADD_SUCCESS
                 );
                 await fetchSuppliers(); // Cập nhật danh sách nhà cung cấp
                 setShowModal(false); // Đóng modal
@@ -101,12 +101,12 @@ const SupplierPage: React.FC = () => {
             } else {
                 showErrorToast(
                     isEditMode
-                        ? SupplierErrorCode.SUPPLIER_UPDATE_FAIL
-                        : SupplierErrorCode.SUPPLIER_ADD_FAIL
+                        ? ErrorCode.SUPPLIER_UPDATE_FAIL
+                        : ErrorCode.SUPPLIER_ADD_FAIL
                 );
             }
         } catch (error) {
-            showErrorToast(SupplierErrorCode.SUPPLIER_UPDATE_FAIL);
+            showErrorToast(ErrorCode.SUPPLIER_UPDATE_FAIL);
         }
     };
 

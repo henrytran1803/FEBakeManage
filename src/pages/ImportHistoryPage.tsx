@@ -9,8 +9,7 @@ import { UserName } from "@/types/User";
 import { unitService } from "@/services/unitService";
 import { Unit } from "@/types/Unit";
 import { useCustomToast } from "@/hooks/CustomAlert";
-import { IngredientErrorCode } from "@/utils/error/ingredientError";
-import { SupplierErrorCode } from "@/utils/error/supplierError";
+import {ErrorCode} from "@/utils/error/ErrorCode.ts";
 
 const ImportHistoryPage: React.FC = () => {
     const navigate = useNavigate();
@@ -49,29 +48,29 @@ const ImportHistoryPage: React.FC = () => {
                     );
                     setImportIngredients(sortedData);
                 } else {
-                    showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_FETCH_FAIL);
+                    showErrorToast(ErrorCode.IMPORT_INGREDIENT_FETCH_FAIL);
                 }
 
                 if (supplierResponse.success) {
                     setSuppliers(supplierResponse.data);
                 } else {
-                    showErrorToast(SupplierErrorCode.SUPPLIER_FETCH_FAIL);
+                    showErrorToast(ErrorCode.SUPPLIER_FETCH_FAIL);
                 }
 
                 if (ingredientResponse.success) {
                     setIngredients(ingredientResponse.data);
                 } else {
-                    showErrorToast(IngredientErrorCode.INGREDIENT_FETCH_FAIL);
+                    showErrorToast(ErrorCode.INGREDIENT_FETCH_FAIL);
                 }
 
                 const UserResponse = await userService.getAllUser();
                 if (UserResponse.success) {
                     setUsers(UserResponse.data);
                 } else {
-                    showErrorToast(IngredientErrorCode.USER_FETCH_FAIL);
+                    showErrorToast(ErrorCode.USER_FETCH_FAIL);
                 }
             } catch (error) {
-                showErrorToast(IngredientErrorCode.IMPORT_INGREDIENT_FETCH_FAIL);
+                showErrorToast(ErrorCode.IMPORT_INGREDIENT_FETCH_FAIL);
             } finally {
                 setLoading(false);
             }
@@ -84,10 +83,10 @@ const ImportHistoryPage: React.FC = () => {
                 if (response.success) {
                     setUnits(response.data);
                 } else {
-                    showErrorToast(IngredientErrorCode.UNIT_FETCH_FAIL);
+                    showErrorToast(ErrorCode.UNIT_FETCH_FAIL);
                 }
             } catch (error) {
-                showErrorToast(IngredientErrorCode.UNIT_FETCH_FAIL);
+                showErrorToast(ErrorCode.UNIT_FETCH_FAIL);
             }
         };
 

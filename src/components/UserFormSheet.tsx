@@ -20,8 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {format, parseISO} from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { UserRequest, User } from "@/types/User";
-import {UserErrorCode} from "@/utils/error/UserError.ts";
-import {ErrorCode} from "@/types/error.ts";
+import {ErrorCode} from "@/utils/error/ErrorCode.ts";
 
 const roles = [
     {
@@ -74,36 +73,36 @@ export const UserFormSheet = ({
         e.preventDefault();
 
         if (!formData.firstName.trim()) {
-            showErrorToast(UserErrorCode.FIRST_NAME_REQUIRED);
+            showErrorToast(ErrorCode.FIRST_NAME_REQUIRED);
             return;
         }
         if (!formData.lastName.trim()) {
-            showErrorToast(UserErrorCode.LAST_NAME_REQUIRED);
+            showErrorToast(ErrorCode.LAST_NAME_REQUIRED);
             return;
         }
         if (!formData.email.trim()) {
-            showErrorToast(UserErrorCode.EMAIL_REQUIRED);
+            showErrorToast(ErrorCode.EMAIL_REQUIRED);
             return;
         }
         if (!user && !formData.password.trim()) {
-            showErrorToast(UserErrorCode.PASSWORD_REQUIRED);
+            showErrorToast(ErrorCode.PASSWORD_REQUIRED);
             return;
         }
         if (!formData.dateOfBirth) {
-            showErrorToast(UserErrorCode.DATE_OF_BIRTH_REQUIRED);
+            showErrorToast(ErrorCode.DATE_OF_BIRTH_REQUIRED);
             return;
         }
         if (formData.roleIds.length === 0) {
-            showErrorToast(UserErrorCode.ROLE_REQUIRED);
+            showErrorToast(ErrorCode.ROLE_REQUIRED);
             return;
         }
 
         try {
             await onSubmit(formData);
-            showSuccessToast(user ? UserErrorCode.UPDATE_SUCCESS : UserErrorCode.CREATE_SUCCESS);
+            showSuccessToast(user ? ErrorCode.UPDATE_SUCCESS : ErrorCode.CREATE_SUCCESS);
             setIsOpen(false);
         } catch (error) {
-            showErrorToast(user ? UserErrorCode.UPDATE_ERROR : UserErrorCode.CREATE_ERROR);
+            showErrorToast(user ? ErrorCode.UPDATE_ERROR : ErrorCode.CREATE_ERROR);
         }
     };
 

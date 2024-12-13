@@ -24,8 +24,8 @@ import { productService } from "@/services/productService";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {ImageUpload} from "@/components/ImageUpload.tsx";
 import {useCustomToast} from "@/hooks/CustomAlert.tsx";
-import {ProductErrorCode} from "@/utils/error/createProductError.ts";
 import {useNavigate} from "react-router-dom";
+import {ErrorCode} from "@/utils/error/ErrorCode.ts";
 
 
 
@@ -144,102 +144,102 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
         try {
             setLoading(true);
             if (formData.categoryId === 0) {
-                showErrorToast(ProductErrorCode.CATEGORY_REQUIRED_ERROR);
+                showErrorToast(ErrorCode.CATEGORY_REQUIRED_ERROR);
                 return;
             }
             if (formData.recipeId === 0) {
-                showErrorToast(ProductErrorCode.RECIPE_REQUIRED_ERROR);
+                showErrorToast(ErrorCode.RECIPE_REQUIRED_ERROR);
                 return;
             }
 
             if (!formData.name) {
-                showErrorToast(ProductErrorCode.PRODUCT_NAME_INPUT_ERROR);
+                showErrorToast(ErrorCode.PRODUCT_NAME_INPUT_ERROR);
                 return;
             }
             if (formData.name.length > 250) {
-                showErrorToast(ProductErrorCode.PRODUCT_NAME_LENGTH_ERROR);
+                showErrorToast(ErrorCode.PRODUCT_NAME_LENGTH_ERROR);
                 return;
             }
             if (!formData.description) {
-                showErrorToast(ProductErrorCode.PRODUCT_DESC_INPUT_ERROR);
+                showErrorToast(ErrorCode.PRODUCT_DESC_INPUT_ERROR);
                 return;
             }
             if (formData.description.length > 500) {
-                showErrorToast(ProductErrorCode.PRODUCT_DESC_LENGTH_ERROR);
+                showErrorToast(ErrorCode.PRODUCT_DESC_LENGTH_ERROR);
                 return;
             }
             if (!formData.price) {
-                showErrorToast(ProductErrorCode.PRODUCT_PRICE_INPUT_ERROR);
+                showErrorToast(ErrorCode.PRODUCT_PRICE_INPUT_ERROR);
                 return;
             }
             if (formData.price < 1000) {
-                showErrorToast(ProductErrorCode.PRODUCT_PRICE_INPUT_ERROR2);
+                showErrorToast(ErrorCode.PRODUCT_PRICE_INPUT_ERROR2);
                 return;
             }
 
             if (!formData.weight) {
-                showErrorToast(ProductErrorCode.PRODUCT_WEIGHT_INPUT_ERROR1);
+                showErrorToast(ErrorCode.PRODUCT_WEIGHT_INPUT_ERROR1);
                 return;
             }
             if (formData.weight < 1 || formData.weight > 20000) {
-                showErrorToast(ProductErrorCode.PRODUCT_WEIGHT_INPUT_ERROR2);
+                showErrorToast(ErrorCode.PRODUCT_WEIGHT_INPUT_ERROR2);
                 return;
             }
 
             if (!formData.length) {
-                showErrorToast(ProductErrorCode.PRODUCT_LENGTH_INPUT_ERROR1);
+                showErrorToast(ErrorCode.PRODUCT_LENGTH_INPUT_ERROR1);
                 return;
             }
             if (formData.length < 1 || formData.length > 200) {
-                showErrorToast(ProductErrorCode.PRODUCT_LENGTH_INPUT_ERROR2);
+                showErrorToast(ErrorCode.PRODUCT_LENGTH_INPUT_ERROR2);
                 return;
             }
 
             if (!formData.width) {
-                showErrorToast(ProductErrorCode.PRODUCT_WIDTH_INPUT_ERROR1);
+                showErrorToast(ErrorCode.PRODUCT_WIDTH_INPUT_ERROR1);
                 return;
             }
             if (formData.width < 1 || formData.width > 200) {
-                showErrorToast(ProductErrorCode.PRODUCT_WIDTH_INPUT_ERROR2);
+                showErrorToast(ErrorCode.PRODUCT_WIDTH_INPUT_ERROR2);
                 return;
             }
             if (!formData.height) {
-                showErrorToast(ProductErrorCode.PRODUCT_HEIGHT_INPUT_ERROR1);
+                showErrorToast(ErrorCode.PRODUCT_HEIGHT_INPUT_ERROR1);
                 return;
             }
             if (formData.height < 1 || formData.height > 200) {
-                showErrorToast(ProductErrorCode.PRODUCT_HEIGHT_INPUT_ERROR2);
+                showErrorToast(ErrorCode.PRODUCT_HEIGHT_INPUT_ERROR2);
                 return;
             }
 
             if (!formData.shelfLifeDays) {
-                showErrorToast(ProductErrorCode.PRODUCT_EXPIRY_INPUT_ERROR1);
+                showErrorToast(ErrorCode.PRODUCT_EXPIRY_INPUT_ERROR1);
                 return;
             }
             if (formData.shelfLifeDays <= 0) {
-                showErrorToast(ProductErrorCode.PRODUCT_EXPIRY_INPUT_ERROR2);
+                showErrorToast(ErrorCode.PRODUCT_EXPIRY_INPUT_ERROR2);
                 return;
             }
             if (!formData.shelfLifeDaysWarning ) {
-                showErrorToast(ProductErrorCode.PRODUCT_EXPIRY_WARNING_ERROR);
+                showErrorToast(ErrorCode.PRODUCT_EXPIRY_WARNING_ERROR);
                 return;
             }
             if (formData.shelfLifeDaysWarning <= 0) {
-                showErrorToast(ProductErrorCode.PRODUCT_EXPIRY_WARNING_ERROR1);
+                showErrorToast(ErrorCode.PRODUCT_EXPIRY_WARNING_ERROR1);
                 return;
             }
             if ((formData.shelfLifeDaysWarning/24) > formData.shelfLifeDays ) {
-                showErrorToast(ProductErrorCode.PRODUCT_EXPIRY_WARNING_ERROR2);
+                showErrorToast(ErrorCode.PRODUCT_EXPIRY_WARNING_ERROR2);
                 return;
             }
 
             if (formData.discountLimit < 0 || formData.discountLimit > 100) {
-                showErrorToast(ProductErrorCode.PRODUCT_DISCOUNT_LIMIT_ERROR);
+                showErrorToast(ErrorCode.PRODUCT_DISCOUNT_LIMIT_ERROR);
                 return;
             }
 
             if (!productId && files.length === 0) {
-                showErrorToast(ProductErrorCode.PRODUCT_IMAGE_REQUIRED_ERROR);
+                showErrorToast(ErrorCode.PRODUCT_IMAGE_REQUIRED_ERROR);
                 return;
             }
 
@@ -255,19 +255,19 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                     deletedImages
                 );
                 if (response.success) {
-                    showSuccessToast(ProductErrorCode.POST_PRODUCT_SUCCESS);
+                    showSuccessToast(ErrorCode.POST_PRODUCT_SUCCESS);
                     onSuccess();
                 }
             } else {
                 const response = await productService.create(formData, files);
                 if (response.success) {
-                    showSuccessToast(ProductErrorCode.POST_PRODUCT_SUCCESS);
+                    showSuccessToast(ErrorCode.POST_PRODUCT_SUCCESS);
                     onSuccess();
                 }
             }
         } catch (error) {
             console.error('Error submitting form:', error);
-            showErrorToast(ProductErrorCode.CONNECT_ERROR);
+            showErrorToast(ErrorCode.CONNECT_ERROR);
         } finally {
             setLoading(false);
         }

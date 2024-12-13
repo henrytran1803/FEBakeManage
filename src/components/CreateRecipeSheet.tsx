@@ -7,8 +7,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { recipeService } from "@/services/recipeService"
 import { CreateRecipe, CreateRecipeDetail } from "@/types/recipe"
 import {Ingredient} from "@/types/Ingredient.ts";
-import {RecipeErrorCode} from "@/utils/error/recipeError.ts";
 import {useCustomToast} from "@/hooks/CustomAlert.tsx";
+import {ErrorCode} from "@/utils/error/ErrorCode.ts";
 
 interface CreateRecipeSheetProps {
     ingredients: Ingredient[];
@@ -28,18 +28,18 @@ const CreateRecipeSheet = ({ ingredients, onSuccess, onError }: CreateRecipeShee
     const [loading, setLoading] = useState(false);
     const validateForm = (): boolean => {
         if (!recipeName.trim()) {
-            showErrorToast(RecipeErrorCode.RECIPE_NAME_REQUIRED);
+            showErrorToast(ErrorCode.RECIPE_NAME_REQUIRED);
             return false;
         }
 
         if (recipeName.length > 250) {
-            showErrorToast(RecipeErrorCode.RECIPE_NAME_LENGTH);
+            showErrorToast(ErrorCode.RECIPE_NAME_LENGTH);
             return false;
         }
 
         // Kiểm tra nguyên liệu
         if (selectedIngredients.length === 0) {
-            showErrorToast(RecipeErrorCode.RECIPE_INGREDIENTS_REQUIRED);
+            showErrorToast(ErrorCode.RECIPE_INGREDIENTS_REQUIRED);
             return false;
         }
 
@@ -48,24 +48,24 @@ const CreateRecipeSheet = ({ ingredients, onSuccess, onError }: CreateRecipeShee
             const quantity = quantities[ingredientId];
 
             if (!quantity) {
-                showErrorToast(RecipeErrorCode.RECIPE_INGREDIENT_QUANTITY_REQUIRED);
+                showErrorToast(ErrorCode.RECIPE_INGREDIENT_QUANTITY_REQUIRED);
                 return false;
             }
 
             const quantityNum = parseFloat(quantity);
 
             if (isNaN(quantityNum)) {
-                showErrorToast(RecipeErrorCode.RECIPE_INGREDIENT_QUANTITY_INVALID);
+                showErrorToast(ErrorCode.RECIPE_INGREDIENT_QUANTITY_INVALID);
                 return false;
             }
 
             if (quantityNum <= 0) {
-                showErrorToast(RecipeErrorCode.RECIPE_INGREDIENT_QUANTITY_MIN);
+                showErrorToast(ErrorCode.RECIPE_INGREDIENT_QUANTITY_MIN);
                 return false;
             }
 
             if (quantityNum > 1000) {
-                showErrorToast(RecipeErrorCode.RECIPE_INGREDIENT_QUANTITY_MAX);
+                showErrorToast(ErrorCode.RECIPE_INGREDIENT_QUANTITY_MAX);
                 return false;
             }
         }
@@ -93,7 +93,7 @@ const CreateRecipeSheet = ({ ingredients, onSuccess, onError }: CreateRecipeShee
             };
 
             await recipeService.createRecipe(newRecipe);
-            showSuccessToast(RecipeErrorCode.POST_SUCCESS);
+            showSuccessToast(ErrorCode.POST_SUCCESS);
             onSuccess();
 
             // Reset form
@@ -101,7 +101,7 @@ const CreateRecipeSheet = ({ ingredients, onSuccess, onError }: CreateRecipeShee
             setSelectedIngredients([]);
             setQuantities({});
         } catch (error) {
-            showErrorToast(RecipeErrorCode.CONNECT_ERROR);
+            showErrorToast(ErrorCode.CONNECT_ERROR);
             onError();
         } finally {
             setLoading(false);

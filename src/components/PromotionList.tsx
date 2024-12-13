@@ -1,4 +1,3 @@
-// components/PromotionList.tsx
 import {
     Table,
     TableBody,
