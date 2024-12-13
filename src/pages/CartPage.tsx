@@ -93,7 +93,7 @@ const Cart: React.FC = () => {
       if (savedTableId) {
         setTableId(savedTableId);
       }
-    }, []);
+      }, []);
 
     //
 
