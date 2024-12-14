@@ -41,6 +41,7 @@ import {
 } from "@/utils/error/BillListError";
 import { toast } from "@/hooks/use-toast";
 import { Search, X } from "lucide-react";
+import { getImageUrl } from "@/utils/imageUtils";
 
 const BillList: React.FC = () => {
   // State declarations
@@ -535,7 +536,7 @@ const BillList: React.FC = () => {
                 {selectedBill.billDetails.map((item) => (
                   <li key={item.id} className="flex items-center space-x-4">
                     <img
-                      src={item.productImages || "/placeholder.png"}
+                      src={ getImageUrl(item.productImages) || "/placeholder.png"}
                       alt={item.productName}
                       className="w-16 h-16 object-cover rounded"
                     />
