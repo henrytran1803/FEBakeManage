@@ -49,6 +49,7 @@ export const promotionApi = {
         return response.data;
     },
     createDailyPromotion: async (data: PromotionDaily): Promise<ApiResponse<void>> => {
+        console.log(data)
         const response = await api.post(`/api/discounts`, data);
         return response.data;
     },

@@ -34,7 +34,6 @@ const ImportHistoryPage: React.FC = () => {
 
     
     useEffect(() => {
-        // Lấy danh sách lịch sử nhập
         const fetchImportIngredients = async () => {
             try {
                 setLoading(true);

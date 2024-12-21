@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Bill, BillResponse_View_Cake, BillStatus } from "@/types/Bill";
+import {Bill, BillResponse_View_Cake, BillStatus, PaymentMethod} from "@/types/Bill";
 import { billService } from "@/services/billService";
 import {
   Table,
@@ -116,8 +116,8 @@ const BillList: React.FC = () => {
       }
 
       const foundBill = isSearching
-        ? searchResults.find((b) => b.billId === billId)
-        : bills.find((b) => b.billId === billId);
+          ? searchResults.find((b) => b.billId === billId)
+          : bills.find((b) => b.billId === billId);
 
       if (!foundBill) {
         toast({
@@ -132,6 +132,7 @@ const BillList: React.FC = () => {
         await billService.updateBillStatus(billId, newStatus);
         setDialogType(null);
 
+        // Reload data based on current view and search state
         const reloadData = async () => {
           if (isSearching) {
             const searchResponse = await billService.searchBill({
@@ -144,10 +145,17 @@ const BillList: React.FC = () => {
               }),
             });
             setSearchResults(searchResponse.data.content);
+          } else {
+            // Fetch based on current viewType
+            let response;
+            if (viewType === 'today') {
+              response = await billService.getTodayBills(page, size);
+            } else {
+              response = await billService.search(status, page, size);
+            }
+            setBills(response.data.content);
+            setTotalPages(response.data.totalPages);
           }
-          const response = await billService.search(status, page, size);
-          setBills(response.data.content);
-          setTotalPages(response.data.totalPages);
         };
 
         await reloadData();
@@ -159,12 +167,13 @@ const BillList: React.FC = () => {
         });
       } else if (userRole === "user") {
         if (
-          foundBill.billStatus !== BillStatus.NOT_PAID ||
-          newStatus !== BillStatus.CANCEL
+            foundBill.billStatus !== BillStatus.NOT_PAID ||
+            newStatus !== BillStatus.CANCEL
         ) {
           await billService.updateBillStatus(billId, newStatus);
           setDialogType(null);
 
+          // Reload data based on current view and search state
           const reloadData = async () => {
             if (isSearching) {
               const searchResponse = await billService.searchBill({
@@ -177,10 +186,17 @@ const BillList: React.FC = () => {
                 }),
               });
               setSearchResults(searchResponse.data.content);
+            } else {
+              // Fetch based on current viewType
+              let response;
+              if (viewType === 'today') {
+                response = await billService.getTodayBills(page, size);
+              } else {
+                response = await billService.search(status, page, size);
+              }
+              setBills(response.data.content);
+              setTotalPages(response.data.totalPages);
             }
-            const response = await billService.search(status, page, size);
-            setBills(response.data.content);
-            setTotalPages(response.data.totalPages);
           };
 
           await reloadData();
@@ -573,15 +589,15 @@ const BillList: React.FC = () => {
               Xác nhận hoàn thành
             </Button>
           )}
-          {selectedBill.billStatus === BillStatus.NOT_PAID && (
-            <Button
-              className="mt-4"
-              onClick={() =>
-                updateBillStatus(selectedBill.billId, BillStatus.PAID)
-              }
-            >
-              Xác nhận thanh toán
-            </Button>
+          {selectedBill.billStatus === BillStatus.NOT_PAID && selectedBill.paymentMethod === PaymentMethod.CASH && (
+              <Button
+                  className="mt-4"
+                  onClick={() =>
+                      updateBillStatus(selectedBill.billId, BillStatus.PAID)
+                  }
+              >
+                Xác nhận thanh toán
+              </Button>
           )}
         </DialogContent>
       </Dialog>

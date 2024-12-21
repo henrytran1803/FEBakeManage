@@ -71,7 +71,7 @@ export function StatisticsTable({ data }: StatisticsTableProps) {
                             </TableCell>
                             <TableCell>{new Date(bill.createdAt).toLocaleString()}</TableCell>
                             <TableCell className="text-right">
-                                ${bill.totalAmount.toLocaleString()}
+                                {bill.totalAmount.toLocaleString()} đ
                             </TableCell>
                         </TableRow>
                     ))}

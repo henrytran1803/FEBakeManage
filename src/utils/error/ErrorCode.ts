@@ -285,12 +285,15 @@ export const validatePromotionName = (name: string): boolean => {
     const specialCharsRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]+/;
     return !specialCharsRegex.test(name);
 };
-
-// Helper function to validate dates
 export const validatePromotionDates = (startDate: string, endDate: string): ErrorCode | null => {
     const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
     const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+
     const end = new Date(endDate);
+    end.setHours(0, 0, 0, 0);
 
     if (start < currentDate) {
         return ErrorCode.PROMOTION_START_DATE_INVALID;
@@ -300,7 +303,7 @@ export const validatePromotionDates = (startDate: string, endDate: string): Erro
         return ErrorCode.PROMOTION_END_DATE_INVALID;
     }
 
-    if (end <= start) {
+    if (end < start) { // Đổi từ <= thành
         return ErrorCode.PROMOTION_DATE_RANGE_INVALID;
     }
 
