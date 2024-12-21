@@ -27,10 +27,10 @@ export default function HomePage() {
   const [size, setSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  const [sortBy, setSortBy] = useState("name");
+  const [sortBy] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { setTable, addItem, currentCart } = useCartStore();
+  const { setTable, currentCart } = useCartStore();
 
   useEffect(() => {
     if (id) {

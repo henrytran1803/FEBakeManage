@@ -81,7 +81,6 @@ export const userService = {
         }
     },
 
-    // API lấy danh sách tất cả user(tên)
     getAllUser: async () => {
         try {
             const response = await userApi.getAllUser();

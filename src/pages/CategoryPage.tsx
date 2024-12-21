@@ -1,4 +1,3 @@
-// pages/CategoryPage/index.tsx
 import { useEffect, useState } from "react";
 import LoadingScreen from "@/pages/LoadingScreen";
 import { SearchFilter } from "@/components/SearchCategoryFilter";

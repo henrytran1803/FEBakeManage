@@ -7,11 +7,68 @@ import { Button } from '@/components/ui/button';
 import { billService } from '@/services/billService';
 import { BillStatus } from '@/types/Bill';
 import { useToast } from '@/hooks/use-toast';
+let websocket: WebSocket | null = null;
 
 const QRSuccessPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { billId } = useParams();
+
+  const connectWebSocket = (paymentId: string) => {
+    const API_BASE_URL = import.meta.env.VITE_WS_URL;
+    const wsUrl = `ws://${API_BASE_URL}/ws/${paymentId}`;
+    console.log(wsUrl);
+
+    websocket = new WebSocket(wsUrl);
+
+    websocket.onopen = () => {
+      console.log('WebSocket connected');
+    };
+
+    websocket.onmessage = (event) => {
+      console.log("WebSocket message received:", event.data);
+
+      try {
+        const message = JSON.parse(event.data);
+        const { type, message: content, severity, duration } = message;
+
+        const severityMap: Record<string, "default" | "destructive" | null | undefined> = {
+          SUCCESS: "default",
+          INFO: "default",
+          WARNING: "default",
+          ERROR: "destructive",
+        };
+
+        if (content === "success" || content === "destructive") {
+          disconnectWebSocket();
+        }
+
+        toast({
+          title: type,
+          description: content,
+          variant: severityMap[severity] || "default",
+          duration: duration || 3000,
+        });
+      } catch (error) {
+        console.error("Error processing WebSocket message:", error);
+      }
+    };
+
+    websocket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    websocket.onclose = () => {
+      console.log('WebSocket disconnected');
+    };
+  };
+
+  const disconnectWebSocket = () => {
+    if (websocket) {
+      websocket.close();
+      websocket = null;
+    }
+  };
 
   useEffect(() => {
     const updatePaymentStatus = async () => {
@@ -26,14 +83,13 @@ const QRSuccessPage = () => {
         navigate('/');
         return;
       }
-
+    connectWebSocket(billId);
       try {
         await billService.updateBillStatus(Number(billId), BillStatus.PAID);
         toast({
           title: 'Thành công',
           description: 'Thanh toán thành công!',
         });
-        // Xóa billId khỏi localStorage sau khi xử lý xong
         localStorage.removeItem('pendingBillId');
       } catch (error) {
         console.error('Error updating bill status:', error);

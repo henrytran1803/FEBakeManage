@@ -47,7 +47,9 @@ export const promotionService = {
     },
     createPromotionDaily: async (data: PromotionDaily) => {
         try {
+            data.endDate = `${data.endDate}T00:00:00`;
             const response = await promotionApi.createDailyPromotion(data);
+            console.log(data)
             return response;
         } catch (error) {
             throw new Error('Failed to create promotion');

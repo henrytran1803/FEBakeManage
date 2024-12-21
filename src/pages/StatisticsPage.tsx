@@ -19,7 +19,7 @@ export default function StatisticsPage() {
                     <div className="flex justify-between items-center">
                         <h2 className="text-xl font-semibold">Details</h2>
                         <p className="text-sm text-muted-foreground">
-                            Total Revenue: ${statistics.totalRevenue.toLocaleString()}
+                            Total Revenue: {statistics.totalRevenue.toLocaleString()} đ
                         </p>
                     </div>
                     <StatisticsTable data={statistics.bills} />

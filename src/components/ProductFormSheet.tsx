@@ -112,7 +112,7 @@ export const ProductFormSheet: React.FC<ProductFormSheetProps> = ({
                         setFormData({
                             categoryId: product.categoryId,
                             name: product.name,
-                            price: product.price || 0,
+                            price: product.currentPrice || 0,
                             description: product.description,
                             weight: product.weight,
                             length: product.length,

@@ -29,7 +29,7 @@ const Cart: React.FC = () => {
   const [tableId, setTableId] = useState<string>("");
   const [diningOption, setDiningOption] = useState("");
   const { toast } = useToast();
-  const { showErrorToast, showSuccessToast } = useCustomToast();
+  const { showErrorToast } = useCustomToast();
 
   const loadProductDetails = async (code?: string) => {
     setIsLoadingCart(true);

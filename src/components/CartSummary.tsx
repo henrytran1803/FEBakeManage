@@ -133,7 +133,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
             <div className="border-t pt-4">
               <div className="flex justify-between font-bold">
                 <span>Total:</span>
-                <span>${calculateTotal().toFixed(2)}</span>
+                <span>{calculateTotal().toFixed(2)} đ</span>
               </div>
             </div>
             <Button className="w-full" onClick={onCheckout} disabled={isLoading}>

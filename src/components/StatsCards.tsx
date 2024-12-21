@@ -43,7 +43,7 @@ export function StatsCards({ onStatisticsUpdate }: StatsCardsProps) {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">
-                        ${todayStats?.totalRevenue.toLocaleString()}
+                        {todayStats?.totalRevenue.toLocaleString()} đ
                     </div>
                     <p className="text-xs text-muted-foreground">
                         {todayStats?.bills.length} orders
@@ -60,7 +60,7 @@ export function StatsCards({ onStatisticsUpdate }: StatsCardsProps) {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">
-                        ${monthStats?.totalRevenue.toLocaleString()}
+                        {monthStats?.totalRevenue.toLocaleString()} đ
                     </div>
                     <p className="text-xs text-muted-foreground">
                         {monthStats?.bills.length} orders
@@ -77,7 +77,7 @@ export function StatsCards({ onStatisticsUpdate }: StatsCardsProps) {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">
-                        ${yearStats?.totalRevenue.toLocaleString()}
+                        {yearStats?.totalRevenue.toLocaleString()} đ
                     </div>
                     <p className="text-xs text-muted-foreground">
                         {yearStats?.bills.length} orders

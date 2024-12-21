@@ -108,7 +108,6 @@ export default function PromotionSheet({
             setIsLoading(true);
 
             if (promotionType === "normal" || isEditing) {
-                // Name validation
                 if (!name.trim()) {
                     showErrorToast(ErrorCode.PROMOTION_NAME_REQUIRED);
                     return;
@@ -122,7 +121,6 @@ export default function PromotionSheet({
                     return;
                 }
 
-                // Description validation
                 if (!description.trim()) {
                     showErrorToast(ErrorCode.PROMOTION_DESC_REQUIRED);
                     return;

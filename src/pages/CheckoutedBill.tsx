@@ -11,6 +11,8 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { billApi } from '@/api/endpoints/billApi';
+import {getImageUrl} from "@/utils/imageUtils.ts";
+let websocket: WebSocket | null = null;
 
 const CheckoutedBill: React.FC = () => {
     const { billId } = useParams<{ billId: string }>();
@@ -22,9 +24,64 @@ const CheckoutedBill: React.FC = () => {
     const [showBillDialog, setShowBillDialog] = useState(false);
     const [billList, setBillList] = useState<BillResponse_View_Cake>();
     const [isLoadingBills, setIsLoadingBills] = useState(false);
+    const connectWebSocket = (paymentId: string) => {
+        const API_BASE_URL = import.meta.env.VITE_WS_URL;
+        const wsUrl = `ws://${API_BASE_URL}/ws/${paymentId}`;
+        console.log(wsUrl);
 
+        websocket = new WebSocket(wsUrl);
+
+        websocket.onopen = () => {
+            console.log('WebSocket connected');
+        };
+
+        websocket.onmessage = (event) => {
+            console.log("WebSocket message received:", event.data);
+
+            try {
+                const message = JSON.parse(event.data);
+                const { type, message: content, severity, duration } = message;
+
+                const severityMap: Record<string, "default" | "destructive" | null | undefined> = {
+                    SUCCESS: "default",
+                    INFO: "default",
+                    WARNING: "default",
+                    ERROR: "destructive",
+                };
+
+                if (content === "success" || content === "destructive") {
+                    disconnectWebSocket();
+                }
+
+                toast({
+                    title: type,
+                    description: content,
+                    variant: severityMap[severity] || "default",
+                    duration: duration || 3000,
+                });
+            } catch (error) {
+                console.error("Error processing WebSocket message:", error);
+            }
+        };
+
+        websocket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        websocket.onclose = () => {
+            console.log('WebSocket disconnected');
+        };
+    };
+
+    const disconnectWebSocket = () => {
+        if (websocket) {
+            websocket.close();
+            websocket = null;
+        }
+    };
     // Load chi tiết đơn hàng hiện tại
     useEffect(() => {
+        connectWebSocket(billId);
         const loadBillDetails = async () => {
             if (!billId) {
                 setError('Không tìm thấy mã đơn hàng');
@@ -152,7 +209,7 @@ const CheckoutedBill: React.FC = () => {
                         >
                             <div className="flex items-center gap-4">
                                 <img
-                                    src={item.productImages || '/api/placeholder/100/100'}
+                                    src={getImageUrl(item.productImages) || '/api/placeholder/100/100'}
                                     alt={item.productName}
                                     className="w-24 h-24 object-cover rounded"
                                 />

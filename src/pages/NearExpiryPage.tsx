@@ -28,7 +28,7 @@ export function NearExpiryPage() {
             productBatchIds: [],
             skipDefaultDiscount: true,
             getLastestDate: false,
-            endDate: ''
+            endDate: '2024-12-20',
         }
     });
 

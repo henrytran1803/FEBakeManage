@@ -32,7 +32,14 @@ export const billApi = {
         const response = await api.get(`/api/user/bills/status?${searchParams.toString()}`);
         return response.data;
     },
+    getTodayBills: async (params: { page?: number; size?: number }): Promise<ApiResponse<BillResponseData>> => {
+        const searchParams = new URLSearchParams();
+        if (params.page !== undefined) searchParams.append('page', params.page.toString());
+        if (params.size !== undefined) searchParams.append('size', params.size.toString());
 
+        const response = await api.get(`/api/user/bills/todaybill?${searchParams.toString()}`);
+        return response.data;
+    },
     getDetailsById: async (billId: number): Promise<ApiResponse<BillResponse_View_Cake>> => {
         const response = await api.get(`/api/user/bills/${billId}`);
         return response.data;
